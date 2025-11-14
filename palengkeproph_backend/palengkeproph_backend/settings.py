@@ -5,23 +5,39 @@ Django settings for palengkeproph_backend project.
 from pathlib import Path
 from datetime import timedelta
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-SECRET_KEY = 'django-insecure-zn)qmhyqa4hbsamdg66w(x-b$yj^c8*%00u_spu14&z$xbu%e7'
+# Security - Railway will provide environment variables
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-zn)qmhyqa4hbsamdg66w(x-b$yj^c8*%00u_spu14&z$xbu%e7')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Debug mode - disable in production
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# Allow localhost and 127.0.0.1 for development (adjust this in production)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app/']
+# Railway provides a random URL, so we need to allow all .railway.app domains
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.railway.app',  # Allows all Railway domains
+    'palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app',
+]
 
-# CSRF trusted origins for React app
+# CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app',
+    'https://*.railway.app',  # For your Railway domain
+]
+
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app',
+    'https://*.railway.app',  # Allow all Railway subdomains
 ]
 
 # Application definition
@@ -46,11 +62,10 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Default for most endpoints
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
-# Fix: Allow registration without authentication
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -66,7 +81,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add for better static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,16 +90,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True 
-# Or be more specific:
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-# ]
-
 ROOT_URLCONF = 'palengkeproph_backend.urls'
 
-# Updated TEMPLATES configuration
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -104,12 +111,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'palengkeproph_backend.wsgi.application'
 
-# Database
+# Database configuration for Railway
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Custom user model
@@ -140,18 +148,25 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Updated Static files configuration
+# Static files configuration
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR.parent, 'palengkeproph_frontend', 'build', 'static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# WhiteNoise configuration for better static file serving
+# WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files (if you have any)
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
