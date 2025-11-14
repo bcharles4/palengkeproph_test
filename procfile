@@ -1,1 +1,1 @@
-web: python palengkeproph_backend/manage.py migrate && python palengkeproph_backend/manage.py collectstatic --noinput && gunicorn palengkeproph_backend.wsgi:application --bind 0.0.0.0:$PORT
+web: cd palengkeproph_backend && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn palengkeproph_backend.wsgi:application --bind 0.0.0.0:$PORT
