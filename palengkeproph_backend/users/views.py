@@ -5,34 +5,17 @@ from .serializers import UserSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
-from django.views.generic import TemplateView
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils.decorators import method_decorator
 
 User = get_user_model()
 
-# Add this view for serving React app
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class ReactAppView(TemplateView):
-    template_name = 'index.html'
-
-# Your existing views remain the same
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
-        print("🔄 Registration attempt with data:", request.data)
-        
         serializer = self.get_serializer(data=request.data)
-        
-        # Check if serializer is valid and show errors
-        if not serializer.is_valid():
-            print("❌ Serializer validation errors:", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        print("✅ Serializer is valid")
+        serializer.is_valid(raise_exception=True)
 
         username = serializer.validated_data.get('username')
         email = serializer.validated_data.get('email')
@@ -44,7 +27,6 @@ class RegisterView(generics.CreateAPIView):
 
         
         user = serializer.save()
-        print("✅ User created successfully:", user.username)
         response_serializer = self.get_serializer(user)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
