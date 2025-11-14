@@ -29,7 +29,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app',
-    'https://*.railway.app',  # For your Railway domain
+    'https://palengkeprophtest-production.up.railway.app',  # For your Railway domain
 ]
 
 # CORS settings
@@ -37,7 +37,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app',
-    'https://*.railway.app',  # Allow all Railway subdomains
+    'https://palengkeprophtest-production.up.railway.app',  # Allow all Railway subdomains
 ]
 
 # Application definition

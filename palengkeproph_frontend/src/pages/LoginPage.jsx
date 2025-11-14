@@ -29,11 +29,11 @@ import axios from "axios";
 
 // Create axios instance for login
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/',
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://palengkeprophtest-production.up.railway.app',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 10000, // 10 seconds timeout
 });
 
 export default function LoginPage() {
