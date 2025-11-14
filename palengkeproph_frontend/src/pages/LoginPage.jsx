@@ -27,18 +27,18 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 
-// Create axios instance for login
+// Create axios instance for login - REMOVE TRAILING SLASH
 const api = axios.create({
-  baseURL: 'https://palengkeprophtest-production.up.railway.app/',
+  baseURL: 'https://palengkeprophtest-production.up.railway.app',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 10000,
 });
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
-    username: "", // Changed from email to username
+    username: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +51,6 @@ export default function LoginPage() {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -63,10 +62,9 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Basic validation
     const newErrors = {};
     if (!formData.username) {
-      newErrors.username = "Username is required"; // Changed from email to username
+      newErrors.username = "Username is required";
     }
     if (!formData.password) {
       newErrors.password = "Password is required";
@@ -83,52 +81,65 @@ export default function LoginPage() {
     setErrors({});
 
     try {
-      // Real API login call - using username instead of email
-      const response = await api.post("api/auth/token/", {
-        username: formData.username, // Changed from email to username
+      // Use leading slash in the endpoint
+      const response = await api.post("/api/auth/token/", {
+        username: formData.username,
         password: formData.password,
       });
 
-      // Handle successful login
       if (response.data.access) {
-        // Store tokens and user data
         localStorage.setItem("authToken", response.data.access);
-        localStorage.setItem("userEmail", formData.username); // Using username as identifier
+        localStorage.setItem("userEmail", formData.username);
         
-        // Store refresh token if available
         if (response.data.refresh) {
           localStorage.setItem("refreshToken", response.data.refresh);
         }
         
-        // Store user info if available
         if (response.data.user) {
           localStorage.setItem("userInfo", JSON.stringify(response.data.user));
         }
         
-        // Redirect to dashboard
         window.location.href = "/dashboard";
       } else {
         setErrors({ submit: "Invalid response from server" });
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error details:", error);
       
-      // Handle different error scenarios
-      if (error.response?.status === 401) {
-        setErrors({ submit: "Invalid username or password" }); // Updated error message
-      } else if (error.response?.status === 400) {
-        setErrors({ submit: error.response.data?.message || "Invalid request" });
-      } else if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
-        setErrors({ submit: "Network error. Please check if the server is running." });
-      } else if (error.response?.status >= 500) {
-        setErrors({ submit: "Server error. Please try again later." });
+      // More detailed error handling
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 401) {
+          setErrors({ submit: "Invalid username or password" });
+        } else if (error.response.status === 400) {
+          const errorData = error.response.data;
+          if (errorData.detail) {
+            setErrors({ submit: errorData.detail });
+          } else if (typeof errorData === 'object') {
+            // Handle field-specific errors from Django
+            const firstError = Object.values(errorData)[0];
+            setErrors({ submit: Array.isArray(firstError) ? firstError[0] : firstError });
+          } else {
+            setErrors({ submit: "Invalid request format" });
+          }
+        } else if (error.response.status === 404) {
+          setErrors({ submit: "API endpoint not found. Please check the URL." });
+        } else if (error.response.status >= 500) {
+          setErrors({ submit: "Server error. Please try again later." });
+        } else {
+          setErrors({ submit: `Server error: ${error.response.status}` });
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("No response received:", error.request);
+        setErrors({ submit: "Cannot connect to server. Please check your internet connection and try again." });
       } else {
+        // Something else happened
         setErrors({ submit: "Login failed. Please try again." });
       }
       
-      // Fallback to demo mode if API is not available
-      if (error.code === 'NETWORK_ERROR' || error.response?.status === 404) {
-        // Use demo login as fallback
+      // Fallback to demo mode for network errors
+      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
         handleDemoLogin();
       }
     } finally {
@@ -136,14 +147,12 @@ export default function LoginPage() {
     }
   };
 
-  // Demo login function for when API is not available
   const handleDemoLogin = () => {
-    // Check if it's the demo credentials or any credentials when API is down
     const isDemoCredentials = 
-      formData.username === "admin" && // Changed from email to username
+      formData.username === "admin" && 
       formData.password === "demo123";
     
-    if (isDemoCredentials || formData.username && formData.password.length >= 6) {
+    if (isDemoCredentials || (formData.username && formData.password.length >= 6)) {
       localStorage.setItem("authToken", "demo-token");
       localStorage.setItem("userEmail", formData.username);
       localStorage.setItem("userInfo", JSON.stringify({
@@ -154,7 +163,7 @@ export default function LoginPage() {
       
       window.location.href = "/dashboard";
     } else {
-      setErrors({ submit: "Using demo mode. Please use demo credentials: admin / demo123" }); // Updated demo message
+      setErrors({ submit: "Using demo mode. Please use demo credentials: admin / demo123" });
     }
   };
 
@@ -164,11 +173,25 @@ export default function LoginPage() {
 
   const fillDemoCredentials = () => {
     setFormData({
-      username: "admin", // Changed from email to username
+      username: "admin",
       password: "demo123",
     });
     setErrors({});
   };
+
+  // Test API connection on component mount
+  React.useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const response = await api.get("/api/");
+        console.log("✅ Backend connection successful:", response.status);
+      } catch (error) {
+        console.error("❌ Backend connection failed:", error.message);
+      }
+    };
+    
+    testConnection();
+  }, []);
 
   const features = [
     { icon: <Store />, text: "Stall Management", color: "#D32F2F" },
@@ -307,7 +330,7 @@ export default function LoginPage() {
 
               <Box sx={{ mt: 4, p: 2, bgcolor: "#f8f9fa", borderRadius: 2 }}>
                 <Typography variant="caption" color="text.secondary" display="block" textAlign="center">
-                  Trusted by market administrators nationwide
+                  Backend: palengkeprophtest-production.up.railway.app
                 </Typography>
               </Box>
             </Paper>
@@ -397,7 +420,7 @@ export default function LoginPage() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Person sx={{ color: "#D32F2F", fontSize: 20 }} /> {/* Changed icon */}
+                        <Person sx={{ color: "#D32F2F", fontSize: 20 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -521,7 +544,6 @@ export default function LoginPage() {
                 </Button>
               </Box>
 
-              {/* Demo Info */}
               <Box
                 sx={{
                   mt: 3,
@@ -538,7 +560,7 @@ export default function LoginPage() {
                   display="block"
                   fontWeight={500}
                 >
-                  Demo: admin / demo123 {/* Updated demo credentials */}
+                  Demo: admin / demo123
                 </Typography>
                 <Typography
                   variant="caption"
@@ -547,11 +569,10 @@ export default function LoginPage() {
                   display="block"
                   sx={{ mt: 0.5, fontSize: '0.7rem' }}
                 >
-                  Works in demo mode when API is unavailable
+                  Connected to: palengkeprophtest-production.up.railway.app
                 </Typography>
               </Box>
 
-              {/* Footer */}
               <Box sx={{ mt: 3, textAlign: "center" }}>
                 <Typography variant="caption" color="text.secondary">
                   © {new Date().getFullYear()} PalengkePro.PH
