@@ -73,6 +73,7 @@ export default function SecurityManagement() {
     { id: "CAM-01", name: "Entrance - North" },
     { id: "CAM-02", name: "Wet Section - East" },
     { id: "CAM-03", name: "Dry Section - South" },
+    
   ]);
 
   /** Personnel management */
