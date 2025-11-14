@@ -40,6 +40,10 @@ CORS_ALLOWED_ORIGINS = [
     'https://palengkeprophtest-production.up.railway.app',  # Allow all Railway subdomains
 ]
 
+
+CORS_ALLOW_ALL_ORIGINS = True  # Only for testing, remove later
+
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
