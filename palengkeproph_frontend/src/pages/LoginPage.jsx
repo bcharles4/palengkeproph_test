@@ -29,7 +29,7 @@ import axios from "axios";
 
 // Create axios instance for login
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://palengkeprophtest-production.up.railway.app',
+  baseURL: 'https://palengkeprophtest-production.up.railway.app',
   headers: {
     'Content-Type': 'application/json',
   },
