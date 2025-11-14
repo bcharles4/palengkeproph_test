@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-zn)qmhyqa4hbsamdg66w(x-b$yj^c8*%00u_spu14&z$xbu%e7
 DEBUG = True
 
 # Allow localhost and 127.0.0.1 for development (adjust this in production)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://palengkepro-test-prod-1ema1amjy-charles-brian-mitras-projects.vercel.app/']
 
 # CSRF trusted origins for React app
 CSRF_TRUSTED_ORIGINS = [
