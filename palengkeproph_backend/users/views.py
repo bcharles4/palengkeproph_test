@@ -5,9 +5,18 @@ from .serializers import UserSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
+from django.views.generic import TemplateView
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 
 User = get_user_model()
 
+# Add this view for serving React app
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class ReactAppView(TemplateView):
+    template_name = 'index.html'
+
+# Your existing views remain the same
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
