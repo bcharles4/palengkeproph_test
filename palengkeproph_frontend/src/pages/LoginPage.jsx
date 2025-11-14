@@ -29,7 +29,7 @@ import axios from "axios";
 
 // Create axios instance for login
 const api = axios.create({
-  baseURL: 'https://palengkeprophtest-production.up.railway.app',
+  baseURL: 'https://palengkeprophtest-production.up.railway.app/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
     try {
       // Real API login call - using username instead of email
-      const response = await api.post("/api/auth/token/", {
+      const response = await api.post("api/auth/token/", {
         username: formData.username, // Changed from email to username
         password: formData.password,
       });
