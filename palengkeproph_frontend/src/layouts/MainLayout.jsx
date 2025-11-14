@@ -40,6 +40,7 @@ import {
   Payment as PaymentIcon,
   Paid as PaidIcon,
   People as PeopleIcon,
+  Security as SecurityIcon,
 } from "@mui/icons-material";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -142,6 +143,8 @@ export default function MainLayout({ children }) {
     { text: "Loan Management", icon: <CreditScoreIcon />, path: "/loan-management", keywords: ["loan", "management", "preferences"] },
 
     { text: "User Management", icon: <PeopleIcon />, path: "/user-management", keywords: ["user", "management", "preferences"] },
+    
+    { text: "Security Management", icon: <SecurityIcon />, path: "/security-management", keywords: ["security", "management", "preferences"] },
 
     { text: "Settings", icon: <SettingsIcon />, path: "/settings", keywords: ["settings", "configuration", "preferences"] },
   ];

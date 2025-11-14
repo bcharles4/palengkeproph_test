@@ -22,6 +22,7 @@ import Budgeting from './pages/expenses/Budgeting';
 import FinancialReporting from './pages/finance/FinancialReporting';
 import LoanManagement from './pages/loan/LoanManagement';
 import UserManagement from './pages/user/UserManagement';
+import SecurityManagement from './pages/security/SecurityManagement';
 import Settings from './pages/user/Settings';
 const theme = createTheme({
   typography: {
@@ -55,6 +56,7 @@ function App() {
           <Route path="/financial-reporting" element={<FinancialReporting />} />
           <Route path="/loan-management" element={<LoanManagement />} />
           <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/security-management" element={<SecurityManagement />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Router>
