@@ -111,7 +111,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'palengkeproph_backend.wsgi.application'
 
-# Database configuration for Railway
+# Database configuration for Railway - handles both SQLite and PostgreSQL
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
