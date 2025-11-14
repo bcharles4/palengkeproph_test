@@ -308,7 +308,7 @@ export default function UserManagement() {
       return;
     }
 
-    const response = await api.get("/api/users/users/");
+    const response = await api.get("/api/users/");
     console.log("API Response:", response.data);
     
     const usersArray = ensureArray(response.data);
