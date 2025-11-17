@@ -498,7 +498,7 @@ const handleSaveUser = async () => {
         // Create new user - use register endpoint
         console.log("Creating user at: /api/users/register/");
         console.log("Request payload:", JSON.stringify(userData, null, 2));
-        response = await api.post("/api/users/register/", userData);
+        response = await api.post("/api/register/", userData);
       }
       
       console.log("✅ Save successful:", response.data);
