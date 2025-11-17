@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-zn)qmhyqa4hbsamdg66w(x-b$yj^c8*%00u_spu14&z$xbu%e7')
 
 # Debug mode - disable in production
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = 'true'
 
 # Railway provides a random URL, so we need to allow all .railway.app domains
 ALLOWED_HOSTS = [

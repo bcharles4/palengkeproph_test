@@ -21,3 +21,8 @@ class User(AbstractUser):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
     full_name.short_description = 'Full Name'  # Optional: Sets column header in admin
+
+    class meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'   
+
