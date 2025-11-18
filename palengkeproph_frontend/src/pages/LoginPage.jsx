@@ -567,7 +567,6 @@ export default function LoginPage() {
                   align="center"
                   display="block"
                   sx={{ mt: 0.5, fontSize: '0.7rem' }}
-                  
                 >
                   Connected to: palengkeprophtest-production.up.railway.app
                 </Typography>
