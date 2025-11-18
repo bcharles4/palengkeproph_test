@@ -27,13 +27,8 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-
-// Create axios instance for login - REMOVE TRAILING SLASH
 const api = axios.create({
-   baseURL: isLocal
-    ? 'http://127.0.0.1:8000/api'   // local dev
-    : 'https://palengkeprophtest-production.up.railway.app/api',
+  baseURL: 'https://palengkeprophtest-production.up.railway.app',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -572,6 +567,7 @@ export default function LoginPage() {
                   align="center"
                   display="block"
                   sx={{ mt: 0.5, fontSize: '0.7rem' }}
+                  
                 >
                   Connected to: palengkeprophtest-production.up.railway.app
                 </Typography>

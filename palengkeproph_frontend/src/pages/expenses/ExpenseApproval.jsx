@@ -48,16 +48,23 @@ export default function ExpenseApproval() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [currentUser] = useState({
-    role: "Manager", // Can be "Manager", "MarketMaster", "Executive", "FinanceHead"
+    role: "FinanceHead", // Changed to FinanceHead for payment testing
     name: "John Smith",
     id: "USER-001"
   });
+
+  // Safe amount formatter
+  const formatAmount = (amount) => {
+    const numAmount = parseFloat(amount) || 0;
+    return `₱${numAmount.toLocaleString()}`;
+  };
 
   // Approval thresholds based on role
   const approvalThresholds = {
     Manager: 10000,       // Up to ₱10,000
     MarketMaster: 50000,  // Up to ₱50,000
-    Executive: Infinity   // No threshold
+    Executive: Infinity,  // No threshold
+    FinanceHead: Infinity // For payment processing
   };
 
   // Load expenses from localStorage
@@ -126,6 +133,7 @@ export default function ExpenseApproval() {
     );
     setExpenses(updated);
     localStorage.setItem("expenses", JSON.stringify(updated));
+    setOpenDialog(false);
     setSnackbar({ open: true, message: "Check request generated!", severity: "success" });
   };
 
@@ -141,6 +149,7 @@ export default function ExpenseApproval() {
     );
     setExpenses(updated);
     localStorage.setItem("expenses", JSON.stringify(updated));
+    setOpenDialog(false);
     setSnackbar({ open: true, message: "Check released and marked as paid!", severity: "success" });
   };
 
@@ -177,6 +186,7 @@ export default function ExpenseApproval() {
       case "Manager": return <Security fontSize="small" />;
       case "MarketMaster": return <AdminPanelSettings fontSize="small" />;
       case "Executive": return <AttachMoney fontSize="small" />;
+      case "FinanceHead": return <AttachMoney fontSize="small" />;
       default: return <Security fontSize="small" />;
     }
   };
@@ -236,7 +246,7 @@ export default function ExpenseApproval() {
                     {currentUser.role}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Threshold: {approvalThresholds[currentUser.role] === Infinity ? "No limit" : `₱${approvalThresholds[currentUser.role].toLocaleString()}`}
+                    Threshold: {approvalThresholds[currentUser.role] === Infinity ? "No limit" : formatAmount(approvalThresholds[currentUser.role])}
                   </Typography>
                 </Box>
               </Box>
@@ -407,7 +417,7 @@ export default function ExpenseApproval() {
                     <TableCell>{exp.expenseCategory}</TableCell>
                     <TableCell>
                       <Typography fontWeight={600} color="#D32F2F">
-                        ₱{(exp.expenseAmount || 0).toLocaleString()}
+                        {formatAmount(exp.expenseAmount)}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -481,7 +491,7 @@ export default function ExpenseApproval() {
                   
                   <Typography variant="subtitle2" color="text.secondary">Amount</Typography>
                   <Typography variant="h6" color="#D32F2F" sx={{ mb: 2 }}>
-                    ₱{(selectedExpense.expenseAmount || 0).toLocaleString()}
+                    {formatAmount(selectedExpense.expenseAmount)}
                   </Typography>
                   
                   <Typography variant="subtitle2" color="text.secondary">Date</Typography>

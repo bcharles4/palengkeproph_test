@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -7,7 +7,6 @@ import {
   Paper,
   Grid,
   Button,
-  TextField,
   Table,
   TableBody,
   TableCell,
@@ -21,50 +20,186 @@ import {
   DialogTitle,
   DialogActions,
   Chip,
+  Card,
+  CardContent,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
+import {
+  Home as HomeIcon,
+  Receipt,
+  CheckCircle,
+  PendingActions,
+} from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
 
 export default function CheckRequestAndRelease() {
   const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [dialog, setDialog] = useState({ open: false, action: "", id: null });
-
-  const [requests, setRequests] = useState([
-    { id: 1, date: "2025-10-25", payee: "Market Supply Co.", amount: 15000, purpose: "Stall Maintenance", status: "Pending" },
-    { id: 2, date: "2025-10-26", payee: "Waterworks Inc.", amount: 8200, purpose: "Water Bill", status: "Approved" },
-  ]);
-
-  const [releases, setReleases] = useState([
-    { id: 1, releaseDate: "2025-10-27", checkNo: "000123", payee: "Market Supply Co.", releasedBy: "Admin1", amount: "₱15,000" },
-  ]);
-
-  const [formData, setFormData] = useState({
-    payee: "",
-    amount: "",
-    purpose: "",
+  const [currentUser] = useState({
+    role: "FinanceHead",
+    name: "Finance Manager",
+    id: "FIN-001"
   });
 
-  const formatAmount = (amount) => `₱${amount.toLocaleString()}`;
+  // State for all data
+  const [expenses, setExpenses] = useState([]);
+  const [checkRequests, setCheckRequests] = useState([]);
+  const [checkReleases, setCheckReleases] = useState([]);
 
-  // Submit New Request
-  const handleSubmit = () => {
-    if (!formData.payee || !formData.amount || !formData.purpose) {
-      setSnackbar({ open: true, message: "Please fill out all fields.", severity: "warning" });
+  // Load all data from localStorage on component mount
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = () => {
+    try {
+      const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
+      const storedRequests = JSON.parse(localStorage.getItem("checkRequests")) || [];
+      const storedReleases = JSON.parse(localStorage.getItem("checkReleases")) || [];
+      
+      console.log("Loaded expenses:", storedExpenses);
+      console.log("Loaded requests:", storedRequests);
+      console.log("Loaded releases:", storedReleases);
+
+      setExpenses(storedExpenses);
+      setCheckRequests(storedRequests);
+      setCheckReleases(storedReleases);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      setSnackbar({ open: true, message: "Error loading data", severity: "error" });
+    }
+  };
+
+  // Get expenses ready for payment (approved but payment not processed)
+  const expensesReadyForPayment = expenses.filter(exp => {
+    const isApproved = exp.approvalStatus === "Approved";
+    const paymentNotProcessed = !exp.paymentStatus || 
+                               exp.paymentStatus === "Pending" || 
+                               exp.paymentStatus === "Ready for Payment";
+    const hasNoCheckRequest = !checkRequests.find(req => req.expenseId === exp.id);
+    
+    return isApproved && paymentNotProcessed && hasNoCheckRequest;
+  });
+
+  const formatAmount = (amount) => {
+    const numAmount = parseFloat(amount) || 0;
+    return `₱${numAmount.toLocaleString()}`;
+  };
+
+  // Generate Check Request from Approved Expense
+  const handleGenerateRequest = (expenseId) => {
+    const expense = expenses.find(exp => exp.id === expenseId);
+    if (!expense) {
+      setSnackbar({ open: true, message: "Expense not found", severity: "error" });
       return;
     }
 
+    // Create new check request
     const newRequest = {
-      id: requests.length + 1,
+      id: `CHK-${Date.now()}`,
+      expenseId: expense.id,
       date: new Date().toISOString().split("T")[0],
-      payee: formData.payee,
-      amount: parseFloat(formData.amount),
-      purpose: formData.purpose,
+      payee: expense.submittedBy || "Vendor",
+      amount: parseFloat(expense.expenseAmount) || 0,
+      purpose: expense.expenseDescription || "Expense Payment",
+      category: expense.expenseCategory,
       status: "Pending",
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
     };
 
-    setRequests([...requests, newRequest]);
-    setFormData({ payee: "", amount: "", purpose: "" });
-    setSnackbar({ open: true, message: "Check request submitted successfully!", severity: "success" });
+    // Update check requests
+    const updatedRequests = [...checkRequests, newRequest];
+    setCheckRequests(updatedRequests);
+    localStorage.setItem("checkRequests", JSON.stringify(updatedRequests));
+
+    // Update expense payment status
+    const updatedExpenses = expenses.map(exp =>
+      exp.id === expenseId ? { 
+        ...exp, 
+        paymentStatus: "Ready for Payment",
+        checkRequestDate: new Date().toISOString().split('T')[0],
+        financeHead: currentUser.name
+      } : exp
+    );
+    setExpenses(updatedExpenses);
+    localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
+
+    setSnackbar({ 
+      open: true, 
+      message: "Check request generated successfully!", 
+      severity: "success" 
+    });
+  };
+
+  // Handle Approve/Reject/Release actions
+  const handleAction = () => {
+    const { id, action } = dialog;
+    
+    if (action === "approve") {
+      const updatedRequests = checkRequests.map(req =>
+        req.id === id ? { ...req, status: "Approved" } : req
+      );
+      setCheckRequests(updatedRequests);
+      localStorage.setItem("checkRequests", JSON.stringify(updatedRequests));
+      setSnackbar({ open: true, message: "Check request approved.", severity: "success" });
+    } 
+    else if (action === "reject") {
+      const updatedRequests = checkRequests.map(req =>
+        req.id === id ? { ...req, status: "Rejected" } : req
+      );
+      setCheckRequests(updatedRequests);
+      localStorage.setItem("checkRequests", JSON.stringify(updatedRequests));
+      setSnackbar({ open: true, message: "Check request rejected.", severity: "info" });
+    } 
+    else if (action === "release") {
+      const request = checkRequests.find(req => req.id === id);
+      if (request) {
+        // Create release record
+        const newRelease = {
+          id: `REL-${Date.now()}`,
+          requestId: request.id,
+          expenseId: request.expenseId,
+          releaseDate: new Date().toISOString().split("T")[0],
+          checkNo: `CHK${String(checkReleases.length + 1).padStart(6, '0')}`,
+          payee: request.payee,
+          amount: request.amount,
+          purpose: request.purpose,
+          releasedBy: currentUser.name,
+          releasedAt: new Date().toISOString(),
+        };
+
+        // Update releases
+        const updatedReleases = [...checkReleases, newRelease];
+        setCheckReleases(updatedReleases);
+        localStorage.setItem("checkReleases", JSON.stringify(updatedReleases));
+
+        // Update request status
+        const updatedRequests = checkRequests.map(req =>
+          req.id === id ? { ...req, status: "Released" } : req
+        );
+        setCheckRequests(updatedRequests);
+        localStorage.setItem("checkRequests", JSON.stringify(updatedRequests));
+
+        // Update expense payment status
+        const updatedExpenses = expenses.map(exp =>
+          exp.id === request.expenseId ? { 
+            ...exp, 
+            paymentStatus: "Paid",
+            checkReleaseDate: new Date().toISOString().split('T')[0],
+            releasedBy: currentUser.name
+          } : exp
+        );
+        setExpenses(updatedExpenses);
+        localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
+
+        setSnackbar({ open: true, message: "Check released successfully!", severity: "success" });
+      }
+    }
+
+    closeDialog();
   };
 
   // Handle Dialog Open
@@ -76,215 +211,368 @@ export default function CheckRequestAndRelease() {
     setDialog({ open: false, id: null, action: "" });
   };
 
-  // Handle Approve/Reject/Release
-  const handleAction = () => {
-    const { id, action } = dialog;
-    const updatedRequests = [...requests];
-    const target = updatedRequests.find((r) => r.id === id);
-
-    if (action === "approve") {
-      target.status = "Approved";
-      setSnackbar({ open: true, message: "Request approved successfully.", severity: "success" });
-    } else if (action === "reject") {
-      target.status = "Rejected";
-      setSnackbar({ open: true, message: "Request rejected.", severity: "info" });
-    } else if (action === "release") {
-      target.status = "Released";
-      const newRelease = {
-        id: releases.length + 1,
-        releaseDate: new Date().toISOString().split("T")[0],
-        checkNo: "000" + (123 + releases.length),
-        payee: target.payee,
-        releasedBy: "Executive",
-        amount: formatAmount(target.amount),
-      };
-      setReleases([...releases, newRelease]);
-      setSnackbar({ open: true, message: "Check released successfully.", severity: "success" });
-    }
-
-    setRequests(updatedRequests);
-    closeDialog();
+  // Refresh data
+  const handleRefresh = () => {
+    loadAllData();
+    setSnackbar({ open: true, message: "Data refreshed", severity: "info" });
   };
+
+  // Statistics
+  const pendingRequests = checkRequests.filter(req => req.status === "Pending").length;
+  const approvedRequests = checkRequests.filter(req => req.status === "Approved").length;
+  const totalReleased = checkReleases.reduce((sum, rel) => sum + (parseFloat(rel.amount) || 0), 0);
 
   return (
     <MainLayout>
-      <Box>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: "#D32F2F", mb: 2 }}>
-          Check Request and Release
-        </Typography>
-        <Divider sx={{ mb: 3 }} />
+      <Box sx={{ p: 3 }}>
+        {/* Breadcrumbs */}
+        <Box mb={3}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              underline="hover"
+              color="inherit"
+              href="/dashboard"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                "&:hover": { color: "#D32F2F" },
+              }}
+            >
+              <HomeIcon fontSize="small" /> Dashboard
+            </Link>
+            <Typography color="text.primary">Check Management</Typography>
+          </Breadcrumbs>
+        </Box>
 
-        <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 1 }}>
+        {/* Header */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+          <Box>
+            <Typography variant="h4" fontWeight={700} gutterBottom color="black">
+              Check Request & Release
+            </Typography>
+            <Typography color="text.secondary">
+              Manage check requests and releases with integrated expense tracking
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button 
+              variant="outlined" 
+              onClick={handleRefresh}
+              sx={{ borderColor: "#D32F2F", color: "#D32F2F" }}
+            >
+              Refresh Data
+            </Button>
+            <Card sx={{ bgcolor: "#FFF5F5", border: "1px solid #D32F2F" }}>
+              <CardContent sx={{ py: 2, "&:last-child": { pb: 2 } }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Receipt fontSize="small" />
+                  <Box>
+                    <Typography variant="body2" fontWeight={600}>
+                      {currentUser.role}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {currentUser.name}
+                    </Typography>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
+
+        {/* Statistics Cards */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ textAlign: "center", bgcolor: "#ffff", boxShadow: "0 2px 8px rgba(0,0,0,0.2)", borderRadius: 3 }}>
+              <CardContent>
+                <Typography variant="h4" color="#D32F2F" fontWeight={700}>
+                  {expensesReadyForPayment.length}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Ready for Payment
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ textAlign: "center", bgcolor: "#ffff", boxShadow: "0 2px 8px rgba(0,0,0,0.2)", borderRadius: 3 }}>
+              <CardContent>
+                <Typography variant="h4" color="#D32F2F" fontWeight={700}>
+                  {pendingRequests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Pending Requests
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ textAlign: "center", bgcolor: "#ffff", boxShadow: "0 2px 8px rgba(0,0,0,0.2)", borderRadius: 3 }}>
+              <CardContent>
+                <Typography variant="h4" color="#2E7D32" fontWeight={700}>
+                  {approvedRequests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Approved
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ textAlign: "center", bgcolor: "#ffff", boxShadow: "0 2px 8px rgba(0,0,0,0.2)", borderRadius: 3 }}>
+              <CardContent>
+                <Typography variant="h4" color="#2E7D32" fontWeight={700}>
+                  {formatAmount(totalReleased)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Total Released
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
           <Tabs
             value={activeTab}
             onChange={(e, newValue) => setActiveTab(newValue)}
             sx={{
               borderBottom: "1px solid #ddd",
-              "& .MuiTab-root": { textTransform: "none", fontWeight: 600 },
+              "& .MuiTab-root": { 
+                textTransform: "none", 
+                fontWeight: 600,
+                fontSize: "1rem"
+              },
               "& .Mui-selected": { color: "#D32F2F" },
-              mb: 2,
+              mb: 3,
             }}
           >
-            <Tab label="Check Requests" />
-            <Tab label="Check Releases" />
+            <Tab label={`Approved Expenses (${expensesReadyForPayment.length})`} />
+            <Tab label={`Check Requests (${checkRequests.length})`} />
+            <Tab label={`Released Checks (${checkReleases.length})`} />
           </Tabs>
 
-          {/* === Check Request Tab === */}
+          {/* === Approved Expenses Tab === */}
           {activeTab === 0 && (
             <Box>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                New Check Request
+                Approved Expenses Ready for Payment
               </Typography>
 
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    label="Payee"
-                    fullWidth
-                    value={formData.payee}
-                    onChange={(e) => setFormData({ ...formData, payee: e.target.value })}
-                  />
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <TextField
-                    label="Amount"
-                    type="number"
-                    fullWidth
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    label="Purpose"
-                    fullWidth
-                    value={formData.purpose}
-                    onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                  />
-                </Grid>
-                <Grid item xs={12} md={1}>
-                  <Button
-                    variant="contained"
-                    sx={{ height: "100%", bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
-                    fullWidth
-                    onClick={handleSubmit}
-                  >
-                    Submit
-                  </Button>
-                </Grid>
-              </Grid>
-
-              {/* Pending Request Table */}
-              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                Check Request List
-              </Typography>
-
-              <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: "#f8f8f8" }}>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Payee</TableCell>
-                      <TableCell>Amount</TableCell>
-                      <TableCell>Purpose</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell align="center">Action</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {requests.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.date}</TableCell>
-                        <TableCell>{row.payee}</TableCell>
-                        <TableCell>{formatAmount(row.amount)}</TableCell>
-                        <TableCell>{row.purpose}</TableCell>
-                        <TableCell>
-                          <Chip
-                            label={row.status}
-                            color={
-                              row.status === "Approved"
-                                ? "success"
-                                : row.status === "Rejected"
-                                ? "default"
-                                : row.status === "Released"
-                                ? "primary"
-                                : "warning"
-                            }
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.status === "Pending" && (
-                            <>
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                color="success"
-                                onClick={() => openDialog(row.id, "approve")}
-                                sx={{ mr: 1 }}
-                              >
-                                Approve
-                              </Button>
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                color="error"
-                                onClick={() => openDialog(row.id, "reject")}
-                              >
-                                Reject
-                              </Button>
-                            </>
-                          )}
-                          {row.status === "Approved" && (
-                            <Button
-                              size="small"
-                              variant="contained"
-                              color="primary"
-                              onClick={() => openDialog(row.id, "release")}
-                            >
-                              Release
-                            </Button>
-                          )}
-                        </TableCell>
+              {expensesReadyForPayment.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <CheckCircle sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+                  <Typography color="text.secondary">
+                    No approved expenses ready for payment
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Approved expenses will appear here automatically
+                  </Typography>
+                </Box>
+              ) : (
+                <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ bgcolor: "#f5f5f5" }}>
+                        <TableCell><b>Expense ID</b></TableCell>
+                        <TableCell><b>Category</b></TableCell>
+                        <TableCell><b>Amount</b></TableCell>
+                        <TableCell><b>Date</b></TableCell>
+                        <TableCell><b>Submitted By</b></TableCell>
+                        <TableCell align="center"><b>Action</b></TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {expensesReadyForPayment.map((expense) => (
+                        <TableRow key={expense.id} hover>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={600}>
+                              {expense.id}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>{expense.expenseCategory}</TableCell>
+                          <TableCell>
+                            <Typography fontWeight={600} color="#D32F2F">
+                              {formatAmount(expense.expenseAmount)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            {expense.expenseDate ? new Date(expense.expenseDate).toLocaleDateString() : 'N/A'}
+                          </TableCell>
+                          <TableCell>{expense.submittedBy || "N/A"}</TableCell>
+                          <TableCell align="center">
+                            <Button
+                              variant="contained"
+                              size="small"
+                              onClick={() => handleGenerateRequest(expense.id)}
+                              sx={{ 
+                                bgcolor: "#D32F2F",
+                                "&:hover": { bgcolor: "#B71C1C" }
+                              }}
+                            >
+                              Generate Check Request
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Box>
+          )}
+
+          {/* === Check Requests Tab === */}
+          {activeTab === 1 && (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Check Request Management
+              </Typography>
+
+              {checkRequests.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <PendingActions sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+                  <Typography color="text.secondary">
+                    No check requests found
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Generate check requests from approved expenses
+                  </Typography>
+                </Box>
+              ) : (
+                <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ bgcolor: "#f5f5f5" }}>
+                        <TableCell><b>Request ID</b></TableCell>
+                        <TableCell><b>Expense ID</b></TableCell>
+                        <TableCell><b>Payee</b></TableCell>
+                        <TableCell><b>Amount</b></TableCell>
+                        <TableCell><b>Purpose</b></TableCell>
+                        <TableCell><b>Status</b></TableCell>
+                        <TableCell align="center"><b>Action</b></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {checkRequests.map((request) => (
+                        <TableRow key={request.id} hover>
+                          <TableCell>{request.id}</TableCell>
+                          <TableCell>{request.expenseId}</TableCell>
+                          <TableCell>{request.payee}</TableCell>
+                          <TableCell>{formatAmount(request.amount)}</TableCell>
+                          <TableCell>{request.purpose}</TableCell>
+                          <TableCell>
+                            <Chip
+                              label={request.status}
+                              color={
+                                request.status === "Approved"
+                                  ? "success"
+                                  : request.status === "Rejected"
+                                  ? "error"
+                                  : request.status === "Released"
+                                  ? "primary"
+                                  : "warning"
+                              }
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            {request.status === "Pending" && (
+                              <>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="success"
+                                  onClick={() => openDialog(request.id, "approve")}
+                                  sx={{ mr: 1 }}
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="error"
+                                  onClick={() => openDialog(request.id, "reject")}
+                                >
+                                  Reject
+                                </Button>
+                              </>
+                            )}
+                            {request.status === "Approved" && (
+                              <Button
+                                size="small"
+                                variant="contained"
+                                color="primary"
+                                onClick={() => openDialog(request.id, "release")}
+                              >
+                                Release Check
+                              </Button>
+                            )}
+                            {(request.status === "Rejected" || request.status === "Released") && (
+                              <Typography variant="body2" color="text.secondary">
+                                No actions available
+                              </Typography>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Box>
           )}
 
           {/* === Released Checks Tab === */}
-          {activeTab === 1 && (
+          {activeTab === 2 && (
             <Box>
-              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                Released Checks
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Released Checks History
               </Typography>
 
-              <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: "#f8f8f8" }}>
-                      <TableCell>Release Date</TableCell>
-                      <TableCell>Check No.</TableCell>
-                      <TableCell>Payee</TableCell>
-                      <TableCell>Released By</TableCell>
-                      <TableCell>Amount</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {releases.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.releaseDate}</TableCell>
-                        <TableCell>{row.checkNo}</TableCell>
-                        <TableCell>{row.payee}</TableCell>
-                        <TableCell>{row.releasedBy}</TableCell>
-                        <TableCell>{row.amount}</TableCell>
+              {checkReleases.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Receipt sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+                  <Typography color="text.secondary">
+                    No checks released yet
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Released checks will appear here
+                  </Typography>
+                </Box>
+              ) : (
+                <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ bgcolor: "#f5f5f5" }}>
+                        <TableCell><b>Release Date</b></TableCell>
+                        <TableCell><b>Check No.</b></TableCell>
+                        <TableCell><b>Payee</b></TableCell>
+                        <TableCell><b>Amount</b></TableCell>
+                        <TableCell><b>Purpose</b></TableCell>
+                        <TableCell><b>Released By</b></TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {checkReleases.map((release) => (
+                        <TableRow key={release.id} hover>
+                          <TableCell>{release.releaseDate}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={600}>
+                              {release.checkNo}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>{release.payee}</TableCell>
+                          <TableCell>{formatAmount(release.amount)}</TableCell>
+                          <TableCell>{release.purpose}</TableCell>
+                          <TableCell>{release.releasedBy}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Box>
           )}
         </Paper>
@@ -300,7 +588,11 @@ export default function CheckRequestAndRelease() {
           </DialogTitle>
           <DialogActions>
             <Button onClick={closeDialog}>Cancel</Button>
-            <Button onClick={handleAction} variant="contained" color="error">
+            <Button 
+              onClick={handleAction} 
+              variant="contained" 
+              color={dialog.action === "reject" ? "error" : "primary"}
+            >
               Confirm
             </Button>
           </DialogActions>
@@ -309,11 +601,13 @@ export default function CheckRequestAndRelease() {
         {/* Snackbar */}
         <Snackbar
           open={snackbar.open}
-          autoHideDuration={3000}
+          autoHideDuration={4000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+          <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+            {snackbar.message}
+          </Alert>
         </Snackbar>
       </Box>
     </MainLayout>
