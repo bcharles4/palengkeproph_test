@@ -1118,6 +1118,7 @@ export default function StallInventory() {
             {selectedStall ? (
               <Grid container spacing={1}>
                 <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Classification:</b> {selectedStall.classification}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
@@ -1136,11 +1137,15 @@ export default function StallInventory() {
             )}
 
             <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
-              <Button variant="outlined" onClick={handleCloseDrawer}>Close</Button>
+              <Button variant="contained" onClick={handleCloseDrawer}>Close</Button>
               <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
                 if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
               }}>Edit Stall</Button>
+              <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
+
             </Box>
+
+
           </Box>
         </SwipeableDrawer>
       </Box>

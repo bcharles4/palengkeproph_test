@@ -48,7 +48,7 @@ export default function ExpenseApproval() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [currentUser] = useState({
-    role: "FinanceHead", // Changed to FinanceHead for payment testing
+    role: "Manager", // Changed to FinanceHead for payment testing
     name: "John Smith",
     id: "USER-001"
   });
