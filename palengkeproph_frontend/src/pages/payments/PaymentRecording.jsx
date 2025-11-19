@@ -40,6 +40,7 @@ function uid(prefix = "") {
 export default function PaymentRecording() {
   const [tenants, setTenants] = useState([]);
   const [stalls, setStalls] = useState([]);
+  const [collectors, setCollectors] = useState([]);
   const [selectedTenant, setSelectedTenant] = useState("");
   const [selectedStall, setSelectedStall] = useState("");
   const [paymentType, setPaymentType] = useState("");
@@ -80,8 +81,15 @@ export default function PaymentRecording() {
       { id: "STL-003", name: "Stall 3 - Electronics Section" },
     ];
 
+    // Load collectors from localStorage or use defaults
+    const storedCollectors = JSON.parse(localStorage.getItem("collectors")) || [
+      { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
+      { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
+    ];
+
     setTenants(storedTenants);
     setStalls(storedStalls);
+    setCollectors(storedCollectors);
 
     // Load payment history
     const storedPayments = JSON.parse(localStorage.getItem("paymentHistory")) || [];
@@ -90,19 +98,20 @@ export default function PaymentRecording() {
     // Generate receipt number
     setReceiptNumber(`RCP-${String(storedPayments.length + 1).padStart(5, "0")}`);
     
-    // Set default collector ID (in real app, this would come from user session)
-    setCollectorId("COL-001");
+    // Set default collector ID (use first collector as default)
+    setCollectorId(storedCollectors[0]?.id || "C-001");
   }, []);
 
   const currentTenant = tenants.find((t) => t.id === selectedTenant);
   const currentStall = stalls.find((s) => s.id === selectedStall);
+  const currentCollector = collectors.find((c) => c.id === collectorId);
 
   // Check if current payment type requires tenant selection
   const currentPaymentType = paymentTypes.find(pt => pt.value === paymentType);
   const requiresTenant = currentPaymentType?.requiresTenant || false;
 
   const handleRecordPayment = () => {
-    if (!paymentType || !amount || !method) {
+    if (!paymentType || !amount || !method || !collectorId) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -139,6 +148,8 @@ export default function PaymentRecording() {
       amount: paymentAmount.toFixed(2),
       method: method,
       collectorId: collectorId,
+      collectorName: currentCollector?.name || "Unknown Collector",
+      collectorArea: currentCollector?.area || "Unknown Area",
       status: "completed",
       category: currentPaymentType?.category || "other",
     };
@@ -308,10 +319,25 @@ export default function PaymentRecording() {
             </CardContent>
           </Card>
         </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Active Collectors
+              </Typography>
+              <Typography variant="h4" component="div" sx={{fontWeight:"700"}}>
+                {collectors.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Available collectors
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
 
       {/* 🧾 PAYMENT FORM */}
-      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3, mb: 5,  borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
+      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", mb: 5 }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
           Payment Recording Form
         </Typography>
@@ -350,7 +376,7 @@ export default function PaymentRecording() {
               <Grid item xs={12} md={6}>
                 <TextField
                   select
-                  label="Select Tenant *"
+                  label="Select Tenant"
                   fullWidth
                   value={selectedTenant}
                   onChange={(e) => {
@@ -422,12 +448,19 @@ export default function PaymentRecording() {
 
           <Grid item xs={12} md={6}>
             <TextField
-              label="Collector ID *"
+              select
+              label="Collector"
               fullWidth
               value={collectorId}
               onChange={(e) => setCollectorId(e.target.value)}
               required
-            />
+            >
+              {collectors.map((collector) => (
+                <MenuItem key={collector.id} value={collector.id}>
+                  {collector.name} ({collector.id}) - {collector.area}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
 
@@ -444,7 +477,7 @@ export default function PaymentRecording() {
       </Paper>
 
       {/* 📋 PAYMENT HISTORY */}
-      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 2,  borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
+      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h5"sx={{ fontWeight: 700 }}>Payment History</Typography>
           <Box display="flex" gap={2}>
@@ -484,6 +517,7 @@ export default function PaymentRecording() {
                 <TableCell><b>Amount (₱)</b></TableCell>
                 <TableCell><b>Method</b></TableCell>
                 <TableCell><b>Collector</b></TableCell>
+                <TableCell><b>Area</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -507,12 +541,13 @@ export default function PaymentRecording() {
                     </TableCell>
                     <TableCell>₱{payment.amount}</TableCell>
                     <TableCell>{payment.method}</TableCell>
-                    <TableCell>{payment.collectorId}</TableCell>
+                    <TableCell>{payment.collectorName}</TableCell>
+                    <TableCell>{payment.collectorArea}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">
                       No payment records found.
                     </Typography>
@@ -617,7 +652,14 @@ export default function PaymentRecording() {
                   <Typography><b>Collector:</b></Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography>{receipt.collectorId}</Typography>
+                  <Typography>{receipt.collectorName} ({receipt.collectorId})</Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography><b>Area:</b></Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>{receipt.collectorArea}</Typography>
                 </Grid>
               </Grid>
               

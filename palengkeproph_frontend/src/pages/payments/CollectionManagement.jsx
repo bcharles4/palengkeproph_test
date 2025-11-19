@@ -29,10 +29,7 @@ import { Monitor, Receipt, RefreshCw } from "lucide-react";
 import MainLayout from "../../layouts/MainLayout";
 
 const CollectionManagement = () => {
-  const [collectors, setCollectors] = useState([
-    { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
-    { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
-  ]);
+  const [collectors, setCollectors] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [selectedCollector, setSelectedCollector] = useState("");
   const [cashReceived, setCashReceived] = useState("");
@@ -42,29 +39,47 @@ const CollectionManagement = () => {
   const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
 
   useEffect(() => {
-    setTransactions([
-      {
-        id: "TXN-001",
-        collectorId: "C-001",
-        payer: "Tenant 001",
-        amount: 1500,
-        receiptNo: "R-1001",
-        date: "2025-10-27",
-      },
-      {
-        id: "TXN-002",
-        collectorId: "C-002",
-        payer: "Parking User",
-        amount: 100,
-        receiptNo: "R-2001",
-        date: "2025-10-28",
-      },
-    ]);
+    refreshData();
   }, []);
+
+  const refreshData = () => {
+    // Load transactions from payment history
+    const storedPayments = JSON.parse(localStorage.getItem("paymentHistory")) || [];
+    
+    // Transform payment data to transaction format
+    const paymentTransactions = storedPayments.map(payment => ({
+      id: payment.id,
+      collectorId: payment.collectorId,
+      collectorName: payment.collectorName,
+      payer: payment.tenantName,
+      amount: parseFloat(payment.amount),
+      receiptNo: payment.receiptNumber,
+      date: payment.date.split('T')[0], // Extract date part only
+      paymentType: payment.paymentTypeLabel,
+      method: payment.method,
+      stallName: payment.stallName
+    }));
+
+    setTransactions(paymentTransactions);
+
+    // Load collectors
+    const storedCollectors = JSON.parse(localStorage.getItem("collectors")) || [
+      { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
+      { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
+    ];
+    setCollectors(storedCollectors);
+    
+    setAlert({
+      open: true,
+      message: "Data refreshed successfully",
+      severity: "success",
+    });
+  };
 
   const handleAssignCollector = (id, area) => {
     const updated = collectors.map((c) => (c.id === id ? { ...c, area } : c));
     setCollectors(updated);
+    localStorage.setItem("collectors", JSON.stringify(updated));
     setAlert({
       open: true,
       message: `Collector ${id} assigned to ${area}`,
@@ -93,25 +108,46 @@ const CollectionManagement = () => {
       message:
         diff === 0
           ? "Reconciliation complete. All amounts match."
-          : "Reconciliation discrepancy detected.",
+          : `Reconciliation discrepancy detected. Difference: ₱${diff.toLocaleString()}`,
       severity: diff === 0 ? "success" : "error",
     });
   };
 
   const handleGenerateAudit = () => {
+    if (transactions.length === 0) {
+      setAlert({
+        open: true,
+        message: "No transactions available for audit.",
+        severity: "warning",
+      });
+      return;
+    }
+
     const random = transactions[Math.floor(Math.random() * transactions.length)];
     if (random) {
       const newAudit = {
         id: `AUD-${Date.now()}`,
         collectorId: random.collectorId,
+        collectorName: random.collectorName,
         receiptNo: random.receiptNo,
         amount: random.amount,
+        payer: random.payer,
         date: new Date().toLocaleDateString(),
+        timestamp: new Date().toLocaleString(),
       };
       setAuditLogs((prev) => [...prev, newAudit]);
       setOpenAuditDialog(true);
+      
+      setAlert({
+        open: true,
+        message: "Audit request generated successfully",
+        severity: "success",
+      });
     }
   };
+
+  // Calculate total collections across all collectors
+  const totalCollections = transactions.reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <MainLayout>
@@ -140,7 +176,48 @@ const CollectionManagement = () => {
         <Typography variant="h4" fontWeight={700}>
           Collection Management
         </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<RefreshCw size={20} />}
+          onClick={refreshData}
+        >
+          Refresh Data
+        </Button>
       </Stack>
+
+      {/* Summary Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+            <Typography color="text.secondary" gutterBottom>
+              Total Collectors
+            </Typography>
+            <Typography variant="h4" component="div" color="#D32F2F" sx={{fontWeight: "700"}}>
+              {collectors.length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+            <Typography color="text.secondary" gutterBottom>
+              Total Transactions
+            </Typography>
+            <Typography variant="h4" component="div" sx={{fontWeight:"700"}}>
+              {transactions.length}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+            <Typography color="text.secondary" gutterBottom>
+              Total Collections
+            </Typography>
+            <Typography variant="h4" component="div" sx={{fontWeight:"700"}}>
+              ₱{totalCollections.toLocaleString()}
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {/* SECTION 1: Collector Assignment */}
       <Paper sx={{ p: 4, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", mb: 4 }}>
@@ -230,23 +307,35 @@ const CollectionManagement = () => {
             sx={{
               mt: 3,
               p: 2,
-              bgcolor: "#fef6f6",
+              bgcolor: reconciliationResult.diff === 0 ? "#f0f9f0" : "#fef6f6",
               borderRadius: 2,
-              border: "1px solid #ffcdd2",
+              border: reconciliationResult.diff === 0 ? "1px solid #c8e6c9" : "1px solid #ffcdd2",
             }}
           >
             <Typography>
-              <strong>Total Collected:</strong> ₱
+              <strong>Total Collected (from records):</strong> ₱
               {reconciliationResult.totalCollected.toLocaleString()}
+            </Typography>
+            <Typography>
+              <strong>Cash Received:</strong> ₱
+              {cashReceived.toLocaleString()}
             </Typography>
             <Typography
               sx={{
                 color: reconciliationResult.diff === 0 ? "green" : "red",
                 fontWeight: 500,
+                fontSize: "1.1rem",
               }}
             >
-              Difference: ₱{reconciliationResult.diff.toLocaleString()}
+              <strong>Difference:</strong> ₱{reconciliationResult.diff.toLocaleString()}
             </Typography>
+            {reconciliationResult.diff !== 0 && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {reconciliationResult.diff > 0 
+                  ? "Cash received is more than recorded amount." 
+                  : "Cash received is less than recorded amount."}
+              </Typography>
+            )}
           </Box>
         )}
       </Paper>
@@ -264,21 +353,28 @@ const CollectionManagement = () => {
           <TableHead sx={{ bgcolor: "#f9f9f9" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Collector</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Area</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Transactions</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Total Collected (₱)</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Last Activity</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {collectors.map((c) => {
-              const total = transactions
-                .filter((t) => t.collectorId === c.id)
-                .reduce((sum, t) => sum + t.amount, 0);
-              const count = transactions.filter((t) => t.collectorId === c.id).length;
+              const collectorTransactions = transactions.filter((t) => t.collectorId === c.id);
+              const total = collectorTransactions.reduce((sum, t) => sum + t.amount, 0);
+              const count = collectorTransactions.length;
+              const lastTransaction = collectorTransactions[0]; // Most recent (assuming sorted)
+              
               return (
                 <TableRow key={c.id}>
                   <TableCell>{c.name}</TableCell>
+                  <TableCell>{c.area}</TableCell>
                   <TableCell>{count}</TableCell>
                   <TableCell>₱{total.toLocaleString()}</TableCell>
+                  <TableCell>
+                    {lastTransaction ? new Date(lastTransaction.date).toLocaleDateString() : 'No activity'}
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -304,15 +400,18 @@ const CollectionManagement = () => {
       <Dialog
         open={openAuditDialog}
         onClose={() => setOpenAuditDialog(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle sx={{ bgcolor: "#D32F2F", color: "white" }}>
           Audit Request Generated
         </DialogTitle>
         <DialogContent dividers>
+          <Typography variant="h6" gutterBottom>
+            Recent Audit Logs
+          </Typography>
           {auditLogs.length > 0 ? (
-            auditLogs.map((a) => (
+            auditLogs.slice(-5).reverse().map((a) => (
               <Box
                 key={a.id}
                 sx={{
@@ -323,21 +422,18 @@ const CollectionManagement = () => {
                   border: "1px solid #eee",
                 }}
               >
-                <Typography>
-                  <b>Audit ID:</b> {a.id}
-                </Typography>
-                <Typography>
-                  <b>Collector:</b> {a.collectorId}
-                </Typography>
-                <Typography>
-                  <b>Receipt:</b> {a.receiptNo}
-                </Typography>
-                <Typography>
-                  <b>Amount:</b> ₱{a.amount.toLocaleString()}
-                </Typography>
-                <Typography>
-                  <b>Date:</b> {a.date}
-                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography><b>Audit ID:</b> {a.id}</Typography>
+                    <Typography><b>Collector:</b> {a.collectorName} ({a.collectorId})</Typography>
+                    <Typography><b>Receipt:</b> {a.receiptNo}</Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography><b>Amount:</b> ₱{a.amount.toLocaleString()}</Typography>
+                    <Typography><b>Payer:</b> {a.payer}</Typography>
+                    <Typography><b>Date:</b> {a.timestamp}</Typography>
+                  </Grid>
+                </Grid>
               </Box>
             ))
           ) : (
