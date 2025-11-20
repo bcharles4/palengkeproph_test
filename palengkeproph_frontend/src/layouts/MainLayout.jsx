@@ -116,27 +116,27 @@ export default function MainLayout({ children }) {
       ],
     },
 
-    {
-      text: "Expense Records",
-      key: "expense",
-      icon: <PaidIcon />,
-      children: [
-        { text: "Expense Recording", icon: <ListAltIcon />, path: "/expense-recording", keywords: ["expense", "recording", "new", "add"] },
-        { text: "Expense Approval", icon: <AssessmentIcon />, path: "/expense-approval", keywords: ["expense", "approval", "approve", "review"] },
-        { text: "Check Request and Release", icon: <InsightsIcon />, path: "/check-request-and-release", keywords: ["check", "request", "release", "expense"] },
-        { text: "Budgeting", icon: <InsightsIcon />, path: "/budgeting", keywords: ["budgeting", "budget", "plan", "expenses"] },
-      ],
-    },
+    // {
+    //   text: "Expense Records",
+    //   key: "expense",
+    //   icon: <PaidIcon />,
+    //   children: [
+    //     { text: "Expense Recording", icon: <ListAltIcon />, path: "/expense-recording", keywords: ["expense", "recording", "new", "add"] },
+    //     { text: "Expense Approval", icon: <AssessmentIcon />, path: "/expense-approval", keywords: ["expense", "approval", "approve", "review"] },
+    //     { text: "Check Request and Release", icon: <InsightsIcon />, path: "/check-request-and-release", keywords: ["check", "request", "release", "expense"] },
+    //     { text: "Budgeting", icon: <InsightsIcon />, path: "/budgeting", keywords: ["budgeting", "budget", "plan", "expenses"] },
+    //   ],
+    // },
 
-    {
-      text: "Inventory & Purchasing",
-      key: "inventory",
-      icon: <InventoryIcon />,
-      children: [
-        { text: "Purchase Order Creation", icon: <ShoppingCartIcon />, path: "/purchase-order", keywords: ["purchase", "order", "vendor", "buy", "po"] },
-        { text: "Inventory Tracking", icon: <ListAltIcon />, path: "/inventory-tracking", keywords: ["inventory", "stock", "track", "adjust", "items"] },
-      ],
-    },
+    // {
+    //   text: "Inventory & Purchasing",
+    //   key: "inventory",
+    //   icon: <InventoryIcon />,
+    //   children: [
+    //     { text: "Purchase Order Creation", icon: <ShoppingCartIcon />, path: "/purchase-order", keywords: ["purchase", "order", "vendor", "buy", "po"] },
+    //     { text: "Inventory Tracking", icon: <ListAltIcon />, path: "/inventory-tracking", keywords: ["inventory", "stock", "track", "adjust", "items"] },
+    //   ],
+    // },
 
     { text: "Financial Report", icon: <AccountBalanceWalletIcon />, path: "/financial-reporting", keywords: ["settings", "configuration", "preferences"] },
     
