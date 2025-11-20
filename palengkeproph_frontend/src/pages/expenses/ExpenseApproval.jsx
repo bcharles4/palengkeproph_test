@@ -389,7 +389,6 @@ export default function ExpenseApproval() {
             </Card>
           </Grid>
         </Grid>
-
         {/* Table */}
         <TableContainer component={Paper} sx={{boxShadow: "0 2px 8px rgba(0,0,0,0.2)", borderRadius: 3 }}>
           <Table>
