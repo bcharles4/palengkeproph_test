@@ -140,7 +140,7 @@ export default function MainLayout({ children }) {
 
     { text: "Financial Report", icon: <AccountBalanceWalletIcon />, path: "/financial-reporting", keywords: ["settings", "configuration", "preferences"] },
     
-    { text: "Loan Management", icon: <CreditScoreIcon />, path: "/loan-management", keywords: ["loan", "management", "preferences"] },
+    // { text: "Loan Management", icon: <CreditScoreIcon />, path: "/loan-management", keywords: ["loan", "management", "preferences"] },
 
     { text: "User Management", icon: <PeopleIcon />, path: "/user-management", keywords: ["user", "management", "preferences"] },
     
