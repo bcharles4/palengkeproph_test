@@ -22,10 +22,16 @@ import {
   Breadcrumbs,
   Link,
   Stack,
+  Card,
+  CardContent,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import { Monitor, Receipt, RefreshCw } from "lucide-react";
+import { Monitor, Receipt, RefreshCw, FileText, CheckCircle, Upload, Calculator } from "lucide-react";
 import MainLayout from "../../layouts/MainLayout";
 
 const CollectionManagement = () => {
@@ -37,9 +43,36 @@ const CollectionManagement = () => {
   const [openAuditDialog, setOpenAuditDialog] = useState(false);
   const [auditLogs, setAuditLogs] = useState([]);
   const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
+  const [activeStep, setActiveStep] = useState(0);
+  const [receipts, setReceipts] = useState([]);
+  const [dailyReport, setDailyReport] = useState({
+    totalCash: 0,
+    encodedTotal: 0,
+    balanceStatus: "pending"
+  });
+
+  const steps = [
+    {
+      label: 'Preparation & Receipt Management',
+      description: 'Obtain ARs from AR Keeper and prepare collection receipts',
+    },
+    {
+      label: 'Field Collection Activities',
+      description: 'Collect payments and issue official receipts to tenants',
+    },
+    {
+      label: 'Post-Collection & Reconciliation',
+      description: 'Cancel unused receipts, count cash, and encode DCR',
+    },
+    {
+      label: 'Cash Remittance',
+      description: 'Remit cash to Cashier and obtain acknowledgment',
+    },
+  ];
 
   useEffect(() => {
     refreshData();
+    initializeReceipts();
   }, []);
 
   const refreshData = () => {
@@ -54,10 +87,14 @@ const CollectionManagement = () => {
       payer: payment.tenantName,
       amount: parseFloat(payment.amount),
       receiptNo: payment.receiptNumber,
-      date: payment.date.split('T')[0], // Extract date part only
+      date: payment.date.split('T')[0],
       paymentType: payment.paymentTypeLabel,
       method: payment.method,
-      stallName: payment.stallName
+      stallName: payment.stallName,
+      rent: payment.rent || 0,
+      rights: payment.rights || 0,
+      electricity: payment.electricity || 0,
+      water: payment.water || 0
     }));
 
     setTransactions(paymentTransactions);
@@ -76,6 +113,17 @@ const CollectionManagement = () => {
     });
   };
 
+  const initializeReceipts = () => {
+    // Simulate receipt management
+    const sampleReceipts = [
+      { id: "AR-001", status: "assigned", tenant: "Tenant A", amount: 1500, reason: "" },
+      { id: "AR-002", status: "assigned", tenant: "Tenant B", amount: 2000, reason: "" },
+      { id: "AR-003", status: "unused", tenant: "", amount: 0, reason: "" },
+      { id: "AR-004", status: "unused", tenant: "", amount: 0, reason: "" },
+    ];
+    setReceipts(sampleReceipts);
+  };
+
   const handleAssignCollector = (id, area) => {
     const updated = collectors.map((c) => (c.id === id ? { ...c, area } : c));
     setCollectors(updated);
@@ -85,6 +133,55 @@ const CollectionManagement = () => {
       message: `Collector ${id} assigned to ${area}`,
       severity: "success",
     });
+  };
+
+  const handleObtainReceipts = () => {
+    setAlert({
+      open: true,
+      message: "Acknowledgement Receipts obtained from AR Keeper",
+      severity: "success",
+    });
+    setActiveStep(1);
+  };
+
+  const handleCancelUnusedReceipts = () => {
+    const updatedReceipts = receipts.map(receipt => 
+      receipt.status === "unused" ? { ...receipt, status: "cancelled", reason: "Stall Closed" } : receipt
+    );
+    setReceipts(updatedReceipts);
+    setAlert({
+      open: true,
+      message: "Unused receipts cancelled with remarks",
+      severity: "success",
+    });
+  };
+
+  const handleEncodeDCR = () => {
+    const totalCollected = transactions
+      .filter(t => t.collectorId === selectedCollector)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    setDailyReport({
+      totalCash: parseFloat(cashReceived) || 0,
+      encodedTotal: totalCollected,
+      balanceStatus: totalCollected === parseFloat(cashReceived) ? "balanced" : "discrepancy"
+    });
+
+    setAlert({
+      open: true,
+      message: "Daily Collection Report encoded successfully",
+      severity: "success",
+    });
+    setActiveStep(3);
+  };
+
+  const handleRemitCash = () => {
+    setAlert({
+      open: true,
+      message: "Cash remitted to Cashier with acknowledgment",
+      severity: "success",
+    });
+    setActiveStep(4);
   };
 
   const handleReconcile = () => {
@@ -185,6 +282,43 @@ const CollectionManagement = () => {
         </Button>
       </Stack>
 
+      {/* SOP Process Stepper */}
+      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", mb: 4 }}>
+        <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <FileText size={20} /> Area Collector Daily Operations
+        </Typography>
+        <Stepper activeStep={activeStep} orientation="vertical">
+          {steps.map((step, index) => (
+            <Step key={step.label}>
+              <StepLabel>{step.label}</StepLabel>
+              <StepContent>
+                <Typography>{step.description}</Typography>
+                {index === 0 && (
+                  <Button variant="contained" onClick={handleObtainReceipts} sx={{ mt: 2 }}>
+                    Obtain ARs from Keeper
+                  </Button>
+                )}
+                {index === 2 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Button variant="outlined" onClick={handleCancelUnusedReceipts} sx={{ mr: 2 }}>
+                      Cancel Unused Receipts
+                    </Button>
+                    <Button variant="contained" onClick={handleEncodeDCR}>
+                      Encode DCR
+                    </Button>
+                  </Box>
+                )}
+                {index === 3 && (
+                  <Button variant="contained" onClick={handleRemitCash} sx={{ mt: 2 }}>
+                    Remit Cash to Cashier
+                  </Button>
+                )}
+              </StepContent>
+            </Step>
+          ))}
+        </Stepper>
+      </Paper>
+
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
@@ -200,10 +334,10 @@ const CollectionManagement = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
             <Typography color="text.secondary" gutterBottom>
-              Total Transactions
+              Active Receipts
             </Typography>
             <Typography variant="h4" component="div" sx={{fontWeight:"700"}}>
-              {transactions.length}
+              {receipts.filter(r => r.status === "assigned").length}
             </Typography>
           </Paper>
         </Grid>
@@ -214,6 +348,25 @@ const CollectionManagement = () => {
             </Typography>
             <Typography variant="h4" component="div" sx={{fontWeight:"700"}}>
               ₱{totalCollections.toLocaleString()}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+            <Typography color="text.secondary" gutterBottom>
+              Balance Status
+            </Typography>
+            <Typography 
+              variant="h6" 
+              component="div" 
+              sx={{
+                fontWeight: "700",
+                color: dailyReport.balanceStatus === "balanced" ? "green" : 
+                       dailyReport.balanceStatus === "discrepancy" ? "red" : "orange"
+              }}
+            >
+              {dailyReport.balanceStatus === "balanced" ? "Balanced" : 
+               dailyReport.balanceStatus === "discrepancy" ? "Discrepancy" : "Pending"}
             </Typography>
           </Paper>
         </Grid>
@@ -256,88 +409,128 @@ const CollectionManagement = () => {
         </Table>
       </Paper>
 
-      {/* SECTION 2: Reconciliation */}
+      {/* SECTION 2: Receipt Management */}
       <Paper sx={{ p: 4, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", mb: 4 }}>
         <Typography
           variant="h6"
           sx={{ display: "flex", alignItems: "center", gap: 1 }}
         >
-          <Receipt size={20} /> Reconciliation
+          <Receipt size={20} /> Receipt Management
         </Typography>
         <Divider sx={{ my: 2 }} />
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              select
-              fullWidth
-              label="Select Collector"
-              value={selectedCollector}
-              onChange={(e) => setSelectedCollector(e.target.value)}
-            >
-              {collectors.map((c) => (
-                <MenuItem key={c.id} value={c.id}>
-                  {c.name} ({c.id})
-                </MenuItem>
-              ))}
-            </TextField>
+        
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="subtitle1" gutterBottom>Receipt Status</Typography>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Receipt No</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Tenant</TableCell>
+                  <TableCell>Amount</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {receipts.map((receipt) => (
+                  <TableRow key={receipt.id}>
+                    <TableCell>{receipt.id}</TableCell>
+                    <TableCell>
+                      <Typography 
+                        sx={{ 
+                          color: receipt.status === "assigned" ? "green" : 
+                                receipt.status === "cancelled" ? "red" : "orange" 
+                        }}
+                      >
+                        {receipt.status}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{receipt.tenant || "-"}</TableCell>
+                    <TableCell>₱{receipt.amount.toLocaleString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              label="Cash Received (₱)"
-              type="number"
-              value={cashReceived}
-              onChange={(e) => setCashReceived(parseFloat(e.target.value))}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{ bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
-              onClick={handleReconcile}
-            >
-              Reconcile
-            </Button>
+
+          <Grid item xs={12} md={6}>
+            <Typography variant="subtitle1" gutterBottom>Daily Reconciliation</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Select Collector"
+                  value={selectedCollector}
+                  onChange={(e) => setSelectedCollector(e.target.value)}
+                >
+                  {collectors.map((c) => (
+                    <MenuItem key={c.id} value={c.id}>
+                      {c.name} ({c.id})
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Cash Received (₱)"
+                  type="number"
+                  value={cashReceived}
+                  onChange={(e) => setCashReceived(parseFloat(e.target.value))}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{ bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
+                  onClick={handleReconcile}
+                  startIcon={<Calculator size={20} />}
+                >
+                  Reconcile Collections
+                </Button>
+              </Grid>
+            </Grid>
+
+            {reconciliationResult && (
+              <Box
+                sx={{
+                  mt: 3,
+                  p: 2,
+                  bgcolor: reconciliationResult.diff === 0 ? "#f0f9f0" : "#fef6f6",
+                  borderRadius: 2,
+                  border: reconciliationResult.diff === 0 ? "1px solid #c8e6c9" : "1px solid #ffcdd2",
+                }}
+              >
+                <Typography>
+                  <strong>Total Collected (from records):</strong> ₱
+                  {reconciliationResult.totalCollected.toLocaleString()}
+                </Typography>
+                <Typography>
+                  <strong>Cash Received:</strong> ₱
+                  {cashReceived.toLocaleString()}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: reconciliationResult.diff === 0 ? "green" : "red",
+                    fontWeight: 500,
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  <strong>Difference:</strong> ₱{reconciliationResult.diff.toLocaleString()}
+                </Typography>
+                {reconciliationResult.diff !== 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {reconciliationResult.diff > 0 
+                      ? "Cash received is more than recorded amount." 
+                      : "Cash received is less than recorded amount."}
+                  </Typography>
+                )}
+              </Box>
+            )}
           </Grid>
         </Grid>
-
-        {reconciliationResult && (
-          <Box
-            sx={{
-              mt: 3,
-              p: 2,
-              bgcolor: reconciliationResult.diff === 0 ? "#f0f9f0" : "#fef6f6",
-              borderRadius: 2,
-              border: reconciliationResult.diff === 0 ? "1px solid #c8e6c9" : "1px solid #ffcdd2",
-            }}
-          >
-            <Typography>
-              <strong>Total Collected (from records):</strong> ₱
-              {reconciliationResult.totalCollected.toLocaleString()}
-            </Typography>
-            <Typography>
-              <strong>Cash Received:</strong> ₱
-              {cashReceived.toLocaleString()}
-            </Typography>
-            <Typography
-              sx={{
-                color: reconciliationResult.diff === 0 ? "green" : "red",
-                fontWeight: 500,
-                fontSize: "1.1rem",
-              }}
-            >
-              <strong>Difference:</strong> ₱{reconciliationResult.diff.toLocaleString()}
-            </Typography>
-            {reconciliationResult.diff !== 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {reconciliationResult.diff > 0 
-                  ? "Cash received is more than recorded amount." 
-                  : "Cash received is less than recorded amount."}
-              </Typography>
-            )}
-          </Box>
-        )}
       </Paper>
 
       {/* SECTION 3: Collector Activity Dashboard */}
@@ -364,7 +557,7 @@ const CollectionManagement = () => {
               const collectorTransactions = transactions.filter((t) => t.collectorId === c.id);
               const total = collectorTransactions.reduce((sum, t) => sum + t.amount, 0);
               const count = collectorTransactions.length;
-              const lastTransaction = collectorTransactions[0]; // Most recent (assuming sorted)
+              const lastTransaction = collectorTransactions[0];
               
               return (
                 <TableRow key={c.id}>

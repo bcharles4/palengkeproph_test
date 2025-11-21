@@ -10,12 +10,40 @@ import {
   Paper,
   Breadcrumbs,
   Link,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
 } from "@mui/material";
 import { UploadFile as UploadFileIcon, Home as HomeIcon } from "@mui/icons-material";
 import { NavigateNext } from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
 
+const steps = [
+  {
+    label: 'Add New Tenant',
+    description: 'Access the Tenant Onboarding form. System will automatically generate a unique Tenant ID.',
+  },
+  {
+    label: 'Record Tenant Information',
+    description: 'Complete all mandatory fields including Tenant Name, Address, and Government ID.',
+  },
+  {
+    label: 'Upload Required Documents',
+    description: 'Upload necessary tenant documents in supported formats (PDF, JPG, JPEG, PNG).',
+  },
+  {
+    label: 'Verify Tenant Information',
+    description: 'Review all entered information for accuracy and mark verification as complete.',
+  },
+  {
+    label: 'Submit Tenant Record',
+    description: 'System validates all mandatory fields and creates the tenant record in the database.',
+  },
+];
+
 export default function TenantOnboarding() {
+  const [activeStep, setActiveStep] = useState(0);
   const [form, setForm] = useState({
     tenantName: "",
     address: "",
@@ -110,7 +138,7 @@ export default function TenantOnboarding() {
             p: 4,
             borderRadius: 3,
             width: "100%",
-            maxWidth: "650px",
+            maxWidth: "800px",
             boxShadow: 3,
           }}
         >
@@ -161,6 +189,31 @@ export default function TenantOnboarding() {
           <Typography mb={3} color="text.secondary">
             Add and record new tenant information for leasing.
           </Typography>
+
+          {/* Onboarding Steps */}
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Tenant Onboarding Process
+            </Typography>
+            <Stepper activeStep={activeStep} orientation="vertical">
+              {steps.map((step, index) => (
+                <Step key={step.label}>
+                  <StepLabel
+                    optional={
+                      index === 4 ? (
+                        <Typography variant="caption">Final step</Typography>
+                      ) : null
+                    }
+                  >
+                    {step.label}
+                  </StepLabel>
+                  <StepContent>
+                    <Typography>{step.description}</Typography>
+                  </StepContent>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
 
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
