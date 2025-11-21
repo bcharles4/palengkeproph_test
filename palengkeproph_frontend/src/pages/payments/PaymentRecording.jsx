@@ -98,6 +98,7 @@ export default function PaymentRecording() {
   const [tabValue, setTabValue] = useState(0);
   const [uploadedData, setUploadedData] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [duplicateDialog, setDuplicateDialog] = useState({ open: false, duplicates: [] });
 
   // Payment types based on requirements
   const paymentTypes = [
@@ -262,6 +263,13 @@ export default function PaymentRecording() {
       setPatronName("Walk-in Customer");
     }
 
+    // Check for duplicate receipt number
+    const existingReceipt = paymentHistory.find(p => p.receiptNumber === receiptNumber);
+    if (existingReceipt) {
+      showSnackbar(`Receipt number ${receiptNumber} already exists in the system. Please use a different receipt number.`, "error");
+      return;
+    }
+
     const newPayment = createPaymentRecord(totalAmount);
     const updatedHistory = [newPayment, ...paymentHistory];
     setPaymentHistory(updatedHistory);
@@ -317,8 +325,8 @@ export default function PaymentRecording() {
     
     return {
       id: `PAY-${String(paymentHistory.length + 1).padStart(5, "0")}`,
-      receiptNumber: isManual ? "MANUAL" : receiptNumber,
-      receiptType: isManual ? "MANUAL" : receiptType,
+      receiptNumber: isManual ? (baseData.receiptNumber || "MANUAL") : receiptNumber,
+      receiptType: isManual ? (baseData.receiptType || "MANUAL") : receiptType,
       tenantId: requiresTenant ? selectedTenant : "N/A",
       tenantName: baseData.tenantName || (requiresTenant ? currentTenant?.name : patronName || "Walk-in Customer"),
       stallId: requiresTenant ? (selectedStall || currentTenant?.stallId) : "N/A",
@@ -359,30 +367,73 @@ export default function PaymentRecording() {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        // Map Excel columns to our data structure
-        const mappedData = jsonData.map((row, index) => ({
-          id: `UPL-${index + 1}`,
-          tenantName: row['Tenant Name'] || row['tenantName'] || row['Tenant'] || 'Unknown',
-          stallName: row['Stall'] || row['stallName'] || row['Stall Name'] || 'N/A',
-          paymentType: mapPaymentType(row['Payment Type'] || row['paymentType'] || row['Type']),
-          amount: row['Amount'] || row['amount'] || row['Total'] || '0',
-          electric: row['Electric'] || row['electric'] || row['ELECTRIC'] || '0',
-          water: row['Water'] || row['water'] || row['WATER'] || '0',
-          rent: row['Rent'] || row['rent'] || row['RENT'] || '0',
-          rights: row['Rights'] || row['rights'] || row['RIGHTS'] || '0',
-          others: row['Others'] || row['others'] || row['OTHERS'] || '0',
-          method: mapPaymentMethod(row['Method'] || row['method'] || row['Payment Method'] || 'Cash'),
-          collectorId: row['Collector ID'] || row['collectorId'] || row['Collector'] || collectorId,
-        }));
+        // Validate required fields
+        const missingFields = [];
+        const validatedData = jsonData.map((row, index) => {
+          const receiptNo = row['Receipt Number'] || row['receiptNumber'] || row['Receipt No'] || '';
+          const receiptType = row['Receipt Type'] || row['receiptType'] || '';
+          const tenantName = row['Tenant Name'] || row['tenantName'] || row['Tenant'] || '';
+          
+          if (!receiptNo) missingFields.push(`Row ${index + 2}: Receipt Number`);
+          if (!receiptType) missingFields.push(`Row ${index + 2}: Receipt Type`);
+          if (!tenantName) missingFields.push(`Row ${index + 2}: Tenant Name`);
 
-        setUploadedData(mappedData);
-        showSnackbar(`Successfully loaded ${mappedData.length} records from Excel`, "success");
+          // Calculate total from breakdown
+          const electric = parseFloat(row['Electric'] || row['electric'] || 0);
+          const water = parseFloat(row['Water'] || row['water'] || 0);
+          const rent = parseFloat(row['Rent'] || row['rent'] || 0);
+          const rights = parseFloat(row['Rights'] || row['rights'] || 0);
+          const others = parseFloat(row['Others'] || row['others'] || 0);
+          const total = electric + water + rent + rights + others;
+
+          // Map Excel columns to our data structure
+          return {
+            id: `UPL-${index + 1}`,
+            receiptNumber: receiptNo,
+            receiptType: mapReceiptType(receiptType),
+            tenantName: tenantName,
+            stallName: row['Stall'] || row['stallName'] || row['Stall Name'] || 'N/A',
+            paymentType: mapPaymentType(row['Payment Type'] || row['paymentType'] || row['Type'] || 'other_fees'),
+            amount: total > 0 ? total.toString() : (row['Total'] || row['total'] || '0'),
+            electric: electric.toString(),
+            water: water.toString(),
+            rent: rent.toString(),
+            rights: rights.toString(),
+            others: others.toString(),
+            method: mapPaymentMethod(row['Method'] || row['method'] || row['Payment Method'] || 'Cash'),
+            collectorId: row['Collector'] || row['collectorId'] || row['Collector ID'] || collectorId,
+          };
+        });
+
+        if (missingFields.length > 0) {
+          showSnackbar(`Missing required fields: ${missingFields.join(', ')}`, "error");
+          return;
+        }
+
+        setUploadedData(validatedData);
+        showSnackbar(`Successfully loaded ${validatedData.length} records from Excel`, "success");
       } catch (error) {
         showSnackbar("Error reading Excel file. Please check the format.", "error");
         console.error("Excel read error:", error);
       }
     };
     reader.readAsArrayBuffer(file);
+  };
+
+  const mapReceiptType = (type) => {
+    if (!type) return 'AR';
+    
+    const typeMap = {
+      'ar': 'AR',
+      'AR': 'AR',
+      'acknowledgement': 'AR',
+      'Acknowledgement': 'AR',
+      'or': 'OR',
+      'OR': 'OR',
+      'official': 'OR',
+      'Official': 'OR'
+    };
+    return typeMap[type.toString().toLowerCase()] || 'AR';
   };
 
   const mapPaymentType = (type) => {
@@ -437,9 +488,23 @@ export default function PaymentRecording() {
       return;
     }
 
+    // Check for duplicate receipt numbers
+    const existingReceiptNumbers = paymentHistory.map(p => p.receiptNumber);
+    const duplicates = uploadedData.filter(data => 
+      existingReceiptNumbers.includes(data.receiptNumber)
+    );
+
+    if (duplicates.length > 0) {
+      setDuplicateDialog({
+        open: true,
+        duplicates: duplicates.map(d => d.receiptNumber)
+      });
+      return;
+    }
+
     const newPayments = uploadedData.map((data, index) => {
       const totalAmount = parseFloat(data.amount) || calculateBreakdownTotal(data);
-      return createPaymentRecord(totalAmount, data, true);
+      return createPaymentRecord(totalAmount, data, false);
     });
 
     const updatedHistory = [...newPayments, ...paymentHistory];
@@ -461,6 +526,96 @@ export default function PaymentRecording() {
     const rights = parseFloat(data.rights) || 0;
     const others = parseFloat(data.others) || 0;
     return electric + water + rent + rights + others;
+  };
+
+  // Test File Generator Component
+  const TestFileGenerator = () => {
+    const generateTestFile = () => {
+      // Sample data with new column structure
+      const testData = [
+        {
+          'Receipt Number': 'AR-00001',
+          'Receipt Type': 'AR',
+          'Tenant Name': 'Juan Dela Cruz',
+          'Stall': 'Stall 1 - Food Section',
+          'Electric': '0',
+          'Water': '0',
+          'Rent': '1500',
+          'Rights': '0',
+          'Others': '0',
+          'Total': '1500',
+          'Collector': 'C-001'
+        },
+        {
+          'Receipt Number': 'AR-00002',
+          'Receipt Type': 'AR',
+          'Tenant Name': 'Maria Santos',
+          'Stall': 'Stall 2 - Clothing Section',
+          'Electric': '500',
+          'Water': '0',
+          'Rent': '0',
+          'Rights': '0',
+          'Others': '0',
+          'Total': '500',
+          'Collector': 'C-002'
+        },
+        {
+          'Receipt Number': 'OR-00001',
+          'Receipt Type': 'OR',
+          'Tenant Name': 'Pedro Reyes',
+          'Stall': 'Stall 3 - Electronics',
+          'Electric': '0',
+          'Water': '300',
+          'Rent': '0',
+          'Rights': '0',
+          'Others': '0',
+          'Total': '300',
+          'Collector': 'C-001'
+        },
+        {
+          'Receipt Number': 'AR-00003',
+          'Receipt Type': 'AR',
+          'Tenant Name': 'Walk-in Customer',
+          'Stall': 'Parking Area',
+          'Electric': '0',
+          'Water': '0',
+          'Rent': '0',
+          'Rights': '0',
+          'Others': '50',
+          'Total': '50',
+          'Collector': 'C-002'
+        }
+      ];
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(testData);
+      
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Payment Data');
+      
+      // Generate and download the file
+      XLSX.writeFile(wb, 'payment_test_data_new_format.xlsx');
+    };
+
+    return (
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Generate Test XLSX File
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Download a sample XLSX file with the new column structure.
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<CloudUploadIcon />}
+          onClick={generateTestFile}
+          sx={{ bgcolor: 'green', '&:hover': { bgcolor: 'darkgreen' } }}
+        >
+          Download Test XLSX File
+        </Button>
+      </Paper>
+    );
   };
 
   const handlePrint = () => {
@@ -1003,23 +1158,23 @@ export default function PaymentRecording() {
                     <Table stickyHeader size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>Tenant</TableCell>
-                          <TableCell>Stall</TableCell>
+                          <TableCell>Receipt No.</TableCell>
                           <TableCell>Type</TableCell>
-                          <TableCell>Amount</TableCell>
-                          <TableCell>Method</TableCell>
+                          <TableCell>Tenant</TableCell>
+                          <TableCell>Total</TableCell>
+                          <TableCell>Collector</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {uploadedData.slice(0, 10).map((row, index) => (
                           <TableRow key={index}>
-                            <TableCell>{row.tenantName}</TableCell>
-                            <TableCell>{row.stallName}</TableCell>
+                            <TableCell>{row.receiptNumber}</TableCell>
                             <TableCell>
-                              <Chip label={row.paymentType} color={getPaymentTypeColor(row.paymentType)} size="small" />
+                              <Chip label={row.receiptType} size="small" variant="outlined" />
                             </TableCell>
+                            <TableCell>{row.tenantName}</TableCell>
                             <TableCell>₱{parseFloat(row.amount).toFixed(2)}</TableCell>
-                            <TableCell>{row.method}</TableCell>
+                            <TableCell>{row.collectorId}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -1054,15 +1209,19 @@ export default function PaymentRecording() {
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>Excel Bulk Import</Typography>
             <Typography color="text.secondary" mb={3}>Upload Excel file to import multiple payments at once</Typography>
             
+            {/* Test File Generator */}
+            <TestFileGenerator />
+
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Alert severity="info">
                   <Typography variant="subtitle2" gutterBottom>Excel Format Requirements:</Typography>
                   <Typography variant="body2">
-                    • Required Columns: Tenant Name, Payment Type, Amount<br/>
-                    • Optional Columns: Stall, Electric, Water, Rent, Rights, Others, Method, Collector ID<br/>
-                    • Payment Types: rent, electricity, water, rights, parking, restroom, loan_repayment, special_event<br/>
-                    • Methods: Cash, GCash
+                    • <strong>Required Columns:</strong> Receipt Number, Receipt Type, Tenant Name<br/>
+                    • <strong>Breakdown Columns:</strong> Electric, Water, Rent, Rights, Others, Total<br/>
+                    • <strong>Additional Column:</strong> Collector<br/>
+                    • <strong>Receipt Types:</strong> AR (Acknowledgement Receipt), OR (Official Receipt)<br/>
+                    • <strong>Note:</strong> Total is automatically calculated from breakdown, but can be overridden
                   </Typography>
                 </Alert>
               </Grid>
@@ -1082,24 +1241,40 @@ export default function PaymentRecording() {
                       <Table>
                         <TableHead>
                           <TableRow>
+                            <TableCell>Receipt No.</TableCell>
+                            <TableCell>Type</TableCell>
                             <TableCell>Tenant</TableCell>
                             <TableCell>Stall</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Amount</TableCell>
-                            <TableCell>Method</TableCell>
+                            <TableCell>Electric</TableCell>
+                            <TableCell>Water</TableCell>
+                            <TableCell>Rent</TableCell>
+                            <TableCell>Rights</TableCell>
+                            <TableCell>Others</TableCell>
+                            <TableCell>Total</TableCell>
                             <TableCell>Collector</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {uploadedData.slice(0, 5).map((row, index) => (
                             <TableRow key={index}>
+                              <TableCell>
+                                <Chip 
+                                  label={row.receiptNumber} 
+                                  color={row.receiptType === 'AR' ? 'primary' : 'secondary'}
+                                  size="small"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Chip label={row.receiptType} size="small" variant="outlined" />
+                              </TableCell>
                               <TableCell>{row.tenantName}</TableCell>
                               <TableCell>{row.stallName}</TableCell>
-                              <TableCell>
-                                <Chip label={row.paymentType} color={getPaymentTypeColor(row.paymentType)} size="small" />
-                              </TableCell>
-                              <TableCell>₱{parseFloat(row.amount).toFixed(2)}</TableCell>
-                              <TableCell>{row.method}</TableCell>
+                              <TableCell>₱{row.electric}</TableCell>
+                              <TableCell>₱{row.water}</TableCell>
+                              <TableCell>₱{row.rent}</TableCell>
+                              <TableCell>₱{row.rights}</TableCell>
+                              <TableCell>₱{row.others}</TableCell>
+                              <TableCell><strong>₱{parseFloat(row.amount).toFixed(2)}</strong></TableCell>
                               <TableCell>{row.collectorId}</TableCell>
                             </TableRow>
                           ))}
@@ -1222,6 +1397,33 @@ export default function PaymentRecording() {
           </Table>
         </TableContainer>
       </Paper>
+
+      {/* Duplicate Receipt Dialog */}
+      <Dialog open={duplicateDialog.open} onClose={() => setDuplicateDialog({ open: false, duplicates: [] })}>
+        <DialogTitle sx={{ bgcolor: "#D32F2F", color: "white" }}>
+          Duplicate Receipt Numbers Found
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ mt: 2 }}>
+            The following receipt numbers already exist in the system:
+          </Typography>
+          <Box sx={{ mt: 2, p: 2, bgcolor: '#fff3cd', borderRadius: 1 }}>
+            {duplicateDialog.duplicates.map((receiptNo, index) => (
+              <Typography key={index} sx={{ fontFamily: 'monospace' }}>
+                • {receiptNo}
+              </Typography>
+            ))}
+          </Box>
+          <Typography sx={{ mt: 2, color: 'red' }}>
+            Please remove or change these duplicate receipt numbers before importing.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDuplicateDialog({ open: false, duplicates: [] })}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* 🧾 VERTICAL RECEIPT DIALOG */}
       <Dialog open={openReceipt} onClose={() => setOpenReceipt(false)} maxWidth="xs" fullWidth>
