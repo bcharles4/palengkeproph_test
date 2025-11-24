@@ -43,6 +43,8 @@ import {
   Tabs,
   Tab,
   Snackbar,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import MainLayout from "../../layouts/MainLayout";
 import * as XLSX from 'xlsx';
@@ -56,12 +58,16 @@ function TabPanel({ children, value, index, ...other }) {
       aria-labelledby={`payment-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>{children}</Box>}
     </div>
   );
 }
 
 export default function PaymentRecording() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [tenants, setTenants] = useState([]);
   const [stalls, setStalls] = useState([]);
   const [collectors, setCollectors] = useState([]);
@@ -617,7 +623,7 @@ export default function PaymentRecording() {
     };
 
     return (
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" gutterBottom>
           Generate Test XLSX File
         </Typography>
@@ -629,6 +635,7 @@ export default function PaymentRecording() {
           startIcon={<CloudUploadIcon />}
           onClick={generateTestFile}
           sx={{ bgcolor: 'green', '&:hover': { bgcolor: 'darkgreen' } }}
+          fullWidth={isMobile}
         >
           Download Test XLSX File
         </Button>
@@ -726,7 +733,7 @@ export default function PaymentRecording() {
   return (
     <MainLayout>
       {/* 🧭 Breadcrumbs */}
-      <Box mb={3}>
+      <Box mb={2}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link
             underline="hover"
@@ -759,9 +766,10 @@ export default function PaymentRecording() {
       </Box>
 
       <Stack
-        direction="row"
+        direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
-        alignItems="center"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={2}
         mb={3}
       >
         <Typography variant="h4" fontWeight={700} color="black">
@@ -772,6 +780,7 @@ export default function PaymentRecording() {
           color="error"
           startIcon={<RestartAltIcon />}
           onClick={handleResetData}
+          size={isMobile ? "small" : "medium"}
         >
           Reset Data
         </Button>
@@ -782,74 +791,74 @@ export default function PaymentRecording() {
       </Typography>
 
       {/* 📊 Today's Summary */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
-            <CardContent>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={6} sm={4} md={2}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+            <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Rent
               </Typography>
-              <Typography variant="h6" component="div" color="primary.main" sx={{fontWeight: "700"}}>
+              <Typography variant="h6" component="div" color="primary.main" sx={{fontWeight: "700", fontSize: { xs: '0.9rem', sm: '1rem' }}}>
                 ₱{dailyBreakdown.rent.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
-            <CardContent>
+        <Grid item xs={6} sm={4} md={2}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+            <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Rights
               </Typography>
-              <Typography variant="h6" component="div" color="secondary.main" sx={{fontWeight:"700"}}>
+              <Typography variant="h6" component="div" color="secondary.main" sx={{fontWeight:"700", fontSize: { xs: '0.9rem', sm: '1rem' }}}>
                 ₱{dailyBreakdown.rights.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
-            <CardContent>
+        <Grid item xs={6} sm={4} md={2}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+            <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Electricity
               </Typography>
-              <Typography variant="h6" component="div" color="warning.main" sx={{fontWeight:"700"}}>
+              <Typography variant="h6" component="div" color="warning.main" sx={{fontWeight:"700", fontSize: { xs: '0.9rem', sm: '1rem' }}}>
                 ₱{dailyBreakdown.electricity.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
-            <CardContent>
+        <Grid item xs={6} sm={4} md={2}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+            <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Water
               </Typography>
-              <Typography variant="h6" component="div" color="info.main" sx={{fontWeight:"700"}}>
+              <Typography variant="h6" component="div" color="info.main" sx={{fontWeight:"700", fontSize: { xs: '0.9rem', sm: '1rem' }}}>
                 ₱{dailyBreakdown.water.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
-            <CardContent>
+        <Grid item xs={6} sm={4} md={2}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+            <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Other
               </Typography>
-              <Typography variant="h6" component="div" sx={{fontWeight:"700"}}>
+              <Typography variant="h6" component="div" sx={{fontWeight:"700", fontSize: { xs: '0.9rem', sm: '1rem' }}}>
                 ₱{dailyBreakdown.other.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", bgcolor: "#D32F2F", color: "white" }}>
-            <CardContent>
+        <Grid item xs={6} sm={4} md={2}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", bgcolor: "#D32F2F", color: "white" }}>
+            <CardContent sx={{ p: 2 }}>
               <Typography gutterBottom variant="body2" sx={{ color: "white" }}>
                 Total Today
               </Typography>
-              <Typography variant="h6" component="div" sx={{fontWeight:"700"}}>
+              <Typography variant="h6" component="div" sx={{fontWeight:"700", fontSize: { xs: '0.9rem', sm: '1rem' }}}>
                 ₱{dailyBreakdown.total.toLocaleString()}
               </Typography>
             </CardContent>
@@ -858,13 +867,15 @@ export default function PaymentRecording() {
       </Grid>
 
       {/* Tabs for different entry methods */}
-      <Paper sx={{ width: '74%', mb: 5, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+      <Paper sx={{ width: '100%', mb: 3, borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", overflow: 'hidden' }}>
         <Tabs 
           value={tabValue} 
           onChange={(e, newValue) => setTabValue(newValue)} 
           centered
+          variant={isMobile ? "scrollable" : "standard"}
+          scrollButtons={isMobile ? "auto" : false}
           sx={{
-            '& .MuiTab-root': { fontWeight: 600 },
+            '& .MuiTab-root': { fontWeight: 600, minWidth: { xs: 120, sm: 160 } },
             '& .Mui-selected': { color: '#D32F2F' }
           }}
         >
@@ -876,12 +887,12 @@ export default function PaymentRecording() {
         {/* AUTO ISSUANCE TAB */}
         <TabPanel value={tabValue} index={0}>
           <Box>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>Auto Issuance - Single Payment</Typography>
-            <Typography color="text.secondary" mb={3}>Record individual payments with automatic receipt generation</Typography>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Auto Issuance - Single Payment</Typography>
+            <Typography color="text.secondary" mb={2}>Record individual payments with automatic receipt generation</Typography>
             
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" fullWidth>
                   <FormLabel component="legend">Receipt Type</FormLabel>
                   <RadioGroup
                     row
@@ -901,11 +912,12 @@ export default function PaymentRecording() {
                   value={receiptNumber}
                   InputProps={{ readOnly: true }}
                   helperText={`${receiptType} Number`}
+                  size={isMobile ? "small" : "medium"}
                 />
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size={isMobile ? "small" : "medium"}>
                   <InputLabel>Payment Type</InputLabel>
                   <Select
                     value={paymentType}
@@ -936,6 +948,7 @@ export default function PaymentRecording() {
                         if (tenant) setSelectedStall(tenant.stallId);
                       }}
                       required
+                      size={isMobile ? "small" : "medium"}
                     >
                       <MenuItem value="">-- Select Tenant --</MenuItem>
                       {tenants.map((t) => (
@@ -952,6 +965,7 @@ export default function PaymentRecording() {
                       fullWidth
                       value={currentStall?.name || stalls.find(s => s.id === selectedStall)?.name || "No stall assigned"}
                       InputProps={{ readOnly: true }}
+                      size={isMobile ? "small" : "medium"}
                     />
                   </Grid>
                 </>
@@ -967,6 +981,7 @@ export default function PaymentRecording() {
                     onChange={(e) => setPatronName(e.target.value)}
                     placeholder="Walk-in Customer"
                     helperText="For public facility payments"
+                    size={isMobile ? "small" : "medium"}
                   />
                 </Grid>
               )}
@@ -976,64 +991,28 @@ export default function PaymentRecording() {
                 <Typography variant="h6" gutterBottom>
                   Payment Breakdown
                 </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      label="ELECTRIC (₱)"
-                      fullWidth
-                      type="number"
-                      value={breakdown.electric}
-                      onChange={(e) => handleBreakdownChange('electric', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      label="WATER (₱)"
-                      fullWidth
-                      type="number"
-                      value={breakdown.water}
-                      onChange={(e) => handleBreakdownChange('water', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      label="RENT (₱)"
-                      fullWidth
-                      type="number"
-                      value={breakdown.rent}
-                      onChange={(e) => handleBreakdownChange('rent', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      label="RIGHTS (₱)"
-                      fullWidth
-                      type="number"
-                      value={breakdown.rights}
-                      onChange={(e) => handleBreakdownChange('rights', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      label="OTHERS (₱)"
-                      fullWidth
-                      type="number"
-                      value={breakdown.others}
-                      onChange={(e) => handleBreakdownChange('others', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
+                <Grid container spacing={1}>
+                  {['electric', 'water', 'rent', 'rights', 'others'].map((field) => (
+                    <Grid item xs={6} sm={4} md={2.4} key={field}>
+                      <TextField
+                        label={field.toUpperCase() + " (₱)"}
+                        fullWidth
+                        type="number"
+                        value={breakdown[field]}
+                        onChange={(e) => handleBreakdownChange(field, e.target.value)}
+                        placeholder="0.00"
+                        size={isMobile ? "small" : "medium"}
+                      />
+                    </Grid>
+                  ))}
+                  <Grid item xs={6} sm={4} md={2.4}>
                     <TextField
                       label="TOTAL (₱)"
                       fullWidth
                       value={calculateTotal().toFixed(2)}
                       InputProps={{ readOnly: true }}
                       sx={{ fontWeight: 'bold', '& .MuiInputBase-input': { fontWeight: 'bold' } }}
+                      size={isMobile ? "small" : "medium"}
                     />
                   </Grid>
                 </Grid>
@@ -1047,6 +1026,7 @@ export default function PaymentRecording() {
                   value={method}
                   onChange={(e) => setMethod(e.target.value)}
                   required
+                  size={isMobile ? "small" : "medium"}
                 >
                   <MenuItem value="Cash">Cash</MenuItem>
                   <MenuItem value="E-Wallet">E-Wallet (GCash, PayMaya, etc.)</MenuItem>
@@ -1062,6 +1042,7 @@ export default function PaymentRecording() {
                   value={collectorId}
                   onChange={(e) => setCollectorId(e.target.value)}
                   required
+                  size={isMobile ? "small" : "medium"}
                 >
                   {collectors.map((collector) => (
                     <MenuItem key={collector.id} value={collector.id}>
@@ -1077,7 +1058,7 @@ export default function PaymentRecording() {
               fullWidth
               size="large"
               startIcon={<ReceiptIcon />}
-              sx={{ mt: 3, bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
+              sx={{ mt: 2, bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
               onClick={handleRecordPayment}
             >
               Issue {receiptType === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt'}
@@ -1088,10 +1069,10 @@ export default function PaymentRecording() {
         {/* MANUAL ENTRY TAB */}
         <TabPanel value={tabValue} index={1}>
           <Box>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>Manual Entry - Bulk Payments</Typography>
-            <Typography color="text.secondary" mb={3}>Add multiple payments without generating individual receipts</Typography>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Manual Entry - Bulk Payments</Typography>
+            <Typography color="text.secondary" mb={2}>Add multiple payments without generating individual receipts</Typography>
             
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Alert severity="info">
                   Use this for recording historical payments or bulk entries where individual receipts are not needed.
@@ -1099,27 +1080,29 @@ export default function PaymentRecording() {
                 </Alert>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField 
                   label="Number of Payments" 
                   type="number" 
                   fullWidth 
                   value={uploadedData.length} 
                   InputProps={{ readOnly: true }} 
+                  size={isMobile ? "small" : "medium"}
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField 
                   label="Total Amount" 
                   fullWidth 
                   value={uploadedData.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0).toFixed(2)} 
                   InputProps={{ readOnly: true }} 
+                  size={isMobile ? "small" : "medium"}
                 />
               </Grid>
 
               <Grid item xs={12}>
-                <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />} fullWidth>
+                <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />} fullWidth size={isMobile ? "small" : "medium"}>
                   Upload Excel File for Manual Entry
                   <input type="file" hidden accept=".xlsx,.xls,.csv" onChange={handleFileUpload} />
                 </Button>
@@ -1172,6 +1155,7 @@ export default function PaymentRecording() {
                   onClick={handleManualEntry} 
                   disabled={uploadedData.length === 0}
                   sx={{ bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }}
+                  size={isMobile ? "small" : "medium"}
                 >
                   Add {uploadedData.length} Payments to History
                 </Button>
@@ -1183,13 +1167,13 @@ export default function PaymentRecording() {
         {/* EXCEL UPLOAD TAB */}
         <TabPanel value={tabValue} index={2}>
           <Box>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>Excel Bulk Import</Typography>
-            <Typography color="text.secondary" mb={3}>Upload Excel file to import multiple payments at once</Typography>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Excel Bulk Import</Typography>
+            <Typography color="text.secondary" mb={2}>Upload Excel file to import multiple payments at once</Typography>
             
             {/* Test File Generator */}
             <TestFileGenerator />
 
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Alert severity="info">
                   <Typography variant="subtitle2" gutterBottom>Excel Format Requirements:</Typography>
@@ -1204,7 +1188,7 @@ export default function PaymentRecording() {
               </Grid>
 
               <Grid item xs={12}>
-                <Button variant="contained" component="label" startIcon={<CloudUploadIcon />} fullWidth size="large">
+                <Button variant="contained" component="label" startIcon={<CloudUploadIcon />} fullWidth size={isMobile ? "small" : "medium"}>
                   Upload Excel File
                   <input type="file" hidden accept=".xlsx,.xls,.csv" onChange={handleFileUpload} />
                 </Button>
@@ -1214,25 +1198,20 @@ export default function PaymentRecording() {
                 <>
                   <Grid item xs={12}>
                     <Typography variant="h6" gutterBottom>Data Preview ({uploadedData.length} records)</Typography>
-                    <TableContainer component={Paper}>
-                      <Table>
+                    <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
+                      <Table size="small" stickyHeader>
                         <TableHead>
                           <TableRow>
                             <TableCell>Receipt No.</TableCell>
                             <TableCell>Type</TableCell>
                             <TableCell>Tenant</TableCell>
                             <TableCell>Stall</TableCell>
-                            <TableCell>Electric</TableCell>
-                            <TableCell>Water</TableCell>
-                            <TableCell>Rent</TableCell>
-                            <TableCell>Rights</TableCell>
-                            <TableCell>Others</TableCell>
                             <TableCell>Total</TableCell>
                             <TableCell>Collector</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {uploadedData.slice(0, 5).map((row, index) => (
+                          {uploadedData.slice(0, 10).map((row, index) => (
                             <TableRow key={index}>
                               <TableCell>
                                 <Chip 
@@ -1246,11 +1225,6 @@ export default function PaymentRecording() {
                               </TableCell>
                               <TableCell>{row.tenantName}</TableCell>
                               <TableCell>{row.stallName}</TableCell>
-                              <TableCell>₱{row.electric}</TableCell>
-                              <TableCell>₱{row.water}</TableCell>
-                              <TableCell>₱{row.rent}</TableCell>
-                              <TableCell>₱{row.rights}</TableCell>
-                              <TableCell>₱{row.others}</TableCell>
                               <TableCell><strong>₱{parseFloat(row.amount).toFixed(2)}</strong></TableCell>
                               <TableCell>{row.collectorId}</TableCell>
                             </TableRow>
@@ -1258,9 +1232,9 @@ export default function PaymentRecording() {
                         </TableBody>
                       </Table>
                     </TableContainer>
-                    {uploadedData.length > 5 && (
+                    {uploadedData.length > 10 && (
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                        Showing first 5 of {uploadedData.length} records
+                        Showing first 10 of {uploadedData.length} records
                       </Typography>
                     )}
                   </Grid>
@@ -1284,16 +1258,16 @@ export default function PaymentRecording() {
       </Paper>
 
       {/* 📋 PAYMENT HISTORY */}
-      <Paper sx={{  width: '74%', p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h5"sx={{ fontWeight: 700 }}>Payment History</Typography>
-          <Box display="flex" gap={2}>
+      <Paper sx={{ width: '100%', p: 2, borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", overflow: 'hidden' }}>
+        <Box display="flex" flexDirection={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} gap={2} mb={2}>
+          <Typography variant="h5" sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Payment History</Typography>
+          <Box display="flex" gap={1} flexDirection={{ xs: "column", sm: "row" }} width={{ xs: "100%", sm: "auto" }}>
             <TextField
               select
               size="small"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              sx={{ minWidth: 150 }}
+              sx={{ minWidth: { xs: '100%', sm: 150 } }}
             >
               <MenuItem value="all">All Types</MenuItem>
               {paymentTypes.map((type) => (
@@ -1308,16 +1282,19 @@ export default function PaymentRecording() {
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
               InputLabelProps={{ shrink: true }}
+              sx={{ minWidth: { xs: '100%', sm: 150 } }}
             />
           </Box>
         </Box>
 
         <TableContainer 
           sx={{ 
+            maxWidth: 1200 ,
             maxHeight: 600,
             overflow: 'auto',
             '&::-webkit-scrollbar': {
               height: 8,
+              width: 8,
             },
             '&::-webkit-scrollbar-track': {
               backgroundColor: '#f1f1f1',
@@ -1332,8 +1309,8 @@ export default function PaymentRecording() {
             },
           }}
         >
-          <Table stickyHeader sx={{ minWidth: 1200 }}>
-            <TableHead sx={{ bgcolor: "#f5f5f5" }}>
+          <Table stickyHeader size={isSmallScreen ? "small" : "medium"} sx={{ minWidth: 1200 }}>
+            <TableHead sx={{ bgcolor: "#f5f5f5"}}>
               <TableRow>
                 <TableCell sx={{ minWidth: 120 }}><b>Receipt No.</b></TableCell>
                 <TableCell sx={{ minWidth: 80 }}><b>Type</b></TableCell>
@@ -1351,7 +1328,7 @@ export default function PaymentRecording() {
                 <TableCell sx={{ minWidth: 120 }}><b>Collector</b></TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+                        <TableBody>
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((payment) => (
                   <TableRow key={payment.id} hover>
@@ -1405,7 +1382,12 @@ export default function PaymentRecording() {
       </Paper>
 
       {/* Duplicate Receipt Dialog */}
-      <Dialog open={duplicateDialog.open} onClose={() => setDuplicateDialog({ open: false, duplicates: [] })}>
+      <Dialog 
+        open={duplicateDialog.open} 
+        onClose={() => setDuplicateDialog({ open: false, duplicates: [] })}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle sx={{ bgcolor: "#D32F2F", color: "white" }}>
           Duplicate Receipt Numbers Found
         </DialogTitle>
