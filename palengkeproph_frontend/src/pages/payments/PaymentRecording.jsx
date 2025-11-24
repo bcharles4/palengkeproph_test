@@ -763,32 +763,7 @@ export default function PaymentRecording() {
         Record payments from various revenue streams including tenant payments, restroom fees, parking fees, loan repayments, and special event fees.
       </Typography>
 
-      {/* SOP Process Stepper */}
-      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", mb: 4 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <ReceiptIcon /> Area Collector Daily Operations
-        </Typography>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((step, index) => (
-            <Step key={step.label}>
-              <StepLabel>{step.label}</StepLabel>
-              <StepContent>
-                <Typography>{step.description}</Typography>
-                {index === 0 && (
-                  <Button variant="contained" onClick={handlePrepareReceipts} sx={{ mt: 2 }}>
-                    Prepare Daily Receipts
-                  </Button>
-                )}
-                {index === 1 && (
-                  <Button variant="contained" onClick={handleCompleteCollection} sx={{ mt: 2 }}>
-                    Complete Field Collection
-                  </Button>
-                )}
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-      </Paper>
+
 
       {/* 📊 Today's Summary */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -866,20 +841,6 @@ export default function PaymentRecording() {
         </Grid>
       </Grid>
 
-      {/* SOP Guidance Alert */}
-      {activeStep < 3 && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            SOP Reminder: 
-          </Typography>
-          <Typography variant="body2">
-            {activeStep === 0 && "Prepare receipts with exact amounts for rent, rights, electricity, and water. Double-check all figures."}
-            {activeStep === 1 && "Ensure collected amount exactly matches the receipt amount. Issue official receipt immediately."}
-            {activeStep === 2 && "For additional payments not pre-listed, create separate receipts with clear purpose indication."}
-            {activeStep === 3 && "Verify all amounts match physical cash. Prepare for reconciliation and remittance."}
-          </Typography>
-        </Alert>
-      )}
 
       {/* Tabs for different entry methods */}
       <Paper sx={{ width: '100%', mb: 5, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
@@ -1073,7 +1034,9 @@ export default function PaymentRecording() {
                   required
                 >
                   <MenuItem value="Cash">Cash</MenuItem>
-                  <MenuItem value="GCash">GCash</MenuItem>
+                  <MenuItem value="E-Wallet">E-Wallet (GCash, PayMaya, etc.)</MenuItem>
+                  <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+
                 </TextField>
               </Grid>
 
