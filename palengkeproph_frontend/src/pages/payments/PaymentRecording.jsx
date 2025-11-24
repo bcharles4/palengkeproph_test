@@ -781,8 +781,6 @@ export default function PaymentRecording() {
         Record payments from various revenue streams including tenant payments, restroom fees, parking fees, loan repayments, and special event fees.
       </Typography>
 
-
-
       {/* 📊 Today's Summary */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={2}>
@@ -858,7 +856,6 @@ export default function PaymentRecording() {
           </Card>
         </Grid>
       </Grid>
-
 
       {/* Tabs for different entry methods */}
       <Paper sx={{ width: '100%', mb: 5, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
@@ -1054,7 +1051,6 @@ export default function PaymentRecording() {
                   <MenuItem value="Cash">Cash</MenuItem>
                   <MenuItem value="E-Wallet">E-Wallet (GCash, PayMaya, etc.)</MenuItem>
                   <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
-
                 </TextField>
               </Grid>
 
@@ -1316,31 +1312,50 @@ export default function PaymentRecording() {
           </Box>
         </Box>
 
-        <TableContainer sx={{ maxHeight: 600 }}>
-          <Table stickyHeader>
+        <TableContainer 
+          sx={{ 
+            maxHeight: 600,
+            overflow: 'auto',
+            '&::-webkit-scrollbar': {
+              height: 8,
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: '#f1f1f1',
+              borderRadius: 4,
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#c1c1c1',
+              borderRadius: 4,
+              '&:hover': {
+                backgroundColor: '#a8a8a8',
+              },
+            },
+          }}
+        >
+          <Table stickyHeader sx={{ minWidth: 1200 }}>
             <TableHead sx={{ bgcolor: "#f5f5f5" }}>
               <TableRow>
-                <TableCell><b>Receipt No.</b></TableCell>
-                <TableCell><b>Type</b></TableCell>
-                <TableCell><b>Date & Time</b></TableCell>
-                <TableCell><b>Payment Type</b></TableCell>
-                <TableCell><b>Tenant/Patron</b></TableCell>
-                <TableCell><b>Stall/Facility</b></TableCell>
-                <TableCell><b>Electric (₱)</b></TableCell>
-                <TableCell><b>Water (₱)</b></TableCell>
-                <TableCell><b>Rent (₱)</b></TableCell>
-                <TableCell><b>Rights (₱)</b></TableCell>
-                <TableCell><b>Others (₱)</b></TableCell>
-                <TableCell><b>Total (₱)</b></TableCell>
-                <TableCell><b>Method</b></TableCell>
-                <TableCell><b>Collector</b></TableCell>
+                <TableCell sx={{ minWidth: 120 }}><b>Receipt No.</b></TableCell>
+                <TableCell sx={{ minWidth: 80 }}><b>Type</b></TableCell>
+                <TableCell sx={{ minWidth: 150 }}><b>Date & Time</b></TableCell>
+                <TableCell sx={{ minWidth: 140 }}><b>Payment Type</b></TableCell>
+                <TableCell sx={{ minWidth: 150 }}><b>Tenant/Patron</b></TableCell>
+                <TableCell sx={{ minWidth: 150 }}><b>Stall/Facility</b></TableCell>
+                <TableCell sx={{ minWidth: 100 }}><b>Electric (₱)</b></TableCell>
+                <TableCell sx={{ minWidth: 100 }}><b>Water (₱)</b></TableCell>
+                <TableCell sx={{ minWidth: 100 }}><b>Rent (₱)</b></TableCell>
+                <TableCell sx={{ minWidth: 100 }}><b>Rights (₱)</b></TableCell>
+                <TableCell sx={{ minWidth: 100 }}><b>Others (₱)</b></TableCell>
+                <TableCell sx={{ minWidth: 110 }}><b>Total (₱)</b></TableCell>
+                <TableCell sx={{ minWidth: 100 }}><b>Method</b></TableCell>
+                <TableCell sx={{ minWidth: 120 }}><b>Collector</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((payment) => (
                   <TableRow key={payment.id} hover>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: 120 }}>
                       <Chip 
                         label={payment.receiptNumber} 
                         color={payment.receiptType === 'AR' ? 'primary' : payment.receiptType === 'OR' ? 'secondary' : 'default'}
@@ -1348,31 +1363,31 @@ export default function PaymentRecording() {
                         variant={payment.isManual ? "outlined" : "filled"}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: 80 }}>
                       <Chip 
                         label={payment.receiptType} 
                         size="small"
                         variant="outlined"
                       />
                     </TableCell>
-                    <TableCell>{payment.displayDate}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: 150 }}>{payment.displayDate}</TableCell>
+                    <TableCell sx={{ minWidth: 140 }}>
                       <Chip 
                         label={payment.paymentTypeLabel} 
                         color={getPaymentTypeColor(payment.paymentType)}
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>{payment.tenantName}</TableCell>
-                    <TableCell>{payment.stallName}</TableCell>
-                    <TableCell>₱{(parseFloat(payment.breakdown.electric) || 0).toFixed(2)}</TableCell>
-                    <TableCell>₱{(parseFloat(payment.breakdown.water) || 0).toFixed(2)}</TableCell>
-                    <TableCell>₱{(parseFloat(payment.breakdown.rent) || 0).toFixed(2)}</TableCell>
-                    <TableCell>₱{(parseFloat(payment.breakdown.rights) || 0).toFixed(2)}</TableCell>
-                    <TableCell>₱{(parseFloat(payment.breakdown.others) || 0).toFixed(2)}</TableCell>
-                    <TableCell><strong>₱{payment.amount}</strong></TableCell>
-                    <TableCell>{payment.method}</TableCell>
-                    <TableCell>{payment.collectorName}</TableCell>
+                    <TableCell sx={{ minWidth: 150 }}>{payment.tenantName}</TableCell>
+                    <TableCell sx={{ minWidth: 150 }}>{payment.stallName}</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>₱{(parseFloat(payment.breakdown.electric) || 0).toFixed(2)}</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>₱{(parseFloat(payment.breakdown.water) || 0).toFixed(2)}</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>₱{(parseFloat(payment.breakdown.rent) || 0).toFixed(2)}</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>₱{(parseFloat(payment.breakdown.rights) || 0).toFixed(2)}</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>₱{(parseFloat(payment.breakdown.others) || 0).toFixed(2)}</TableCell>
+                    <TableCell sx={{ minWidth: 110 }}><strong>₱{payment.amount}</strong></TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>{payment.method}</TableCell>
+                    <TableCell sx={{ minWidth: 120 }}>{payment.collectorName}</TableCell>
                   </TableRow>
                 ))
               ) : (
