@@ -76,42 +76,62 @@ const CollectionManagement = () => {
   }, []);
 
   const refreshData = () => {
-  // Load transactions from payment history
-  const storedPayments = JSON.parse(localStorage.getItem("paymentHistory")) || [];
-  
-  // Transform payment data to transaction format with safe property access
-  const paymentTransactions = storedPayments.map(payment => ({
-    id: payment.id,
-    collectorId: payment.collectorId,
-    collectorName: payment.collectorName,
-    payer: payment.tenantName,
-    amount: parseFloat(payment.amount || 0),
-    receiptNo: payment.receiptNumber,
-    date: payment.date ? payment.date.split('T')[0] : new Date().toISOString().split('T')[0],
-    paymentType: payment.paymentTypeLabel,
-    method: payment.method,
-    stallName: payment.stallName,
-    rent: payment.rent || 0,
-    rights: payment.rights || 0,
-    electricity: payment.electricity || payment.electric || 0, // Handle both property names
-    water: payment.water || 0
-  }));
+    try {
+      // Safely load transactions from payment history
+      const storedPayments = JSON.parse(localStorage.getItem("paymentHistory") || "[]");
+      
+      // Transform payment data to transaction format with comprehensive safety checks
+      const paymentTransactions = storedPayments
+        .filter(payment => payment && typeof payment === 'object') // Filter out null/undefined
+        .map(payment => ({
+          id: payment.id || `temp-${Date.now()}-${Math.random()}`,
+          collectorId: payment.collectorId || '',
+          collectorName: payment.collectorName || '',
+          payer: payment.tenantName || '',
+          amount: parseFloat(payment.amount || 0),
+          receiptNo: payment.receiptNumber || '',
+          date: payment?.date ? payment.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          paymentType: payment.paymentTypeLabel || '',
+          method: payment.method || '',
+          stallName: payment.stallName || '',
+          rent: parseFloat(payment.rent || 0),
+          rights: parseFloat(payment.rights || 0),
+          electricity: parseFloat(payment.electricity || payment.electric || 0), // Handle both property names
+          water: parseFloat(payment.water || 0)
+        }));
 
-  setTransactions(paymentTransactions);
+      setTransactions(paymentTransactions);
 
-  // Load collectors
-  const storedCollectors = JSON.parse(localStorage.getItem("collectors")) || [
-    { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
-    { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
-  ];
-  setCollectors(storedCollectors);
-  
-  setAlert({
-    open: true,
-    message: "Data refreshed successfully",
-    severity: "success",
-  });
-};
+      // Load collectors with safety checks
+      const storedCollectors = JSON.parse(localStorage.getItem("collectors") || "[]");
+      const defaultCollectors = [
+        { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
+        { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
+      ];
+      
+      setCollectors(storedCollectors.length > 0 ? storedCollectors : defaultCollectors);
+      
+      setAlert({
+        open: true,
+        message: "Data refreshed successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      setAlert({
+        open: true,
+        message: "Error refreshing data. Please check your data format.",
+        severity: "error",
+      });
+      
+      // Set empty arrays as fallback
+      setTransactions([]);
+      setCollectors([
+        { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
+        { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
+      ]);
+    }
+  };
 
   const initializeReceipts = () => {
     // Simulate receipt management
@@ -159,7 +179,7 @@ const CollectionManagement = () => {
   const handleEncodeDCR = () => {
     const totalCollected = transactions
       .filter(t => t.collectorId === selectedCollector)
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + (t.amount || 0), 0);
 
     setDailyReport({
       totalCash: parseFloat(cashReceived) || 0,
@@ -196,16 +216,16 @@ const CollectionManagement = () => {
 
     const totalCollected = transactions
       .filter((t) => t.collectorId === selectedCollector)
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-    const diff = cashReceived - totalCollected;
+    const diff = parseFloat(cashReceived) - totalCollected;
     setReconciliationResult({ totalCollected, diff });
     setAlert({
       open: true,
       message:
         diff === 0
           ? "Reconciliation complete. All amounts match."
-          : `Reconciliation discrepancy detected. Difference: ₱${diff.toLocaleString()}`,
+          : `Reconciliation discrepancy detected. Difference: ₱${Math.abs(diff).toLocaleString()}`,
       severity: diff === 0 ? "success" : "error",
     });
   };
@@ -224,11 +244,11 @@ const CollectionManagement = () => {
     if (random) {
       const newAudit = {
         id: `AUD-${Date.now()}`,
-        collectorId: random.collectorId,
-        collectorName: random.collectorName,
-        receiptNo: random.receiptNo,
-        amount: random.amount,
-        payer: random.payer,
+        collectorId: random.collectorId || '',
+        collectorName: random.collectorName || '',
+        receiptNo: random.receiptNo || '',
+        amount: random.amount || 0,
+        payer: random.payer || '',
         date: new Date().toLocaleDateString(),
         timestamp: new Date().toLocaleString(),
       };
@@ -243,8 +263,8 @@ const CollectionManagement = () => {
     }
   };
 
-  // Calculate total collections across all collectors
-  const totalCollections = transactions.reduce((sum, t) => sum + t.amount, 0);
+  // Calculate total collections across all collectors with safety
+  const totalCollections = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
 
   return (
     <MainLayout>
@@ -281,8 +301,6 @@ const CollectionManagement = () => {
           Refresh Data
         </Button>
       </Stack>
-
-     
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -442,7 +460,7 @@ const CollectionManagement = () => {
                   label="Cash Received (₱)"
                   type="number"
                   value={cashReceived}
-                  onChange={(e) => setCashReceived(parseFloat(e.target.value))}
+                  onChange={(e) => setCashReceived(e.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -474,7 +492,7 @@ const CollectionManagement = () => {
                 </Typography>
                 <Typography>
                   <strong>Cash Received:</strong> ₱
-                  {cashReceived.toLocaleString()}
+                  {parseFloat(cashReceived).toLocaleString()}
                 </Typography>
                 <Typography
                   sx={{
@@ -483,7 +501,7 @@ const CollectionManagement = () => {
                     fontSize: "1.1rem",
                   }}
                 >
-                  <strong>Difference:</strong> ₱{reconciliationResult.diff.toLocaleString()}
+                  <strong>Difference:</strong> ₱{Math.abs(reconciliationResult.diff).toLocaleString()}
                 </Typography>
                 {reconciliationResult.diff !== 0 && (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -520,7 +538,7 @@ const CollectionManagement = () => {
           <TableBody>
             {collectors.map((c) => {
               const collectorTransactions = transactions.filter((t) => t.collectorId === c.id);
-              const total = collectorTransactions.reduce((sum, t) => sum + t.amount, 0);
+              const total = collectorTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
               const count = collectorTransactions.length;
               const lastTransaction = collectorTransactions[0];
               
