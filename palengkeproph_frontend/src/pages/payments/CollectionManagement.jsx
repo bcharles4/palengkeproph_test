@@ -76,42 +76,42 @@ const CollectionManagement = () => {
   }, []);
 
   const refreshData = () => {
-    // Load transactions from payment history
-    const storedPayments = JSON.parse(localStorage.getItem("paymentHistory")) || [];
-    
-    // Transform payment data to transaction format
-    const paymentTransactions = storedPayments.map(payment => ({
-      id: payment.id,
-      collectorId: payment.collectorId,
-      collectorName: payment.collectorName,
-      payer: payment.tenantName,
-      amount: parseFloat(payment.amount),
-      receiptNo: payment.receiptNumber,
-      date: payment.date.split('T')[0],
-      paymentType: payment.paymentTypeLabel,
-      method: payment.method,
-      stallName: payment.stallName,
-      rent: payment.rent || 0,
-      rights: payment.rights || 0,
-      electricity: payment.electricity || 0,
-      water: payment.water || 0
-    }));
+  // Load transactions from payment history
+  const storedPayments = JSON.parse(localStorage.getItem("paymentHistory")) || [];
+  
+  // Transform payment data to transaction format with safe property access
+  const paymentTransactions = storedPayments.map(payment => ({
+    id: payment.id,
+    collectorId: payment.collectorId,
+    collectorName: payment.collectorName,
+    payer: payment.tenantName,
+    amount: parseFloat(payment.amount || 0),
+    receiptNo: payment.receiptNumber,
+    date: payment.date ? payment.date.split('T')[0] : new Date().toISOString().split('T')[0],
+    paymentType: payment.paymentTypeLabel,
+    method: payment.method,
+    stallName: payment.stallName,
+    rent: payment.rent || 0,
+    rights: payment.rights || 0,
+    electricity: payment.electricity || payment.electric || 0, // Handle both property names
+    water: payment.water || 0
+  }));
 
-    setTransactions(paymentTransactions);
+  setTransactions(paymentTransactions);
 
-    // Load collectors
-    const storedCollectors = JSON.parse(localStorage.getItem("collectors")) || [
-      { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
-      { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
-    ];
-    setCollectors(storedCollectors);
-    
-    setAlert({
-      open: true,
-      message: "Data refreshed successfully",
-      severity: "success",
-    });
-  };
+  // Load collectors
+  const storedCollectors = JSON.parse(localStorage.getItem("collectors")) || [
+    { id: "C-001", name: "Juan Dela Cruz", area: "Stall Area A" },
+    { id: "C-002", name: "Maria Santos", area: "Parking Zone 1" },
+  ];
+  setCollectors(storedCollectors);
+  
+  setAlert({
+    open: true,
+    message: "Data refreshed successfully",
+    severity: "success",
+  });
+};
 
   const initializeReceipts = () => {
     // Simulate receipt management
