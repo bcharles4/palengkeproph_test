@@ -282,42 +282,7 @@ const CollectionManagement = () => {
         </Button>
       </Stack>
 
-      {/* SOP Process Stepper */}
-      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", mb: 4 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <FileText size={20} /> Area Collector Daily Operations
-        </Typography>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((step, index) => (
-            <Step key={step.label}>
-              <StepLabel>{step.label}</StepLabel>
-              <StepContent>
-                <Typography>{step.description}</Typography>
-                {index === 0 && (
-                  <Button variant="contained" onClick={handleObtainReceipts} sx={{ mt: 2 }}>
-                    Obtain ARs from Keeper
-                  </Button>
-                )}
-                {index === 2 && (
-                  <Box sx={{ mt: 2 }}>
-                    <Button variant="outlined" onClick={handleCancelUnusedReceipts} sx={{ mr: 2 }}>
-                      Cancel Unused Receipts
-                    </Button>
-                    <Button variant="contained" onClick={handleEncodeDCR}>
-                      Encode DCR
-                    </Button>
-                  </Box>
-                )}
-                {index === 3 && (
-                  <Button variant="contained" onClick={handleRemitCash} sx={{ mt: 2 }}>
-                    Remit Cash to Cashier
-                  </Button>
-                )}
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-      </Paper>
+     
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
