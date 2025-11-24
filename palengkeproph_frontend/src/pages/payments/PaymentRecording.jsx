@@ -214,6 +214,11 @@ export default function PaymentRecording() {
     setDailyBreakdown(breakdown);
   };
 
+  // Check for duplicate receipt number
+  const isDuplicateReceipt = (receiptNo) => {
+    return paymentHistory.some(p => p.receiptNumber === receiptNo);
+  };
+
   const currentTenant = tenants.find((t) => t.id === selectedTenant);
   const currentStall = stalls.find((s) => s.id === selectedStall);
   const currentCollector = collectors.find((c) => c.id === collectorId);
@@ -264,8 +269,7 @@ export default function PaymentRecording() {
     }
 
     // Check for duplicate receipt number
-    const existingReceipt = paymentHistory.find(p => p.receiptNumber === receiptNumber);
-    if (existingReceipt) {
+    if (isDuplicateReceipt(receiptNumber)) {
       showSnackbar(`Receipt number ${receiptNumber} already exists in the system. Please use a different receipt number.`, "error");
       return;
     }
@@ -303,8 +307,22 @@ export default function PaymentRecording() {
       return;
     }
 
+    // Check for duplicate receipt numbers in uploaded data
+    const existingReceiptNumbers = paymentHistory.map(p => p.receiptNumber);
+    const duplicates = uploadedData.filter(data => 
+      existingReceiptNumbers.includes(data.receiptNumber)
+    );
+
+    if (duplicates.length > 0) {
+      setDuplicateDialog({
+        open: true,
+        duplicates: duplicates.map(d => d.receiptNumber)
+      });
+      return;
+    }
+
     const newPayments = uploadedData.map((data, index) => {
-      const totalAmount = parseFloat(data.amount) || 0;
+      const totalAmount = parseFloat(data.amount) || calculateBreakdownTotal(data);
       return createPaymentRecord(totalAmount, data, true);
     });
 
@@ -1298,8 +1316,8 @@ export default function PaymentRecording() {
           </Box>
         </Box>
 
-        <TableContainer>
-          <Table>
+        <TableContainer sx={{ maxHeight: 600 }}>
+          <Table stickyHeader>
             <TableHead sx={{ bgcolor: "#f5f5f5" }}>
               <TableRow>
                 <TableCell><b>Receipt No.</b></TableCell>
@@ -1308,7 +1326,12 @@ export default function PaymentRecording() {
                 <TableCell><b>Payment Type</b></TableCell>
                 <TableCell><b>Tenant/Patron</b></TableCell>
                 <TableCell><b>Stall/Facility</b></TableCell>
-                <TableCell><b>Amount (₱)</b></TableCell>
+                <TableCell><b>Electric (₱)</b></TableCell>
+                <TableCell><b>Water (₱)</b></TableCell>
+                <TableCell><b>Rent (₱)</b></TableCell>
+                <TableCell><b>Rights (₱)</b></TableCell>
+                <TableCell><b>Others (₱)</b></TableCell>
+                <TableCell><b>Total (₱)</b></TableCell>
                 <TableCell><b>Method</b></TableCell>
                 <TableCell><b>Collector</b></TableCell>
               </TableRow>
@@ -1342,14 +1365,19 @@ export default function PaymentRecording() {
                     </TableCell>
                     <TableCell>{payment.tenantName}</TableCell>
                     <TableCell>{payment.stallName}</TableCell>
-                    <TableCell>₱{payment.amount}</TableCell>
+                    <TableCell>₱{(parseFloat(payment.breakdown.electric) || 0).toFixed(2)}</TableCell>
+                    <TableCell>₱{(parseFloat(payment.breakdown.water) || 0).toFixed(2)}</TableCell>
+                    <TableCell>₱{(parseFloat(payment.breakdown.rent) || 0).toFixed(2)}</TableCell>
+                    <TableCell>₱{(parseFloat(payment.breakdown.rights) || 0).toFixed(2)}</TableCell>
+                    <TableCell>₱{(parseFloat(payment.breakdown.others) || 0).toFixed(2)}</TableCell>
+                    <TableCell><strong>₱{payment.amount}</strong></TableCell>
                     <TableCell>{payment.method}</TableCell>
                     <TableCell>{payment.collectorName}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={14} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">
                       No payment records found.
                     </Typography>
