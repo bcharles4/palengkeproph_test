@@ -858,7 +858,7 @@ export default function PaymentRecording() {
       </Grid>
 
       {/* Tabs for different entry methods */}
-      <Paper sx={{ width: '100%', mb: 5, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+      <Paper sx={{ width: '74%', mb: 5, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
         <Tabs 
           value={tabValue} 
           onChange={(e, newValue) => setTabValue(newValue)} 
@@ -1284,7 +1284,7 @@ export default function PaymentRecording() {
       </Paper>
 
       {/* 📋 PAYMENT HISTORY */}
-      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+      <Paper sx={{  width: '74%', p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h5"sx={{ fontWeight: 700 }}>Payment History</Typography>
           <Box display="flex" gap={2}>
