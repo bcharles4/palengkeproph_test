@@ -242,6 +242,7 @@ export default function LeaseRenewal() {
                     onChange={handleChange}
                     margin="dense"
                   />
+                  
                   <TextField
                     fullWidth
                     label="Remarks"
