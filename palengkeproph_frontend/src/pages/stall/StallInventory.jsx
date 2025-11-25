@@ -214,8 +214,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     },
 
-    // Adding utility fields to all the generated stalls
-    ...Array.from({ length: 90 }).map((_, i) => ({
+      ...Array.from({ length: 90 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -227,21 +226,22 @@ export default function StallInventory() {
       leaseId: "",
       dateAdded: "2025-02-10",
       lastUpdated: "2025-02-10",
-      x: -5 + (i % 18) * 3.2,
-      y: -15 + Math.floor(i / 18) * 10,
+
+      // 2 columns
+      x: -5 + (i % 18) * 3.2,             // 0 or 1 column
+      y: -15 + Math.floor(i / 18) * 10,     // 4 rows (0..3)
       w: 3,
       h: 4,
-      // NEW UTILITY FIELDS
-      hasElectricity: i % 3 === 0,
-      electricityType: i % 3 === 0 ? (i % 2 === 0 ? "Fixed" : "Metered") : "Optional",
-      hasWater: i % 2 === 0,
-      waterType: i % 2 === 0 ? (i % 4 === 0 ? "Dedicated" : "Shared") : "None",
-      hasDrainage: i % 3 !== 0,
-      hasVentilation: i % 5 === 0,
-      stallStructure: i % 4 === 0 ? "Non-Fixed" : "Fixed"
-    })),
 
-    // Continue with the rest of your stall generation, adding utility fields similarly...
+      // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
     ...Array.from({ length: 90 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
@@ -254,24 +254,25 @@ export default function StallInventory() {
       leaseId: "",
       dateAdded: "2025-02-10",
       lastUpdated: "2025-02-10",
-      x: -5 + (i % 18) * 3.2,
-      y: 45 + Math.floor(i / 18) * 10,
+
+      // 2 columns
+      x: -5 + (i % 18) * 3.2,             // 0 or 1 column
+      y: 45 + Math.floor(i / 18) * 10,     // 4 rows (0..3)
+
       w: 3,
       h: 4,
-      // NEW UTILITY FIELDS
-      hasElectricity: i % 3 === 0,
-      electricityType: i % 3 === 0 ? (i % 2 === 0 ? "Fixed" : "Metered") : "Optional",
-      hasWater: i % 2 === 0,
-      waterType: i % 2 === 0 ? (i % 4 === 0 ? "Dedicated" : "Shared") : "None",
-      hasDrainage: i % 3 !== 0,
-      hasVentilation: i % 5 === 0,
-      stallStructure: i % 4 === 0 ? "Non-Fixed" : "Fixed"
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
     })),
 
-    // ... (Add utility fields to all your existing stall arrays following the same pattern)
-    // For brevity, I'll show the pattern for a few more
-    
-    ...Array.from({ length: 18 }).map((_, i) => ({
+      ...Array.from({ length: 18 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -283,21 +284,568 @@ export default function StallInventory() {
       leaseId: "",
       dateAdded: "2025-02-10",
       lastUpdated: "2025-02-10",
-      x: 55 + (i % 2) * 5,
-      y: -13 + Math.floor(i / 2) * 5.5,
+
+      // 2 columns
+      x: 55 + (i % 2) * 5,             // 0 or 1 column
+      y: -13 + Math.floor(i / 2) * 5.5,     // 4 rows (0..3)
+      
       w: 4,
       h: 5,
-      // NEW UTILITY FIELDS
-      hasElectricity: i % 3 === 0,
-      electricityType: i % 3 === 0 ? (i % 2 === 0 ? "Fixed" : "Metered") : "Optional",
-      hasWater: i % 2 === 0,
-      waterType: i % 2 === 0 ? (i % 4 === 0 ? "Dedicated" : "Shared") : "None",
-      hasDrainage: i % 3 !== 0,
-      hasVentilation: i % 5 === 0,
-      stallStructure: i % 4 === 0 ? "Non-Fixed" : "Fixed"
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
     })),
 
-    // Continue this pattern for all your stall arrays...
+      ...Array.from({ length: 18 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Center Left Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 55 + (i % 2) * 5,             // 0 or 1 column
+      y: 40 + Math.floor(i / 2) * 5.5,     // 4 rows (0..3)
+      
+      w: 4,
+      h: 5,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+    ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Right Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 80 + (i % 2) * 6.7,             // 0 or 1 column
+      y: -13 + Math.floor(i / 2) * 16,       
+      
+      w: 6,
+      h: 15,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+        ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Right Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 97 + (i % 2) * 6.7,             // 0 or 1 column
+      y: -13 + Math.floor(i / 2) * 16,       
+
+      w: 6,
+      h: 15,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Right Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 114 + (i % 2) * 6.7,             // 0 or 1 column
+      y: -13 + Math.floor(i / 2) * 16,     // 4 rows (0..3)
+      
+      w: 6,
+      h: 15,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+
+    })),
+
+    ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Right Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 114 + (i % 2) * 6.7,             // 0 or 1 column
+      y: 40 + Math.floor(i / 2) * 16,     // 4 rows (0..3)
+      
+      w: 6,
+      h: 15,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Right Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Reserved",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 97 + (i % 2) * 6.7,             // 0 or 1 column
+      y: 40 + Math.floor(i / 2) * 16,     // 4 rows (0..3)
+
+      w: 6,
+      h: 15,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(1, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Right Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 80 + (i % 2) * 6.7,             // 0 or 1 column
+      y: 40 + Math.floor(i / 2) * 16,     // 4 rows (0..3)
+      
+      w: 6,
+      h: 15,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 12 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Under Admin Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 68 + (i % 2) * 5.5,             // 0 or 1 column
+      y: 46  + Math.floor(i / 2) * 6.5,     // 4 rows (0..3)
+      
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Upper Admin Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Reserved",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 68 + (i % 2) * 5.5,             // 0 or 1 column
+      y: 11  + Math.floor(i / 2) * 6.5,     // 4 rows (0..3)
+      
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+    ...Array.from({ length: 2 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Above Admin Block",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 68 + (i % 2) * 5.5,             // 0 or 1 column
+      y: -5  + Math.floor(i / 2) * 5.5,     // 4 rows (0..3)
+      
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+
+      ...Array.from({ length: 8 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      type: "Food",
+      classification: "Under the Map",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 8 + (i % 4) * 5.5,             // 0 or 1 column
+      y: 100  + Math.floor(i / 4) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 8 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Under the Map",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 32 + (i % 4) * 5.5,             // 0 or 1 column
+      y: 100  + Math.floor(i / 4) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 8 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Under the Map",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 82 + (i % 4) * 5.5,             // 0 or 1 column
+      y: 100  + Math.floor(i / 4) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+    
+
+      ...Array.from({ length: 8 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Under the Map",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Available",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: 106 + (i % 4) * 5.5,             // 0 or 1 column
+      y: 100  + Math.floor(i / 4) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Ambulant Blocks",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x:  -41.5 + (i % 3) * 5.5,             // 0 or 1 column
+      y: -10  + Math.floor(i / 3) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Ambulant Blocks",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: -41.5+ (i % 3) * 5.5,             // 0 or 1 column
+      y: 5  + Math.floor(i / 3) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 6 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Ambulant Blocks",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x:  -41.5 + (i % 3) * 5.5,             // 0 or 1 column
+      y: 20  + Math.floor(i / 3) * 6.5,     // 4 rows (0..3)
+
+      w: 5,
+      h: 6,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
+
+      ...Array.from({ length: 12 }).map((_, i) => ({
+      id: `B-${String(i + 1).padStart(0, "0")}`,
+      original_owner: "Charles",
+      type: "Food",
+      classification: "Ambulant Blocks",
+      location: `B${i + 1}`,
+      dimensions: "2x3m",
+      capacity: 1,
+      status: i % 4 === 0 ? "Under Maintenance" : "Occupied",
+      leaseId: "",
+      dateAdded: "2025-02-10",
+      lastUpdated: "2025-02-10",
+
+      // 2 columns
+      x: -42 + (i % 2) * 8.5,             // 0 or 1 column
+      y: 40  + Math.floor(i / 2) * 8.5,     // 4 rows (0..3)
+
+      w: 8,
+      h: 8,
+
+            // NEW UTILITY FIELDS
+      hasElectricity: false,
+      electricityType: "None",
+      hasWater: false,
+      waterType: "None",
+      hasDrainage: false,
+      hasVentilation: false,
+      stallStructure: "Non-Fixed"
+    })),
     
   ]);
   
@@ -1070,83 +1618,81 @@ export default function StallInventory() {
           </DialogActions>
         </Dialog>
 
-    {/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
-    <SwipeableDrawer
-      anchor="bottom"
-      open={drawerOpen}
-      onClose={handleCloseDrawer}
-      onOpen={() => {}}
-      disableBackdropTransition={false}
-    >
-      <Box sx={{ p: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8, minHeight: 180 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {selectedStall ? `${selectedStall.id} — ${selectedStall.location}` : "Stall Details"}
-            </Typography>
-            <Typography color="text.secondary" sx={{ fontSize: 13 }}>
-              Quick details & actions
-            </Typography>
-          </Box>
-
-          <Box>
-            <Button size="small" sx={{ mr: 1 }} onClick={() => {
-              if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
-            }}>
-              Edit
-            </Button>
-            <Button size="small" color="error" onClick={() => {
-              if (selectedStall) { handleDelete(selectedStall.id); setDrawerOpen(false); }
-            }}>
-              Mark Inactive
-            </Button>
-          </Box>
-        </Stack>
-
-        <Divider sx={{ mb: 2 }} />
-
-        {selectedStall ? (
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Classification:</b> {selectedStall.classification}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Lease ID:</b> {selectedStall.leaseId || "-"}</Typography></Grid>
-            <Grid item xs={12}><Typography><b>Last Updated:</b> {selectedStall.lastUpdated ? new Date(selectedStall.lastUpdated).toLocaleString() : "-"}</Typography></Grid>
-            <Grid item xs={12}>
-              <Box sx={{ mt: 1 }}>
-                <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
+        {/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
+      {/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
+        <SwipeableDrawer
+          anchor="bottom"
+          open={drawerOpen}
+          onClose={handleCloseDrawer}
+          onOpen={() => {}}
+          disableBackdropTransition={false}
+        >
+          <Box sx={{ p: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8, minHeight: 180 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {selectedStall ? `${selectedStall.id} — ${selectedStall.location}` : "Stall Details"}
+                </Typography>
+                <Typography color="text.secondary" sx={{ fontSize: 13 }}>
+                  Quick details & actions
+                </Typography>
               </Box>
-            </Grid>
-            
-            {/* UTILITIES SECTION AT THE BOTTOM */}
-            <Grid item xs={12} sm={6} sx={{ mt: 2, pt: 2, ml: -30, borderTop: "1px solid #eee" }}>
-              <Typography variant="subtitle1" color="error" sx={{ fontWeight: 'bold', mb: 1 }}>Utilities:</Typography>
+
+              <Box>
+                <Button size="small" sx={{ mr: 1 }} onClick={() => {
+                  if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
+                }}>
+                  Edit
+                </Button>
+                <Button size="small" color="error" onClick={() => {
+                  if (selectedStall) { handleDelete(selectedStall.id); setDrawerOpen(false); }
+                }}>
+                  Mark Inactive
+                </Button>
+              </Box>
+            </Stack>
+
+            <Divider sx={{ mb: 2 }} />
+
+            {selectedStall ? (
               <Grid container spacing={1}>
+                <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Classification:</b> {selectedStall.classification}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Lease ID:</b> {selectedStall.leaseId || "-"}</Typography></Grid>
+                
+                {/* NEW UTILITY INFORMATION IN DRAWER */}
+                <Grid item xs={12}><Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>Utilities:</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Water:</b> {selectedStall.hasWater ? selectedStall.waterType : "No"}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Drainage:</b> {selectedStall.hasDrainage ? "Yes" : "No"}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Ventilation:</b> {selectedStall.hasVentilation ? "Yes" : "No"}</Typography></Grid>
                 <Grid item xs={12} sm={6}><Typography><b>Structure:</b> {selectedStall.stallStructure}</Typography></Grid>
+                
+                <Grid item xs={12}><Typography><b>Last Updated:</b> {selectedStall.lastUpdated ? new Date(selectedStall.lastUpdated).toLocaleString() : "-"}</Typography></Grid>
+                <Grid item xs={12}>
+                  <Box sx={{ mt: 1 }}>
+                    <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
+                  </Box>
+                </Grid>
               </Grid>
-            </Grid>
-          </Grid>
-        ) : (
-          <Typography color="text.secondary">No stall selected.</Typography>
-        )}
+            ) : (
+              <Typography color="text.secondary">No stall selected.</Typography>
+            )}
 
-        <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
-          <Button variant="contained" onClick={handleCloseDrawer}>Close</Button>
-          <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
-            if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
-          }}>Edit Stall</Button>
-          <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
-        </Box>
-      </Box>
-    </SwipeableDrawer>
+            <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
+              <Button variant="contained" onClick={handleCloseDrawer}>Close</Button>
+              <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
+                if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
+              }}>Edit Stall</Button>
+              <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
+            </Box>
+          </Box>
+        </SwipeableDrawer>
       </Box>
     </MainLayout>
   );
