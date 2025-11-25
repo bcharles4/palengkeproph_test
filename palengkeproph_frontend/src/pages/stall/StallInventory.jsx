@@ -1618,81 +1618,83 @@ export default function StallInventory() {
           </DialogActions>
         </Dialog>
 
-        {/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
-      {/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
-        <SwipeableDrawer
-          anchor="bottom"
-          open={drawerOpen}
-          onClose={handleCloseDrawer}
-          onOpen={() => {}}
-          disableBackdropTransition={false}
-        >
-          <Box sx={{ p: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8, minHeight: 180 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {selectedStall ? `${selectedStall.id} — ${selectedStall.location}` : "Stall Details"}
-                </Typography>
-                <Typography color="text.secondary" sx={{ fontSize: 13 }}>
-                  Quick details & actions
-                </Typography>
-              </Box>
+{/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
+<SwipeableDrawer
+  anchor="bottom"
+  open={drawerOpen}
+  onClose={handleCloseDrawer}
+  onOpen={() => {}}
+  disableBackdropTransition={false}
+>
+  <Box sx={{ p: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8, minHeight: 180 }}>
+    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          {selectedStall ? `${selectedStall.id} — ${selectedStall.location}` : "Stall Details"}
+        </Typography>
+        <Typography color="text.secondary" sx={{ fontSize: 13 }}>
+          Quick details & actions
+        </Typography>
+      </Box>
 
-              <Box>
-                <Button size="small" sx={{ mr: 1 }} onClick={() => {
-                  if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
-                }}>
-                  Edit
-                </Button>
-                <Button size="small" color="error" onClick={() => {
-                  if (selectedStall) { handleDelete(selectedStall.id); setDrawerOpen(false); }
-                }}>
-                  Mark Inactive
-                </Button>
-              </Box>
-            </Stack>
+      <Box>
+        <Button size="small" sx={{ mr: 1 }} onClick={() => {
+          if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
+        }}>
+          Edit
+        </Button>
+        <Button size="small" color="error" onClick={() => {
+          if (selectedStall) { handleDelete(selectedStall.id); setDrawerOpen(false); }
+        }}>
+          Mark Inactive
+        </Button>
+      </Box>
+    </Stack>
 
-            <Divider sx={{ mb: 2 }} />
+    <Divider sx={{ mb: 2 }} />
 
-            {selectedStall ? (
-              <Grid container spacing={1}>
-                <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Classification:</b> {selectedStall.classification}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Lease ID:</b> {selectedStall.leaseId || "-"}</Typography></Grid>
-                
-                {/* NEW UTILITY INFORMATION IN DRAWER */}
-                <Grid item xs={12}><Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>Utilities:</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Water:</b> {selectedStall.hasWater ? selectedStall.waterType : "No"}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Drainage:</b> {selectedStall.hasDrainage ? "Yes" : "No"}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Ventilation:</b> {selectedStall.hasVentilation ? "Yes" : "No"}</Typography></Grid>
-                <Grid item xs={12} sm={6}><Typography><b>Structure:</b> {selectedStall.stallStructure}</Typography></Grid>
-                
-                <Grid item xs={12}><Typography><b>Last Updated:</b> {selectedStall.lastUpdated ? new Date(selectedStall.lastUpdated).toLocaleString() : "-"}</Typography></Grid>
-                <Grid item xs={12}>
-                  <Box sx={{ mt: 1 }}>
-                    <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            ) : (
-              <Typography color="text.secondary">No stall selected.</Typography>
-            )}
-
-            <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
-              <Button variant="contained" onClick={handleCloseDrawer}>Close</Button>
-              <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
-                if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
-              }}>Edit Stall</Button>
-              <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
-            </Box>
+    {selectedStall ? (
+      <Grid container spacing={1}>
+        <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Classification:</b> {selectedStall.classification}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Lease ID:</b> {selectedStall.leaseId || "-"}</Typography></Grid>
+        <Grid item xs={12}><Typography><b>Last Updated:</b> {selectedStall.lastUpdated ? new Date(selectedStall.lastUpdated).toLocaleString() : "-"}</Typography></Grid>
+        <Grid item xs={12}>
+          <Box sx={{ mt: 1 }}>
+            <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
           </Box>
-        </SwipeableDrawer>
+        </Grid>
+        
+        {/* UTILITIES SECTION AT THE BOTTOM */}
+        <Grid item xs={12} sx={{ mt: 2, pt: 2, borderTop: "1px solid #eee" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Utilities:</Typography>
+          <Grid container spacing={1}>
+            <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
+            <Grid item xs={12} sm={6}><Typography><b>Water:</b> {selectedStall.hasWater ? selectedStall.waterType : "No"}</Typography></Grid>
+            <Grid item xs={12} sm={6}><Typography><b>Drainage:</b> {selectedStall.hasDrainage ? "Yes" : "No"}</Typography></Grid>
+            <Grid item xs={12} sm={6}><Typography><b>Ventilation:</b> {selectedStall.hasVentilation ? "Yes" : "No"}</Typography></Grid>
+            <Grid item xs={12} sm={6}><Typography><b>Structure:</b> {selectedStall.stallStructure}</Typography></Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    ) : (
+      <Typography color="text.secondary">No stall selected.</Typography>
+    )}
+
+    <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
+      <Button variant="contained" onClick={handleCloseDrawer}>Close</Button>
+      <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
+        if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
+      }}>Edit Stall</Button>
+      <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
+    </Box>
+  </Box>
+</SwipeableDrawer>
       </Box>
     </MainLayout>
   );
