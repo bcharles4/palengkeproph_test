@@ -73,7 +73,7 @@ export default function PaymentRecording() {
   const [collectors, setCollectors] = useState([]);
   const [selectedTenant, setSelectedTenant] = useState("");
   const [selectedStall, setSelectedStall] = useState("");
-  const [paymentType, setPaymentType] = useState("");
+  const [paymentType, setPaymentType] = useState("daily");
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("Cash");
   const [collectorId, setCollectorId] = useState("");
@@ -142,6 +142,13 @@ export default function PaymentRecording() {
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  // Add this useEffect to ensure payment type is set when switching to Auto Issuance tab
+  useEffect(() => {
+    if (tabValue === 0 && !paymentType) {
+      setPaymentType("daily");
+    }
+  }, [tabValue, paymentType]);
 
   const loadInitialData = () => {
     // Load tenants and stalls from localStorage
@@ -300,7 +307,7 @@ export default function PaymentRecording() {
     setBreakdown({ electric: "", water: "", rent: "", rights: "", others: "" });
     setSelectedTenant("");
     setSelectedStall("");
-    setPaymentType("");
+    setPaymentType("daily");
     setPatronName("");
     setActiveStep(3);
 
@@ -347,6 +354,9 @@ export default function PaymentRecording() {
 
   const createPaymentRecord = (totalAmount, manualData = null, isManual = false) => {
     const baseData = manualData || {};
+    const now = new Date();
+    const displayDate = now.toLocaleString();
+    const dateOnly = now.toISOString().split('T')[0]; // For filtering
     
     return {
       id: `PAY-${String(paymentHistory.length + 1).padStart(5, "0")}`,
@@ -358,8 +368,9 @@ export default function PaymentRecording() {
       stallName: baseData.stallName || (requiresTenant ? (currentStall?.name || stalls.find(s => s.id === selectedStall)?.name) : "Public Facility"),
       paymentType: baseData.paymentType || paymentType,
       paymentTypeLabel: paymentTypes.find(pt => pt.value === (baseData.paymentType || paymentType))?.label || paymentType,
-      date: new Date().toISOString(),
-      displayDate: new Date().toLocaleString(),
+      date: now.toISOString(),
+      displayDate: displayDate,
+      dateOnly: dateOnly, // For easy date filtering
       amount: totalAmount.toFixed(2),
       breakdown: manualData ? {
         electric: manualData.electric || "0",
@@ -685,10 +696,14 @@ export default function PaymentRecording() {
     setSnackbar({ open: true, message, severity });
   };
 
-  // Filter payment history
+  // Filter payment history - improved date filtering
   const filteredHistory = paymentHistory.filter((payment) => {
     if (filterType !== "all" && payment.paymentType !== filterType) return false;
-    if (filterDate && !payment.displayDate.includes(filterDate)) return false;
+    if (filterDate) {
+      // Use the dateOnly field for consistent date filtering
+      const paymentDate = payment.dateOnly || new Date(payment.date).toISOString().split('T')[0];
+      return paymentDate === filterDate;
+    }
     return true;
   });
 
@@ -791,7 +806,16 @@ export default function PaymentRecording() {
         Record payments from various revenue streams including tenant payments, restroom fees, parking fees, loan repayments, and special event fees.
       </Typography>
 
-      {/* 📊 Today's Summary */}
+      {/* 📊 Today's Summary with Label */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" fontWeight={600} color="text.primary">
+          Today's Collection Summary
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </Typography>
+      </Box>
+
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={6} sm={4} md={2}>
           <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
@@ -885,68 +909,55 @@ export default function PaymentRecording() {
           <Tab label="Excel Upload" />
         </Tabs>
 
-          <TabPanel value={tabValue} index={0}>
-            <Box>
-              {/* Ensure 'daily' is selected by default when Auto Issuance tab is active */}
-              {(() => {
-                const EnsureDailyDefault = () => {
-            useEffect(() => {
-              if (!paymentType && tabValue === 0) {
-                setPaymentType("daily");
-              }
-            }, [tabValue]); // run when tab changes
-            return null;
-                };
-                return <EnsureDailyDefault />;
-              })()}
+        <TabPanel value={tabValue} index={0}>
+          <Box>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Auto Issuance - Single Payment</Typography>
+            <Typography color="text.secondary" mb={2}>Record individual payments with automatic receipt generation</Typography>
+            
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <FormControl component="fieldset" fullWidth>
+                  <FormLabel component="legend">Receipt Type</FormLabel>
+                  <RadioGroup
+                    row
+                    value={receiptType}
+                    onChange={(e) => setReceiptType(e.target.value)}
+                  >
+                    <FormControlLabel value="AR" control={<Radio />} label="Acknowledgement Receipt (AR)" />
+                    <FormControlLabel value="OR" control={<Radio />} label="Official Receipt (OR)" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
 
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Auto Issuance - Single Payment</Typography>
-              <Typography color="text.secondary" mb={2}>Record individual payments with automatic receipt generation</Typography>
-              
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-            <FormControl component="fieldset" fullWidth>
-              <FormLabel component="legend">Receipt Type</FormLabel>
-              <RadioGroup
-                row
-                value={receiptType}
-                onChange={(e) => setReceiptType(e.target.value)}
-              >
-                <FormControlLabel value="AR" control={<Radio />} label="Acknowledgement Receipt (AR)" />
-                <FormControlLabel value="OR" control={<Radio />} label="Official Receipt (OR)" />
-              </RadioGroup>
-            </FormControl>
-                </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label={`${receiptType} Number`}
+                  fullWidth
+                  value={receiptNumber}
+                  InputProps={{ readOnly: true }}
+                  helperText={`${receiptType} Number`}
+                  size={isMobile ? "small" : "medium"}
+                />
+              </Grid>
 
-                <Grid item xs={12} md={6}>
-            <TextField
-              label={`${receiptType} Number`}
-              fullWidth
-              value={receiptNumber}
-              InputProps={{ readOnly: true }}
-              helperText={`${receiptType} Number`}
-              size={isMobile ? "small" : "medium"}
-            />
-                </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                  <InputLabel>Payment Type</InputLabel>
+                  <Select
+                    value={paymentType}
+                    label="Payment Type"
+                    onChange={(e) => setPaymentType(e.target.value)}
+                  >
+                    {paymentTypes.map((type) => (
+                      <MenuItem key={type.value} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth size={isMobile ? "small" : "medium"}>
-                    <InputLabel>Payment Type</InputLabel>
-                    <Select
-                      value={paymentType}
-                      label="Payment Type"
-                      onChange={(e) => setPaymentType(e.target.value)}
-                    >
-                      {paymentTypes.map((type) => (
-                        <MenuItem key={type.value} value={type.value}>
-                    {type.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                {/* Tenant and Stall Selection */}
+              {/* Tenant and Stall Selection */}
               {requiresTenant && (
                 <>
                   <Grid item xs={12} md={6}>
@@ -1297,6 +1308,15 @@ export default function PaymentRecording() {
               InputLabelProps={{ shrink: true }}
               sx={{ minWidth: { xs: '100%', sm: 150 } }}
             />
+            {filterDate && (
+              <Button 
+                size="small" 
+                onClick={() => setFilterDate("")}
+                sx={{ minWidth: { xs: '100%', sm: 80 } }}
+              >
+                Clear Date
+              </Button>
+            )}
           </Box>
         </Box>
 
@@ -1341,7 +1361,7 @@ export default function PaymentRecording() {
                 <TableCell sx={{ minWidth: 120 }}><b>Collector</b></TableCell>
               </TableRow>
             </TableHead>
-                        <TableBody>
+            <TableBody>
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((payment) => (
                   <TableRow key={payment.id} hover>
@@ -1384,7 +1404,7 @@ export default function PaymentRecording() {
                 <TableRow>
                   <TableCell colSpan={14} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">
-                      No payment records found.
+                      {filterDate || filterType !== "all" ? "No payment records found for the selected filters." : "No payment records found."}
                     </Typography>
                   </TableCell>
                 </TableRow>
