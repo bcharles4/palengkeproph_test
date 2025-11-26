@@ -885,56 +885,68 @@ export default function PaymentRecording() {
           <Tab label="Excel Upload" />
         </Tabs>
 
-        {/* AUTO ISSUANCE TAB */}
-        <TabPanel value={tabValue} index={0}>
-          <Box>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Auto Issuance - Single Payment</Typography>
-            <Typography color="text.secondary" mb={2}>Record individual payments with automatic receipt generation</Typography>
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Receipt Type</FormLabel>
-                  <RadioGroup
-                    row
-                    value={receiptType}
-                    onChange={(e) => setReceiptType(e.target.value)}
-                  >
-                    <FormControlLabel value="AR" control={<Radio />} label="Acknowledgement Receipt (AR)" />
-                    <FormControlLabel value="OR" control={<Radio />} label="Official Receipt (OR)" />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
+          <TabPanel value={tabValue} index={0}>
+            <Box>
+              {/* Ensure 'daily' is selected by default when Auto Issuance tab is active */}
+              {(() => {
+                const EnsureDailyDefault = () => {
+            useEffect(() => {
+              if (!paymentType && tabValue === 0) {
+                setPaymentType("daily");
+              }
+            }, [tabValue]); // run when tab changes
+            return null;
+                };
+                return <EnsureDailyDefault />;
+              })()}
 
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label={`${receiptType} Number`}
-                  fullWidth
-                  value={receiptNumber}
-                  InputProps={{ readOnly: true }}
-                  helperText={`${receiptType} Number`}
-                  size={isMobile ? "small" : "medium"}
-                />
-              </Grid>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Auto Issuance - Single Payment</Typography>
+              <Typography color="text.secondary" mb={2}>Record individual payments with automatic receipt generation</Typography>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel component="legend">Receipt Type</FormLabel>
+              <RadioGroup
+                row
+                value={receiptType}
+                onChange={(e) => setReceiptType(e.target.value)}
+              >
+                <FormControlLabel value="AR" control={<Radio />} label="Acknowledgement Receipt (AR)" />
+                <FormControlLabel value="OR" control={<Radio />} label="Official Receipt (OR)" />
+              </RadioGroup>
+            </FormControl>
+                </Grid>
 
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth size={isMobile ? "small" : "medium"}>
-                  <InputLabel>Payment Type</InputLabel>
-                  <Select
-                    value={paymentType}
-                    label="Payment Type"
-                    onChange={(e) => setPaymentType(e.target.value)}
-                  >
-                    {paymentTypes.map((type) => (
-                      <MenuItem key={type.value} value={type.value}>
-                        {type.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+                <Grid item xs={12} md={6}>
+            <TextField
+              label={`${receiptType} Number`}
+              fullWidth
+              value={receiptNumber}
+              InputProps={{ readOnly: true }}
+              helperText={`${receiptType} Number`}
+              size={isMobile ? "small" : "medium"}
+            />
+                </Grid>
 
-              {/* Tenant and Stall Selection */}
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+                    <InputLabel>Payment Type</InputLabel>
+                    <Select
+                      value={paymentType}
+                      label="Payment Type"
+                      onChange={(e) => setPaymentType(e.target.value)}
+                    >
+                      {paymentTypes.map((type) => (
+                        <MenuItem key={type.value} value={type.value}>
+                    {type.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* Tenant and Stall Selection */}
               {requiresTenant && (
                 <>
                   <Grid item xs={12} md={6}>
