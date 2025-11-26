@@ -108,6 +108,7 @@ export default function PaymentRecording() {
 
   // Payment types based on requirements
   const paymentTypes = [
+    { value: "daily", label: "Daily Collection", category: "daily", requiresTenant: true },
     { value: "rent", label: "Rent Payment", category: "tenant", requiresTenant: true },
     { value: "rights", label: "Rights Payment", category: "tenant", requiresTenant: true },
     { value: "electricity", label: "Electricity Bill", category: "tenant", requiresTenant: true },
