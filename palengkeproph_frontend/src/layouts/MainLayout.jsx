@@ -106,7 +106,7 @@ export default function MainLayout({ children }) {
     },
 
     {
-      text: "Payment Records",
+      text: "Market Collections",
       key: "payment",
       icon: <PaymentIcon />,
       children: [
