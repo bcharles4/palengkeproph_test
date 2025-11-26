@@ -190,31 +190,6 @@ export default function TenantOnboarding() {
             Add and record new tenant information for leasing.
           </Typography>
 
-          {/* Onboarding Steps */}
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Tenant Onboarding Process
-            </Typography>
-            <Stepper activeStep={activeStep} orientation="vertical">
-              {steps.map((step, index) => (
-                <Step key={step.label}>
-                  <StepLabel
-                    optional={
-                      index === 4 ? (
-                        <Typography variant="caption">Final step</Typography>
-                      ) : null
-                    }
-                  >
-                    {step.label}
-                  </StepLabel>
-                  <StepContent>
-                    <Typography>{step.description}</Typography>
-                  </StepContent>
-                </Step>
-              ))}
-            </Stepper>
-          </Box>
-
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <TextField fullWidth label="Tenant Name *" name="tenantName" value={form.tenantName} onChange={handleChange} margin="dense" />
