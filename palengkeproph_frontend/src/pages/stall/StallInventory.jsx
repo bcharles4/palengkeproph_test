@@ -1671,7 +1671,7 @@ export default function StallInventory() {
         </Grid>
         
         {/* UTILITIES SECTION AT THE BOTTOM */}
-        <Grid item xs={12} sx={{ mt: 2, pt: 2, ml: -44, borderTop: "1px solid #eee" }}>
+        <Grid item xs={12} sx={{ mt: 2, pt: 2, ml: -30, borderTop: "1px solid #eee" }}>
           <Typography variant="subtitle1" color="error" sx={{ fontWeight: 'bold', mb: 1 }}>Utilities:</Typography>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
