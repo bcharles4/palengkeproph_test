@@ -133,7 +133,7 @@ export default function TenantManagement() {
     // Save selected to session (so onboarding page can pick it up)
     sessionStorage.setItem("selectedTenant", JSON.stringify(tenant));
     // navigate (use SPA routing)
-    window.location.href = "/tenant-onboarding";
+    window.location.href = "/tenant-information";
   };
 
   const filtered = tenants.filter((t) =>
