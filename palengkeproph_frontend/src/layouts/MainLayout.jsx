@@ -99,7 +99,7 @@ export default function MainLayout({ children }) {
       icon: <AccountBoxIcon />,
       children: [
         { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
-        { text: "Tenant Onboarding", icon: <AddBusinessIcon />, path: "/tenant-onboarding", keywords: ["tenant", "onboarding", "new", "register", "add"] },
+        { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-onboarding", keywords: ["tenant", "onboarding", "new", "register", "add"] },
         { text: "Lease Creation", icon: <AssessmentIcon />, path: "/lease-creation", keywords: ["lease", "creation", "create", "new", "agreement"] },
         { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
       ],
