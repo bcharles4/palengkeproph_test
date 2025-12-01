@@ -14,8 +14,10 @@ import {
   Step,
   StepLabel,
   StepContent,
+  MenuItem,
+  IconButton,
 } from "@mui/material";
-import { UploadFile as UploadFileIcon, Home as HomeIcon } from "@mui/icons-material";
+import { UploadFile as UploadFileIcon, Home as HomeIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { NavigateNext } from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
 
@@ -42,7 +44,26 @@ const steps = [
   },
 ];
 
-export default function TenantOnboarding() {
+const idTypes = [
+  "Driver's License",
+  "Passport",
+  "SSS ID",
+  "GSIS ID",
+  "PRC ID",
+  "Voter's ID",
+  "Postal ID",
+  "PhilHealth ID",
+  "UMID",
+  "Company ID",
+  "School ID",
+  "TIN ID",
+  "Barangay ID",
+  "Police Clearance",
+  "NBI Clearance",
+  "Other"
+];
+
+export default function TenantInformation() {
   const [activeStep, setActiveStep] = useState(0);
   const [form, setForm] = useState({
     tenantName: "",
@@ -61,9 +82,14 @@ export default function TenantOnboarding() {
     verificationDetails: "",
     isVerified: false,
     uploadedDocs: [],
+    // New fields for ID type and number
+    idType: "",
+    idNumber: "",
+    idImage: null,
   });
 
   const [fileList, setFileList] = useState([]);
+  const [idImagePreview, setIdImagePreview] = useState(null);
 
   // ✅ Load tenant data if opened via "View" from Tenant List
   useEffect(() => {
@@ -77,7 +103,14 @@ export default function TenantOnboarding() {
         contactPhone: data.contact || "",
         startDate: data.startDate || "",
         isVerified: data.verification === "Verified",
+        idType: data.idType || "",
+        idNumber: data.idNumber || "",
       }));
+      
+      // Load ID image preview if exists
+      if (data.idImage) {
+        setIdImagePreview(data.idImage);
+      }
     }
   }, []);
 
@@ -87,6 +120,44 @@ export default function TenantOnboarding() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleIdImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a valid image file (JPEG, JPG, PNG, GIF)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        idImage: file,
+      }));
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setIdImagePreview(previewUrl);
+    }
+  };
+
+  const handleRemoveIdImage = () => {
+    setForm((prev) => ({
+      ...prev,
+      idImage: null,
+    }));
+    if (idImagePreview) {
+      URL.revokeObjectURL(idImagePreview);
+    }
+    setIdImagePreview(null);
   };
 
   const handleFileUpload = (e) => {
@@ -99,8 +170,8 @@ export default function TenantOnboarding() {
   };
 
   const handleSubmit = () => {
-    if (!form.tenantName || !form.address || !form.governmentId) {
-      alert("Please fill in all mandatory fields.");
+    if (!form.tenantName || !form.address || !form.idType || !form.idNumber) {
+      alert("Please fill in all mandatory fields including ID Type and ID Number.");
       return;
     }
 
@@ -112,15 +183,32 @@ export default function TenantOnboarding() {
       startDate: form.startDate,
       verification: form.isVerified ? "Verified" : "Pending",
       lastUpdated: new Date().toISOString(),
+      idType: form.idType,
+      idNumber: form.idNumber,
+      idImage: idImagePreview, // Store the preview URL or you can store the file separately
     };
 
     const existing = JSON.parse(localStorage.getItem("tenants")) || [];
     existing.push(newTenant);
     localStorage.setItem("tenants", JSON.stringify(existing));
 
+    // Clean up URL object if created
+    if (idImagePreview && idImagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(idImagePreview);
+    }
+
     alert("Tenant registered successfully!");
     window.location.href = "/tenant-list"; // redirect to tenant list
   };
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (idImagePreview && idImagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(idImagePreview);
+      }
+    };
+  }, [idImagePreview]);
 
   return (
     <MainLayout>
@@ -148,33 +236,33 @@ export default function TenantOnboarding() {
               separator={<NavigateNext fontSize="small" />} 
               aria-label="breadcrumb"
             >
-          <Link
-            underline="hover"
-            color="inherit"
-            href="/dashboard"
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              '&:hover': {
-                color: '#D32F2F'
-              }
-            }}
-          >
+              <Link
+                underline="hover"
+                color="inherit"
+                href="/dashboard"
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  '&:hover': {
+                    color: '#D32F2F'
+                  }
+                }}
+              >
                 <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
                 Dashboard
               </Link>
-          <Link
-            underline="hover"
-            color="inherit"
-            href="/tenant-list"
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              '&:hover': {
-                color: '#D32F2F'
-              }
-            }}
-          >
+              <Link
+                underline="hover"
+                color="inherit"
+                href="/tenant-list"
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  '&:hover': {
+                    color: '#D32F2F'
+                  }
+                }}
+              >
                 Tenant List
               </Link>
               <Typography color="text.primary">
@@ -194,7 +282,96 @@ export default function TenantOnboarding() {
             <Grid item xs={12} md={6}>
               <TextField fullWidth label="Tenant Name *" name="tenantName" value={form.tenantName} onChange={handleChange} margin="dense" />
               <TextField fullWidth label="Address *" name="address" value={form.address} onChange={handleChange} margin="dense" />
-              <TextField fullWidth label="Government ID *" name="governmentId" value={form.governmentId} onChange={handleChange} margin="dense" />
+              
+              {/* ID Type and Number Section */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="ID Type *"
+                    name="idType"
+                    value={form.idType}
+                    onChange={handleChange}
+                    margin="dense"
+                  >
+                    {idTypes.map((type) => (
+                      <MenuItem key={type} value={type}>
+                        {type}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="ID Number *"
+                    name="idNumber"
+                    value={form.idNumber}
+                    onChange={handleChange}
+                    margin="dense"
+                  />
+                </Grid>
+              </Grid>
+
+              {/* ID Image Upload */}
+              <Box sx={{ mt: 1, mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Upload ID Image *
+                </Typography>
+                <Button 
+                  variant="outlined" 
+                  component="label" 
+                  startIcon={<UploadFileIcon />}
+                  size="small"
+                >
+                  Upload ID Image
+                  <input 
+                    hidden 
+                    accept=".jpg,.jpeg,.png,.gif" 
+                    type="file" 
+                    onChange={handleIdImageUpload} 
+                  />
+                </Button>
+                
+                {/* ID Image Preview */}
+                {idImagePreview && (
+                  <Box sx={{ mt: 2, position: 'relative', display: 'inline-block' }}>
+                    <img 
+                      src={idImagePreview} 
+                      alt="ID Preview" 
+                      style={{ 
+                        maxWidth: '200px', 
+                        maxHeight: '150px', 
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }} 
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={handleRemoveIdImage}
+                      sx={{
+                        position: 'absolute',
+                        top: -8,
+                        right: -8,
+                        backgroundColor: 'white',
+                        '&:hover': {
+                          backgroundColor: 'grey.100',
+                        }
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                )}
+                
+                {!form.idImage && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                    No ID image uploaded
+                  </Typography>
+                )}
+              </Box>
+
               <TextField fullWidth label="Contact Person" name="contactPerson" value={form.contactPerson} onChange={handleChange} margin="dense" />
               <TextField fullWidth label="Contact Phone Number" name="contactPhone" value={form.contactPhone} onChange={handleChange} margin="dense" />
               <TextField fullWidth label="Mobile Phone" name="mobilePhone" value={form.mobilePhone} onChange={handleChange} margin="dense" />

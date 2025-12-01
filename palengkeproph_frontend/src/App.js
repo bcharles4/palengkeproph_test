@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard';
 import StallInventory from "./pages/stall/StallInventory";
 import StallAssignment from "./pages/stall/StallAssignment";
 import TenantList from './pages/tenant/TenantList';  
-import TenantOnboarding from './pages/tenant/TenantOnboarding';
+import TenantInformation from './pages/tenant/TenantInformation';
 import LeaseCreation from './pages/tenant/LeaseCreation';
 import LeaseRenewal from './pages/tenant/LeaseRenewal';
 import PaymentRecording from './pages/payments/PaymentRecording';
@@ -41,7 +41,7 @@ function App() {
           <Route path="/stall-inventory" element={<StallInventory />} />
           <Route path="/stall-assignment" element={<StallAssignment />} />
           <Route path="/tenant-list" element={<TenantList />} />
-          <Route path="/tenant-onboarding" element={<TenantOnboarding />} />
+          <Route path="/tenant-information" element={<TenantInformation />} />
           <Route path="/lease-creation" element={<LeaseCreation />} />
           <Route path="/lease-renewal" element={<LeaseRenewal />} />
           <Route path="/payment-recording" element={<PaymentRecording />} />
