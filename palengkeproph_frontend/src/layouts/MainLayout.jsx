@@ -94,7 +94,7 @@ export default function MainLayout({ children }) {
     },
 
     {
-      
+
       text: "Tenant Management",
       key: "tenant",
       icon: <AccountBoxIcon />,
@@ -570,5 +570,4 @@ export default function MainLayout({ children }) {
       </Box>
     </Box>
   );
-  
-}
+};
