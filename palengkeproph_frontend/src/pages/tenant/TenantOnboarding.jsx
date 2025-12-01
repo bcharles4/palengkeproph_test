@@ -184,7 +184,7 @@ export default function TenantOnboarding() {
           </Box>
 
           <Typography variant="h4" fontWeight={700} color="black" gutterBottom>
-            Tenant Onboarding
+            Tenant Information
           </Typography>
           <Typography mb={3} color="text.secondary">
             Add and record new tenant information for leasing.
