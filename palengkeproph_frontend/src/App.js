@@ -95,7 +95,7 @@ function App() {
           <Route path="/tenant-information" element={<TenantInformation />} />
           
           {/* Lease Management */}
-          <Route path="/lease-list" element={<LeaseList />} />
+          <Route path="/lease-records" element={<LeaseList />} />
           <Route path="/lease-creation" element={<LeaseCreation />} />
           <Route path="/lease-approval-list" element={<LeaseApprovalList />} />
           <Route path="/lease-approval/:leaseId" element={<LeaseApproval />} /> 

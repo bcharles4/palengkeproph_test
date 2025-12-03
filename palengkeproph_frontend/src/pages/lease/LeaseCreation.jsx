@@ -170,7 +170,7 @@ export default function LeaseCreation() {
       remarks: "",
     });
     
-    navigate("/lease-management");
+    navigate("/lease-records");
   };
 
   const selectedStall = stalls.find(s => s.id === leaseData.stallId);
@@ -202,14 +202,14 @@ export default function LeaseCreation() {
           <Link
             underline="hover"
             color="inherit"
-            href="/lease-management"
+            href="/lease-records"
             sx={{ 
               '&:hover': {
                 color: '#D32F2F'
               }
             }}
           >
-            Lease Management
+            Lease Records
           </Link>
           <Typography color="text.primary" sx={{ fontWeight: 500 }}>
             Create New Lease
