@@ -101,19 +101,18 @@ export default function MainLayout({ children }) {
       icon: <FeedIcon />,
       children: [
         { text: "Lease Creation", icon: <AssessmentIcon />, path: "/lease-creation", keywords: ["lease", "creation", "create", "new", "agreement"] },
+        { text: "Lease Approval", icon: <InsightsIcon />, path: "/lease-approval-list", keywords: ["lease", "approval", "approve", "review", "agreement"] }, // CHANGED HERE
         { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
       ],
     },
 
     {
-
       text: "Tenant Management",
       key: "tenant",
       icon: <AccountBoxIcon />,
       children: [
         { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
         { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-information", keywords: ["tenant", "information", "details", "profile"] },
-        
       ],
     },
 
@@ -128,35 +127,11 @@ export default function MainLayout({ children }) {
       ],
     },
 
-    // {
-    //   text: "Expense Records",
-    //   key: "expense",
-    //   icon: <PaidIcon />,
-    //   children: [
-    //     { text: "Expense Recording", icon: <ListAltIcon />, path: "/expense-recording", keywords: ["expense", "recording", "new", "add"] },
-    //     { text: "Expense Approval", icon: <AssessmentIcon />, path: "/expense-approval", keywords: ["expense", "approval", "approve", "review"] },
-    //     { text: "Check Request and Release", icon: <InsightsIcon />, path: "/check-request-and-release", keywords: ["check", "request", "release", "expense"] },
-    //     { text: "Budgeting", icon: <InsightsIcon />, path: "/budgeting", keywords: ["budgeting", "budget", "plan", "expenses"] },
-    //   ],
-    // },
-
-    // {
-    //   text: "Inventory & Purchasing",
-    //   key: "inventory",
-    //   icon: <InventoryIcon />,
-    //   children: [
-    //     { text: "Purchase Order Creation", icon: <ShoppingCartIcon />, path: "/purchase-order", keywords: ["purchase", "order", "vendor", "buy", "po"] },
-    //     { text: "Inventory Tracking", icon: <ListAltIcon />, path: "/inventory-tracking", keywords: ["inventory", "stock", "track", "adjust", "items"] },
-    //   ],
-    // },
-
-    { text: "Financial Report", icon: <AccountBalanceWalletIcon />, path: "/financial-reporting", keywords: ["settings", "configuration", "preferences"] },
+    { text: "Financial Report", icon: <AccountBalanceWalletIcon />, path: "/financial-reporting", keywords: ["financial", "report", "finance"] }, // Fixed keywords
     
-    // { text: "Loan Management", icon: <CreditScoreIcon />, path: "/loan-management", keywords: ["loan", "management", "preferences"] },
-
-    { text: "User Management", icon: <PeopleIcon />, path: "/user-management", keywords: ["user", "management", "preferences"] },
+    { text: "User Management", icon: <PeopleIcon />, path: "/user-management", keywords: ["user", "management", "users"] }, // Fixed keywords
     
-    { text: "Security Management", icon: <SecurityIcon />, path: "/security-management", keywords: ["security", "management", "preferences"] },
+    { text: "Security Management", icon: <SecurityIcon />, path: "/security-management", keywords: ["security", "management"] }, // Fixed keywords
 
     { text: "Settings", icon: <SettingsIcon />, path: "/settings", keywords: ["settings", "configuration", "preferences"] },
   ];
@@ -267,6 +242,15 @@ export default function MainLayout({ children }) {
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
+  // Check if current path matches any menu item for highlighting
+  const isActivePath = (path) => {
+    return location.pathname === path;
+  };
+
+  const isChildActive = (children) => {
+    return children.some(child => isActivePath(child.path));
+  };
+
   return (
     <Box sx={{ display: "flex", bgcolor: "#f5f6fa", minHeight: "100vh" }}>
       {/* Sidebar Drawer */}
@@ -318,9 +302,8 @@ export default function MainLayout({ children }) {
         <List>
           {menuItems.map((item, index) => {
             if (item.children) {
-              const isParentActive = item.children.some(
-                (sub) => location.pathname === sub.path
-              );
+              const parentActive = isChildActive(item.children);
+              const isDropdownOpen = openDropdowns[item.key];
 
               return (
                 <Box key={index}>
@@ -331,15 +314,15 @@ export default function MainLayout({ children }) {
                       borderRadius: 2,
                       mb: 0.5,
                       px: open ? 2 : 1.5,
-                      color: isParentActive ? "#D32F2F" : "#333",
-                      bgcolor: isParentActive ? "#fdecea" : "transparent",
+                      color: parentActive ? "#D32F2F" : "#333",
+                      bgcolor: parentActive ? "#fdecea" : "transparent",
                       "&:hover": { bgcolor: "#f8f8f8", color: "#D32F2F" },
                       transition: "all 0.2s",
                     }}
                   >
                     <ListItemIcon
                       sx={{
-                        color: isParentActive ? "#D32F2F" : "#555",
+                        color: parentActive ? "#D32F2F" : "#555",
                         minWidth: 0,
                         mr: open ? 2 : "auto",
                         justifyContent: "center",
@@ -356,15 +339,15 @@ export default function MainLayout({ children }) {
                             fontWeight: 600,
                           }}
                         />
-                        {openDropdowns[item.key] ? <ExpandLess /> : <ExpandMore />}
+                        {isDropdownOpen ? <ExpandLess /> : <ExpandMore />}
                       </>
                     )}
                   </ListItem>
 
-                  <Collapse in={openDropdowns[item.key]} timeout="auto" unmountOnExit>
+                  <Collapse in={isDropdownOpen} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                       {item.children.map((sub, i) => {
-                        const isActive = location.pathname === sub.path;
+                        const isActive = isActivePath(sub.path);
                         return (
                           <ListItem
                             key={i}
@@ -378,6 +361,7 @@ export default function MainLayout({ children }) {
                               bgcolor: isActive ? "#fdecea" : "transparent",
                               "&:hover": { bgcolor: "#f9f9f9", color: "#D32F2F" },
                               transition: "all 0.2s",
+                              textDecoration: 'none',
                             }}
                           >
                             <ListItemIcon
@@ -408,7 +392,7 @@ export default function MainLayout({ children }) {
               );
             }
 
-            const isActive = location.pathname === item.path;
+            const isActive = isActivePath(item.path);
             return (
               <ListItem
                 key={index}
@@ -422,6 +406,7 @@ export default function MainLayout({ children }) {
                   bgcolor: isActive ? "#fdecea" : "transparent",
                   "&:hover": { bgcolor: "#f8f8f8", color: "#D32F2F" },
                   transition: "all 0.2s",
+                  textDecoration: 'none',
                 }}
               >
                 <ListItemIcon
