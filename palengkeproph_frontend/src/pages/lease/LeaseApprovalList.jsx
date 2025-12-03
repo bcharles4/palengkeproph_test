@@ -287,7 +287,7 @@ export default function LeaseApprovalList() {
               }
               sx={tabStyles}
             />
-            <Tab 
+            {/* <Tab 
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Archive fontSize="small" />
@@ -295,7 +295,7 @@ export default function LeaseApprovalList() {
                 </Box>
               }
               sx={tabStyles}
-            />
+            /> */}
           </Tabs>
         </Paper>
 

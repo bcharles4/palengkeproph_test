@@ -239,7 +239,7 @@ export default function LeaseCreation() {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Tenant Name *"
+                  label="Tenant Name"
                   name="tenantName"
                   value={leaseData.tenantName}
                   onChange={handleChange}
@@ -299,7 +299,7 @@ export default function LeaseCreation() {
                 <TextField
                   
                   fullWidth
-                  label="Select Stall *"
+                  label="Select Stall"
                   name="stallId"
                   value={leaseData.stallId}
                   onChange={handleChange}
@@ -350,7 +350,7 @@ export default function LeaseCreation() {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Lease Start Date *"
+                  label="Lease Start Date"
                   type="date"
                   name="leaseStart"
                   value={leaseData.leaseStart}
@@ -364,7 +364,7 @@ export default function LeaseCreation() {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Lease End Date *"
+                  label="Lease End Date"
                   type="date"
                   name="leaseEnd"
                   value={leaseData.leaseEnd}
@@ -378,7 +378,7 @@ export default function LeaseCreation() {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Monthly Rate (₱) *"
+                  label="Monthly Rate (₱)"
                   name="monthlyRate"
                   value={leaseData.monthlyRate}
                   onChange={handleChange}
@@ -386,7 +386,7 @@ export default function LeaseCreation() {
                   type="number"
                   required
                   InputProps={{
-                    startAdornment: <AttachMoney sx={{ mr: 1, color: 'action.active' }} />,
+                    // startAdornment: <AttachMoney sx={{ mr: 1, color: 'action.active' }} />,
                   }}
                 />
               </Grid>
