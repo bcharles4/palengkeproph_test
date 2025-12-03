@@ -41,6 +41,7 @@ import {
   Paid as PaidIcon,
   People as PeopleIcon,
   Security as SecurityIcon,
+  Feed as FeedIcon
 } from "@mui/icons-material";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -53,6 +54,7 @@ export default function MainLayout({ children }) {
   const [openDropdowns, setOpenDropdowns] = useState({
     stall: false,
     tenant: false,
+    lease: false,
     inventory: false,
     expense: false,
     payment: false,
@@ -89,7 +91,17 @@ export default function MainLayout({ children }) {
       icon: <MapsHomeWorkIcon />,
       children: [
         { text: "Stall Inventory", icon: <StoreIcon />, path: "/stall-inventory", keywords: ["stall", "inventory", "stalls", "market"] },
-        { text: "Stall Assignment", icon: <AddBusinessIcon />, path: "/stall-assignment", keywords: ["stall", "assignment", "assign", "allocate"] },
+        { text: "Stall Available", icon: <AddBusinessIcon />, path: "/stall-assignment", keywords: ["stall", "assignment", "assign", "allocate"] },
+      ],
+    },
+
+    {
+      text: "Lease Management",
+      key: "lease",
+      icon: <FeedIcon />,
+      children: [
+        { text: "Lease Creation", icon: <AssessmentIcon />, path: "/lease-creation", keywords: ["lease", "creation", "create", "new", "agreement"] },
+        { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
       ],
     },
 
@@ -101,8 +113,7 @@ export default function MainLayout({ children }) {
       children: [
         { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
         { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-information", keywords: ["tenant", "information", "details", "profile"] },
-        { text: "Lease Creation", icon: <AssessmentIcon />, path: "/lease-creation", keywords: ["lease", "creation", "create", "new", "agreement"] },
-        { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
+        
       ],
     },
 

@@ -905,8 +905,8 @@ export default function PaymentRecording() {
           }}
         >
           <Tab label="Auto Issuance" />
-          <Tab label="Manual Entry" />
-          <Tab label="Excel Upload" />
+          <Tab label="Import Payment Records" />
+          {/* <Tab label="Excel Upload" /> */}
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
@@ -1093,7 +1093,7 @@ export default function PaymentRecording() {
         {/* MANUAL ENTRY TAB */}
         <TabPanel value={tabValue} index={1}>
           <Box>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Manual Entry - Bulk Payments</Typography>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Manual Entry - Bulk Data Transfer</Typography>
             <Typography color="text.secondary" mb={2}>Add multiple payments without generating individual receipts</Typography>
             
             <Grid container spacing={2}>
