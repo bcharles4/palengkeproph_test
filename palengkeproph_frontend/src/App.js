@@ -8,6 +8,7 @@ import StallInventory from "./pages/stall/StallInventory";
 import StallAssignment from "./pages/stall/StallAssignment";
 import TenantList from './pages/tenant/TenantList';  
 import TenantInformation from './pages/tenant/TenantInformation';
+import LeaseList from './pages/lease/LeaseRecords';
 import LeaseCreation from './pages/lease/LeaseCreation';
 import LeaseApprovalList from './pages/lease/LeaseApprovalList'; // NEW: List page
 import LeaseApproval from './pages/lease/LeaseApproval'; // Individual approval page
@@ -94,9 +95,10 @@ function App() {
           <Route path="/tenant-information" element={<TenantInformation />} />
           
           {/* Lease Management */}
+          <Route path="/lease-list" element={<LeaseList />} />
           <Route path="/lease-creation" element={<LeaseCreation />} />
-          <Route path="/lease-approval-list" element={<LeaseApprovalList />} /> {/* List of pending approvals */}
-          <Route path="/lease-approval/:leaseId" element={<LeaseApproval />} /> {/* Individual approval page */}
+          <Route path="/lease-approval-list" element={<LeaseApprovalList />} />
+          <Route path="/lease-approval/:leaseId" element={<LeaseApproval />} /> 
           <Route path="/lease-renewal" element={<LeaseRenewal />} />
           
           {/* Payments & Collections */}

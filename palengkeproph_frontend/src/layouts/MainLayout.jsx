@@ -100,6 +100,7 @@ export default function MainLayout({ children }) {
       key: "lease",
       icon: <FeedIcon />,
       children: [
+        {text: "Lease Records", icon: <ListAltIcon />, path: "/lease-list", keywords: ["lease", "list", "leases", "agreements"] },
         { text: "Lease Creation", icon: <AssessmentIcon />, path: "/lease-creation", keywords: ["lease", "creation", "create", "new", "agreement"] },
         { text: "Lease Approval", icon: <InsightsIcon />, path: "/lease-approval-list", keywords: ["lease", "approval", "approve", "review", "agreement"] }, // CHANGED HERE
         { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
