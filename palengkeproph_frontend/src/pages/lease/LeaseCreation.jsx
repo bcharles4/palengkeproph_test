@@ -166,11 +166,11 @@ export default function LeaseCreation() {
       leaseEnd: "",
       monthlyRate: "",
       securityDeposit: "",
-      paymentTerms: "Monthly",
+      paymentTerms: "Daily",
       remarks: "",
     });
     
-    navigate("/lease-records");
+    navigate("/lease-approval-list");
   };
 
   const selectedStall = stalls.find(s => s.id === leaseData.stallId);
@@ -413,6 +413,8 @@ export default function LeaseCreation() {
                   onChange={handleChange}
                   size="small"
                 >
+                  <MenuItem value="Daily">Daily</MenuItem>
+                  <MenuItem value="Weekly">Weekly</MenuItem>
                   <MenuItem value="Monthly">Monthly</MenuItem>
                   <MenuItem value="Quarterly">Quarterly</MenuItem>
                   <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,10 @@ import {
   CardContent,
   IconButton,
   CircularProgress,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
   Home as HomeIcon,
@@ -36,6 +40,10 @@ import {
   ArrowBack,
   Delete,
   Visibility,
+  CameraAlt,
+  PhotoCamera,
+  Upload,
+  MoreVert,
 } from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
 import { useParams, useNavigate } from "react-router-dom";
@@ -52,6 +60,14 @@ export default function LeaseApproval() {
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [generatedTenantId, setGeneratedTenantId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [cameraDialogOpen, setCameraDialogOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [validIdSource, setValidIdSource] = useState("upload"); // "upload" or "camera"
+  const [anchorEl, setAnchorEl] = useState(null);
+  
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     const loadLeaseRequest = () => {
@@ -76,21 +92,85 @@ export default function LeaseApproval() {
     loadLeaseRequest();
   }, [leaseId, navigate]);
 
-  const generateTenantId = () => {
-    const currentYear = new Date().getFullYear();
-    // Get existing tenant IDs to ensure uniqueness
-    const tenants = JSON.parse(localStorage.getItem("tenants")) || [];
-    let newTenantId;
-    let isUnique = false;
-    
-    while (!isUnique) {
-      const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-      newTenantId = `TEN-${currentYear}-${randomNum}`;
-      isUnique = !tenants.some(tenant => tenant.id === newTenantId);
+  // Start camera when dialog opens
+  useEffect(() => {
+    if (cameraDialogOpen) {
+      startCamera();
+    } else {
+      stopCamera();
     }
     
-    setGeneratedTenantId(newTenantId);
-    return newTenantId;
+    return () => {
+      stopCamera();
+    };
+  }, [cameraDialogOpen]);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "environment" } // Use back camera if available
+      });
+      setCameraStream(stream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      alert("Unable to access camera. Please check permissions.");
+      setCameraDialogOpen(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      
+      // Set canvas dimensions to match video
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      // Draw video frame to canvas
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Convert canvas to data URL
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      setCapturedImage(imageDataUrl);
+      
+      // Stop camera after capture
+      stopCamera();
+    }
+  };
+
+  const retakePhoto = () => {
+    setCapturedImage(null);
+    startCamera();
+  };
+
+  const saveCapturedPhoto = () => {
+    if (capturedImage) {
+      const fileData = {
+        fileName: `captured-id-${Date.now()}.jpg`,
+        fileType: 'image/jpeg',
+        fileSize: Math.floor(capturedImage.length * 0.75), // Approximate size
+        uploadDate: new Date().toISOString(),
+        content: capturedImage,
+        source: 'camera' // Add source for tracking
+      };
+      
+      setValidId(fileData);
+      setValidIdSource("camera");
+      setCameraDialogOpen(false);
+      setCapturedImage(null);
+    }
   };
 
   const handleFileUpload = (setter, event) => {
@@ -112,19 +192,56 @@ export default function LeaseApproval() {
     
     const reader = new FileReader();
     reader.onloadend = () => {
-      setter({
+      const fileData = {
         fileName: file.name,
         fileType: file.type,
         fileSize: file.size,
         uploadDate: new Date().toISOString(),
-        content: reader.result
-      });
+        content: reader.result,
+        source: 'upload'
+      };
+      setter(fileData);
+      if (setter === setValidId) {
+        setValidIdSource("upload");
+      }
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveFile = (setter) => {
     setter(null);
+    if (setter === setValidId) {
+      setValidIdSource("upload");
+    }
+  };
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCaptureOption = () => {
+    handleMenuClose();
+    setCameraDialogOpen(true);
+  };
+
+  const generateTenantId = () => {
+    const currentYear = new Date().getFullYear();
+    const tenants = JSON.parse(localStorage.getItem("tenants")) || [];
+    let newTenantId;
+    let isUnique = false;
+    
+    while (!isUnique) {
+      const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      newTenantId = `TEN-${currentYear}-${randomNum}`;
+      isUnique = !tenants.some(tenant => tenant.id === newTenantId);
+    }
+    
+    setGeneratedTenantId(newTenantId);
+    return newTenantId;
   };
 
   const handleApprove = () => {
@@ -133,10 +250,8 @@ export default function LeaseApproval() {
       return;
     }
 
-    // Generate Tenant ID
     const tenantId = generateTenantId();
     
-    // Create tenant record
     const newTenant = {
       id: tenantId,
       name: leaseRequest.tenantName,
@@ -150,18 +265,19 @@ export default function LeaseApproval() {
       leaseEnd: leaseRequest.leaseEnd,
       monthlyRate: leaseRequest.monthlyRate,
       documents: {
-        validId: validId,
+        validId: {
+          ...validId,
+          source: validIdSource // Include source information
+        },
         businessPermit: businessPermit,
         barangayPermit: barangayPermit,
       }
     };
 
-    // Save tenant to database
     const tenants = JSON.parse(localStorage.getItem("tenants")) || [];
     const updatedTenants = [...tenants, newTenant];
     localStorage.setItem("tenants", JSON.stringify(updatedTenants));
 
-    // Update lease request with tenant ID and status
     const leaseRequests = JSON.parse(localStorage.getItem("leaseRequests")) || [];
     const updatedRequests = leaseRequests.map(lease => {
       if (lease.id === leaseId) {
@@ -173,7 +289,10 @@ export default function LeaseApproval() {
           approvedDate: new Date().toISOString(),
           approvedAt: new Date().toISOString(),
           documents: {
-            validId: validId,
+            validId: {
+              ...validId,
+              source: validIdSource
+            },
             businessPermit: businessPermit,
             barangayPermit: barangayPermit,
           }
@@ -182,16 +301,13 @@ export default function LeaseApproval() {
       return lease;
     });
 
-    // Save updated lease requests
     localStorage.setItem("leaseRequests", JSON.stringify(updatedRequests));
 
-    // Add to approved leases
     const approvedLease = updatedRequests.find(lease => lease.id === leaseId);
     const approvedLeases = JSON.parse(localStorage.getItem("approvedLeases")) || [];
     const updatedApprovedLeases = [...approvedLeases, approvedLease];
     localStorage.setItem("approvedLeases", JSON.stringify(updatedApprovedLeases));
 
-    // Update all leases
     const allLeases = JSON.parse(localStorage.getItem("leases")) || [];
     const updatedAllLeases = allLeases.map(lease => {
       if (lease.id === leaseId) {
@@ -216,7 +332,6 @@ export default function LeaseApproval() {
 
     alert(`Lease approved! Tenant ID generated: ${tenantId}`);
     
-    // Redirect after 2 seconds
     setTimeout(() => {
       navigate("/lease-approval-list");
     }, 2000);
@@ -244,7 +359,6 @@ export default function LeaseApproval() {
 
     localStorage.setItem("leaseRequests", JSON.stringify(updatedRequests));
 
-    // Update all leases
     const allLeases = JSON.parse(localStorage.getItem("leases")) || [];
     const updatedAllLeases = allLeases.map(lease => {
       if (lease.id === leaseId) {
@@ -268,7 +382,6 @@ export default function LeaseApproval() {
     
     alert("Lease request rejected.");
     
-    // Redirect after 2 seconds
     setTimeout(() => {
       navigate("/lease-approval-list");
     }, 2000);
@@ -278,13 +391,11 @@ export default function LeaseApproval() {
     if (!file) return;
     
     if (file.fileType === "application/pdf") {
-      // For PDF, open in new tab
       const pdfWindow = window.open();
       pdfWindow.document.write(`
         <iframe width="100%" height="100%" src="${file.content}" style="border: none;"></iframe>
       `);
     } else {
-      // For images, open in new tab
       const imageWindow = window.open();
       imageWindow.document.write(`
         <img src="${file.content}" style="max-width: 100%; max-height: 100%;" />
@@ -456,7 +567,8 @@ export default function LeaseApproval() {
                 <Alert severity="success" sx={{ mt: 3 }}>
                   <Typography variant="body2">
                     <strong>Approved!</strong> Tenant ID: {leaseRequest.tenantId}<br />
-                    <strong>Approved on:</strong> {new Date(leaseRequest.approvedDate).toLocaleDateString()}
+                    <strong>Approved on:</strong> {leaseRequest.approvedDate ? new Date(leaseRequest.approvedDate).toLocaleDateString() : 'N/A'}<br />
+                    <strong>Approved by:</strong> {leaseRequest.approvedBy || 'Admin'}
                   </Typography>
                 </Alert>
               )}
@@ -465,9 +577,18 @@ export default function LeaseApproval() {
                 <Alert severity="error" sx={{ mt: 3 }}>
                   <Typography variant="body2">
                     <strong>Rejected:</strong> {leaseRequest.rejectionReason}<br />
-                    <strong>Rejected on:</strong> {new Date(leaseRequest.rejectedDate).toLocaleDateString()}
+                    <strong>Rejected on:</strong> {leaseRequest.rejectedDate ? new Date(leaseRequest.rejectedDate).toLocaleDateString() : 'N/A'}<br />
+                    <strong>Rejected by:</strong> {leaseRequest.rejectedBy || 'Admin'}
                   </Typography>
                 </Alert>
+              )}
+
+              {leaseRequest.appliedDate && (
+                <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #eee' }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Applied on: {new Date(leaseRequest.appliedDate).toLocaleDateString()}
+                  </Typography>
+                </Box>
               )}
             </Paper>
           </Grid>
@@ -490,30 +611,72 @@ export default function LeaseApproval() {
                     <Typography variant="subtitle1" gutterBottom>
                       Valid ID (Required) *
                     </Typography>
-                    {validId && (
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton size="small" onClick={() => handleViewDocument(validId)}>
-                          <Visibility fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small" onClick={() => handleRemoveFile(setValidId)}>
-                          <Delete fontSize="small" color="error" />
-                        </IconButton>
-                      </Box>
-                    )}
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      {validId && (
+                        <>
+                          <IconButton size="small" onClick={() => handleViewDocument(validId)}>
+                            <Visibility fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small" onClick={() => handleRemoveFile(setValidId)}>
+                            <Delete fontSize="small" color="error" />
+                          </IconButton>
+                        </>
+                      )}
+                      {!validId && (
+                        <>
+                          <IconButton size="small" onClick={handleMenuOpen}>
+                            <MoreVert fontSize="small" />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleMenuClose}
+                          >
+                            <MenuItem onClick={handleCaptureOption}>
+                              <ListItemIcon>
+                                <CameraAlt fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText>Capture with Camera</ListItemText>
+                            </MenuItem>
+                            <MenuItem component="label">
+                              <ListItemIcon>
+                                <Upload fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText>Upload from Device</ListItemText>
+                              <input
+                                accept="image/jpeg,image/png,image/jpg,application/pdf"
+                                style={{ display: 'none' }}
+                                id="validId-upload-menu"
+                                type="file"
+                                onChange={(e) => {
+                                  handleFileUpload(setValidId, e);
+                                  handleMenuClose();
+                                }}
+                              />
+                            </MenuItem>
+                          </Menu>
+                        </>
+                      )}
+                    </Box>
                   </Box>
                   <Typography variant="body2" color="text.secondary" paragraph>
-                    Government-issued ID (Passport, Driver's License, etc.)
+                    Government-issued ID (Passport, Driver's License, etc.) or tenant's photo if no ID available
                   </Typography>
                   
                   {validId ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <FileCopy fontSize="small" />
+                      {validIdSource === "camera" ? (
+                        <CameraAlt fontSize="small" />
+                      ) : (
+                        <FileCopy fontSize="small" />
+                      )}
                       <Typography variant="caption">
                         {validId.fileName} ({formatFileSize(validId.fileSize)})
+                        {validIdSource === "camera" && " (Camera Capture)"}
                       </Typography>
                     </Box>
                   ) : (
-                    <>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                       <input
                         accept="image/jpeg,image/png,image/jpg,application/pdf"
                         style={{ display: 'none' }}
@@ -526,11 +689,22 @@ export default function LeaseApproval() {
                           variant="outlined"
                           component="span"
                           size="small"
+                          startIcon={<Upload />}
+                          sx={{ mb: 1 }}
                         >
-                          Upload Valid ID
+                          Upload File
                         </Button>
                       </label>
-                    </>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<CameraAlt />}
+                        onClick={handleCaptureOption}
+                        sx={{ mb: 1 }}
+                      >
+                        Capture with Camera
+                      </Button>
+                    </Box>
                   )}
                 </CardContent>
               </Card>
@@ -667,13 +841,124 @@ export default function LeaseApproval() {
               <Alert severity="info" sx={{ mt: 3 }}>
                 <Typography variant="body2">
                   <strong>Note:</strong> Valid ID is required for approval. 
-                  Tenant ID will be automatically generated upon approval.
+                  If tenant doesn't have a valid ID, you can capture their photo using the camera option.
+                  This photo will serve as their identification for the lease agreement.
                 </Typography>
               </Alert>
             </Paper>
           </Grid>
         </Grid>
       </Box>
+
+      {/* Camera Capture Dialog */}
+      <Dialog 
+        open={cameraDialogOpen} 
+        onClose={() => setCameraDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Capture Valid ID</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Please capture a clear photo of the tenant's ID or the tenant themselves if they don't have a valid ID.
+          </Typography>
+          
+          <Box sx={{ position: 'relative', width: '100%', height: 400, mb: 2 }}>
+            {!capturedImage ? (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    backgroundColor: '#000'
+                  }}
+                />
+                <canvas
+                  ref={canvasRef}
+                  style={{ display: 'none' }}
+                />
+                {/* Camera overlay */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    border: '2px dashed #fff',
+                    borderRadius: '8px',
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: '80%',
+                      height: '60%',
+                      border: '2px solid #fff',
+                      borderRadius: '4px',
+                      opacity: 0.5
+                    }}
+                  />
+                </Box>
+              </>
+            ) : (
+              <img
+                src={capturedImage}
+                alt="Captured ID"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  borderRadius: '8px'
+                }}
+              />
+            )}
+          </Box>
+          
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              <strong>Tip:</strong> Ensure the ID/document is well-lit and all details are clearly visible.
+            </Typography>
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          {capturedImage ? (
+            <>
+              <Button onClick={retakePhoto} startIcon={<Cancel />}>
+                Retake
+              </Button>
+              <Button 
+                variant="contained" 
+                onClick={saveCapturedPhoto}
+                startIcon={<CheckCircle />}
+              >
+                Use This Photo
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={() => setCameraDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                variant="contained" 
+                onClick={capturePhoto}
+                startIcon={<PhotoCamera />}
+              >
+                Capture Photo
+              </Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
 
       {/* Approve Confirmation Dialog */}
       <Dialog open={approveDialogOpen} onClose={() => setApproveDialogOpen(false)}>
