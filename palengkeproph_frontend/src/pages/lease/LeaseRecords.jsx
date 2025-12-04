@@ -390,7 +390,7 @@ export default function LeaseList() {
         {/* Statistics Cards */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#f0f7ff', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="primary">
                   {stats.total}
@@ -402,7 +402,7 @@ export default function LeaseList() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#f0f9f0', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="success.main">
                   {stats.active}
@@ -414,7 +414,7 @@ export default function LeaseList() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#fff9e6', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="warning.main">
                   {stats.pending}
@@ -426,7 +426,7 @@ export default function LeaseList() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#ffe6e6', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="error.main">
                   {stats.rejected}
@@ -462,7 +462,7 @@ export default function LeaseList() {
         </Grid>
 
         {/* Tabs */}
-        <Paper sx={{ mb: 3, borderRadius: 2 }}>
+        <Paper sx={{ mb: 3, borderRadius: .5 }}>
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -479,7 +479,7 @@ export default function LeaseList() {
         </Paper>
 
         {/* Search and Filter Bar */}
-        <Paper sx={{ p: 2, mb: 3, borderRadius: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Paper sx={{ p: 2, mb: 3, borderRadius: 1, display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             placeholder="Search by ID, Tenant, Stall..."
             value={searchTerm}
