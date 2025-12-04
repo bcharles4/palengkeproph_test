@@ -23,6 +23,10 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  ToggleButtonGroup,
+  ToggleButton,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import {
   Home as HomeIcon,
@@ -44,6 +48,10 @@ import {
   PhotoCamera,
   Upload,
   MoreVert,
+  CameraFront,
+  CameraRear,
+  FlipCameraAndroid,
+  Cameraswitch,
 } from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
 import { useParams, useNavigate } from "react-router-dom";
@@ -65,6 +73,9 @@ export default function LeaseApproval() {
   const [capturedImage, setCapturedImage] = useState(null);
   const [validIdSource, setValidIdSource] = useState("upload"); // "upload" or "camera"
   const [anchorEl, setAnchorEl] = useState(null);
+  const [cameraMode, setCameraMode] = useState("environment"); // "environment" (rear) or "user" (front)
+  const [flashOn, setFlashOn] = useState(false);
+  const [showCameraControls, setShowCameraControls] = useState(true);
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -103,21 +114,42 @@ export default function LeaseApproval() {
     return () => {
       stopCamera();
     };
-  }, [cameraDialogOpen]);
+  }, [cameraDialogOpen, cameraMode]);
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment" } // Use back camera if available
-      });
+      stopCamera(); // Stop any existing stream first
+      
+      const constraints = {
+        video: { 
+          facingMode: cameraMode,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
+      };
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setCameraStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-      alert("Unable to access camera. Please check permissions.");
-      setCameraDialogOpen(false);
+      
+      // Try with more permissive constraints if the first attempt fails
+      try {
+        const fallbackConstraints = {
+          video: true
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+        setCameraStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (fallbackErr) {
+        alert("Unable to access camera. Please check permissions and make sure a camera is available.");
+        setCameraDialogOpen(false);
+      }
     }
   };
 
@@ -126,6 +158,16 @@ export default function LeaseApproval() {
       cameraStream.getTracks().forEach(track => track.stop());
       setCameraStream(null);
     }
+  };
+
+  const switchCamera = () => {
+    setCameraMode(prevMode => prevMode === "environment" ? "user" : "environment");
+  };
+
+  const toggleFlash = () => {
+    setFlashOn(!flashOn);
+    // Note: Flash control requires specific browser support and constraints
+    // This is a visual toggle - actual flash control depends on device/browser
   };
 
   const capturePhoto = () => {
@@ -138,20 +180,33 @@ export default function LeaseApproval() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
+      // Flip the image if using front camera
+      if (cameraMode === "user") {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+      }
+      
       // Draw video frame to canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       
+      // Reset transform for front camera
+      if (cameraMode === "user") {
+        context.setTransform(1, 0, 0, 1, 0, 0);
+      }
+      
       // Convert canvas to data URL
-      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
       setCapturedImage(imageDataUrl);
       
       // Stop camera after capture
       stopCamera();
+      setShowCameraControls(false);
     }
   };
 
   const retakePhoto = () => {
     setCapturedImage(null);
+    setShowCameraControls(true);
     startCamera();
   };
 
@@ -163,13 +218,15 @@ export default function LeaseApproval() {
         fileSize: Math.floor(capturedImage.length * 0.75), // Approximate size
         uploadDate: new Date().toISOString(),
         content: capturedImage,
-        source: 'camera' // Add source for tracking
+        source: 'camera',
+        cameraMode: cameraMode // Store which camera was used
       };
       
       setValidId(fileData);
       setValidIdSource("camera");
       setCameraDialogOpen(false);
       setCapturedImage(null);
+      setShowCameraControls(true);
     }
   };
 
@@ -672,7 +729,8 @@ export default function LeaseApproval() {
                       )}
                       <Typography variant="caption">
                         {validId.fileName} ({formatFileSize(validId.fileSize)})
-                        {validIdSource === "camera" && " (Camera Capture)"}
+                        {validIdSource === "camera" && validId.cameraMode === "user" && " (Front Camera)"}
+                        {validIdSource === "camera" && validId.cameraMode === "environment" && " (Rear Camera)"}
                       </Typography>
                     </Box>
                   ) : (
@@ -842,7 +900,8 @@ export default function LeaseApproval() {
                 <Typography variant="body2">
                   <strong>Note:</strong> Valid ID is required for approval. 
                   If tenant doesn't have a valid ID, you can capture their photo using the camera option.
-                  This photo will serve as their identification for the lease agreement.
+                  Switch between front and rear cameras using the camera switch button.
+                  
                 </Typography>
               </Alert>
             </Paper>
@@ -850,17 +909,59 @@ export default function LeaseApproval() {
         </Grid>
       </Box>
 
-      {/* Camera Capture Dialog */}
+      {/* Camera Capture Dialog with Camera Controls */}
       <Dialog 
         open={cameraDialogOpen} 
-        onClose={() => setCameraDialogOpen(false)}
+        onClose={() => {
+          setCameraDialogOpen(false);
+          setCapturedImage(null);
+          setShowCameraControls(true);
+        }}
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Capture Valid ID</DialogTitle>
+        <DialogTitle>
+          Capture Valid ID
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+            <ToggleButtonGroup
+              value={cameraMode}
+              exclusive
+              onChange={(e, newMode) => {
+                if (newMode) {
+                  setCameraMode(newMode);
+                }
+              }}
+              size="small"
+            >
+              <ToggleButton value="environment" aria-label="rear camera">
+                <CameraRear fontSize="small" sx={{ mr: 1 }} />
+                Rear
+              </ToggleButton>
+              <ToggleButton value="user" aria-label="front camera">
+                <CameraFront fontSize="small" sx={{ mr: 1 }} />
+                Front
+              </ToggleButton>
+            </ToggleButtonGroup>
+            
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={flashOn}
+                  onChange={toggleFlash}
+                  size="small"
+                  disabled // Flash control requires specific API support
+                />
+              }
+              label="Flash"
+              labelPlacement="start"
+            />
+          </Box>
+        </DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Please capture a clear photo of the tenant's ID or the tenant themselves if they don't have a valid ID.
+            {cameraMode === "environment" 
+              ? "Use rear camera to capture documents or IDs" 
+              : "Use front camera to capture tenant's photo"}
           </Typography>
           
           <Box sx={{ position: 'relative', width: '100%', height: 400, mb: 2 }}>
@@ -875,13 +976,15 @@ export default function LeaseApproval() {
                     height: '100%',
                     objectFit: 'cover',
                     borderRadius: '8px',
-                    backgroundColor: '#000'
+                    backgroundColor: '#000',
+                    transform: cameraMode === "user" ? 'scaleX(-1)' : 'none'
                   }}
                 />
                 <canvas
                   ref={canvasRef}
                   style={{ display: 'none' }}
                 />
+                
                 {/* Camera overlay */}
                 <Box
                   sx={{
@@ -908,6 +1011,36 @@ export default function LeaseApproval() {
                     }}
                   />
                 </Box>
+
+                {/* Camera controls overlay */}
+                {showCameraControls && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 16,
+                      left: 0,
+                      right: 0,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 2
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={switchCamera}
+                      startIcon={<Cameraswitch />}
+                      sx={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        }
+                      }}
+                    >
+                      Switch Camera
+                    </Button>
+                  </Box>
+                )}
               </>
             ) : (
               <img
@@ -925,7 +1058,10 @@ export default function LeaseApproval() {
           
           <Alert severity="info" sx={{ mb: 2 }}>
             <Typography variant="body2">
-              <strong>Tip:</strong> Ensure the ID/document is well-lit and all details are clearly visible.
+              <strong>Tip:</strong> 
+              {cameraMode === "environment" 
+                ? " Ensure the document is well-lit and all details are clearly visible. Use rear camera for better quality."
+                : " Ask the tenant to look directly at the camera. Use good lighting for clear photos."}
             </Typography>
           </Alert>
         </DialogContent>
@@ -945,13 +1081,23 @@ export default function LeaseApproval() {
             </>
           ) : (
             <>
-              <Button onClick={() => setCameraDialogOpen(false)}>
+              <Button onClick={() => {
+                setCameraDialogOpen(false);
+                setCapturedImage(null);
+                setShowCameraControls(true);
+              }}>
                 Cancel
               </Button>
               <Button 
                 variant="contained" 
                 onClick={capturePhoto}
                 startIcon={<PhotoCamera />}
+                sx={{
+                  backgroundColor: '#D32F2F',
+                  '&:hover': {
+                    backgroundColor: '#B71C1C',
+                  }
+                }}
               >
                 Capture Photo
               </Button>

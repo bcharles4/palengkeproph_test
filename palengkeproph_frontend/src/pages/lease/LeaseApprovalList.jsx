@@ -272,7 +272,7 @@ export default function LeaseApprovalList() {
         </Typography>
 
         {/* Tabs */}
-        <Paper sx={{ mb: 3, borderRadius: 2 }}>
+        <Paper sx={{ mb: 3, borderRadius: .5 }}>
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -356,7 +356,7 @@ export default function LeaseApprovalList() {
                               <Tooltip title="View Details">
                                 <Button
                                   size="small"
-                                  variant="outlined"
+                                  variant="transparent"
                                   startIcon={<Visibility />}
                                   onClick={() => handleViewDetails(lease.id)}
                                   sx={{ color: '#1976d2' }}
