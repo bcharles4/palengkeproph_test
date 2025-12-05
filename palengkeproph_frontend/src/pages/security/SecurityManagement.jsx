@@ -207,7 +207,7 @@ export default function SecurityManagement() {
         </Grid>
       </Grid>
 
-      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+      <Paper sx={{ p: 3, borderRadius: 3 }}>
         <Tabs value={tab} onChange={(e, v) => setTab(v)} aria-label="security-tabs" sx={{ mb: 2 }}>
           <Tab label="Incident Reporting" />
           <Tab label="Incident Management" />
