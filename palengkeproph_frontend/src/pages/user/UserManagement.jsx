@@ -738,7 +738,7 @@ const handleSaveUser = async () => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+            <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
           <CardContent>
             <Typography color="text.secondary">System Modules</Typography>
             <Typography variant="h4" sx={{ color: "#D32F2F", fontWeight: 700 }}>{modules.length}</Typography>
