@@ -197,7 +197,7 @@ export default function SecurityManagement() {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: 3 }}>
+          <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
             <CardContent>
               <Typography color="text.secondary">Open / Investigating</Typography>
               <Typography variant="h4" sx={{ color: "#D32F2F", fontWeight: 700 }}>{analytics.byStatus['Investigating'] || 0}</Typography>
@@ -207,7 +207,7 @@ export default function SecurityManagement() {
         </Grid>
       </Grid>
 
-      <Paper sx={{ p: 3, borderRadius: 3 }}>
+      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
         <Tabs value={tab} onChange={(e, v) => setTab(v)} aria-label="security-tabs" sx={{ mb: 2 }}>
           <Tab label="Incident Reporting" />
           <Tab label="Incident Management" />
