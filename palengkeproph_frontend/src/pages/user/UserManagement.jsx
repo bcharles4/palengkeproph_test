@@ -704,7 +704,7 @@ const handleSaveUser = async () => {
       {/* Summary Cards */}
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+            <Card sx={{ borderRadius: 3,  boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
           <CardContent>
             <Typography color="text.secondary">Total Users</Typography>
             <Typography variant="h4" sx={{ color: "#000", fontWeight: 700 }}>
@@ -717,7 +717,7 @@ const handleSaveUser = async () => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+            <Card sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
             <CardContent>
               <Typography color="text.secondary">Active Users</Typography>
               <Typography variant="h4" sx={{ color: "#D32F2F", fontWeight: 700 }}>
