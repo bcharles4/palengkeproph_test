@@ -818,7 +818,7 @@ export default function PaymentRecording() {
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={6} sm={4} md={2}>
-          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
             <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Rent
@@ -830,7 +830,7 @@ export default function PaymentRecording() {
           </Card>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
             <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Rights
@@ -842,7 +842,7 @@ export default function PaymentRecording() {
           </Card>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
             <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Electricity
@@ -854,7 +854,7 @@ export default function PaymentRecording() {
           </Card>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
             <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Water
@@ -866,7 +866,7 @@ export default function PaymentRecording() {
           </Card>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)"}}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
             <CardContent sx={{ p: 2 }}>
               <Typography color="text.secondary" gutterBottom variant="body2">
                 Other
@@ -878,7 +878,7 @@ export default function PaymentRecording() {
           </Card>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", bgcolor: "#D32F2F", color: "white" }}>
+          <Card sx={{ borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", bgcolor: "#D32F2F", color: "white" }}>
             <CardContent sx={{ p: 2 }}>
               <Typography gutterBottom variant="body2" sx={{ color: "white" }}>
                 Total Today
@@ -892,7 +892,7 @@ export default function PaymentRecording() {
       </Grid>
 
       {/* Tabs for different entry methods */}
-      <Paper sx={{ width: '100%', mb: 3, borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", overflow: 'hidden' }}>
+      <Paper sx={{ width: '100%', mb: 3, borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)", overflow: 'hidden' }}>
         <Tabs 
           value={tabValue} 
           onChange={(e, newValue) => setTabValue(newValue)} 
