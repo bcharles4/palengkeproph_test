@@ -390,7 +390,7 @@ export default function LeaseList() {
         {/* Statistics Cards */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="primary">
                   {stats.total}
@@ -402,7 +402,7 @@ export default function LeaseList() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"}}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="success.main">
                   {stats.active}
@@ -414,7 +414,7 @@ export default function LeaseList() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="warning.main">
                   {stats.pending}
@@ -426,7 +426,7 @@ export default function LeaseList() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={2.4}>
-            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: '#ffffffff', borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="error.main">
                   {stats.rejected}
@@ -441,7 +441,7 @@ export default function LeaseList() {
             <Card sx={{ 
               bgcolor: stats.upcomingRenewals > 0 ? '#fff3cd' : '#f8f9fa',
               border: stats.upcomingRenewals > 0 ? '2px solid #ffc107' : 'none',
-              borderRadius: 2 
+              borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.5)"
             }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} color="warning.dark">
