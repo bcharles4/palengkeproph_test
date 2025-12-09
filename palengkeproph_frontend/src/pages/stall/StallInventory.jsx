@@ -1484,8 +1484,7 @@ export default function StallInventory() {
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={12} sm={6}><TextField fullWidth label="Classification" value={form.classification} onChange={(e) => setForm({ ...form, classification: e.target.value })} /></Grid>
-              <Grid item xs={12} sm={6}><TextField fullWidth label="Location Label" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} /></Grid>
+              <Grid item xs={12} sm={6}><TextField fullWidth label="Section" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })} /></Grid>
               <Grid item xs={12} sm={6}><TextField fullWidth label="Dimensions" value={form.dimensions} onChange={(e) => setForm({ ...form, dimensions: e.target.value })} /></Grid>
               <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Capacity" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: Number(e.target.value) })} /></Grid>
               <Grid item xs={6} sm={3}>
@@ -1657,7 +1656,7 @@ export default function StallInventory() {
         <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
         <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
         <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Classification:</b> {selectedStall.classification}</Typography></Grid>
+        <Grid item xs={12} sm={6}><Typography><b>Section:</b> {selectedStall.section}</Typography></Grid>
         <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
         <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
         <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
