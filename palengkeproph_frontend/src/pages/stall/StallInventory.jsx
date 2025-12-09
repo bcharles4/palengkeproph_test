@@ -701,7 +701,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Under the Map",
+      section: "Under the Map",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
