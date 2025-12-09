@@ -159,15 +159,15 @@ export default function StallAssignment() {
               }}}>
             Stall Management
           </Link>
-          <Typography color="text.primary">Stall Assignment</Typography>
+          <Typography color="text.primary">Stall Available</Typography>
         </Breadcrumbs>
 
         {/* === Page Header === */}
         <Typography variant="h4" fontWeight={700} color="black" gutterBottom>
-          Stall Assignment
+          Stall Available
         </Typography>
         <Typography mb={3} color="text.secondary">
-          Manage and track tenant assignments, leases, and stall occupancy.
+          Manage and track tenant assignments, leases, and stall availability.
         </Typography>
 
         {/* === Toolbar === */}
