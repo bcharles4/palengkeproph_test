@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -20,24 +20,40 @@ import {
   DialogActions,
   Breadcrumbs,
   Link,
+  Chip,
+  Tabs,
+  Tab,
+  Alert,
+  Stack,
 } from "@mui/material";
 import {
   Add as AddIcon,
   History as HistoryIcon,
   Delete as DeleteIcon,
   Home as HomeIcon,
+  Assignment as AssignmentIcon,
+  FilterList as FilterIcon,
 } from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
+import { useNavigate } from "react-router-dom";
 
 export default function StallAssignment() {
+  const navigate = useNavigate();
   const [assignments, setAssignments] = useState([
     {
       stallId: "ST-001",
-      tenantId: "TEN-1001",
-      leaseId: "LEASE-2001",
-      leaseStart: "2025-01-10",
-      leaseEnd: "2025-12-31",
-      assignedDate: "2025-01-09",
+      originalOwner: "John Smith",
+      recentOwner: "Sarah Johnson",
+      type: "Food Stall",
+      section: "A",
+      utilities: {
+        electricity: "Metered",
+        water: "No",
+        drainage: "No",
+        ventilation: "Yes",
+        structure: "Fixed"
+      },
+      status: "Available",
       history: [
         {
           tenantId: "TEN-0990",
@@ -46,7 +62,70 @@ export default function StallAssignment() {
           leaseEnd: "2024-12-31",
         },
       ],
+    },
+    {
+      stallId: "ST-002",
+      originalOwner: "Maria Garcia",
+      recentOwner: "James Wilson",
+      type: "Retail Stall",
+      section: "B",
+      utilities: {
+        electricity: "Metered",
+        water: "Yes",
+        drainage: "Yes",
+        ventilation: "Yes",
+        structure: "Fixed"
+      },
       status: "Occupied",
+      history: [],
+    },
+    {
+      stallId: "ST-003",
+      originalOwner: "Robert Chen",
+      recentOwner: "Robert Chen",
+      type: "Service Stall",
+      section: "C",
+      utilities: {
+        electricity: "Metered",
+        water: "No",
+        drainage: "No",
+        ventilation: "No",
+        structure: "Fixed"
+      },
+      status: "Available",
+      history: [],
+    },
+    {
+      stallId: "ST-004",
+      originalOwner: "Lisa Wong",
+      recentOwner: "Michael Brown",
+      type: "Kiosk",
+      section: "D",
+      utilities: {
+        electricity: "Metered",
+        water: "Yes",
+        drainage: "Yes",
+        ventilation: "Yes",
+        structure: "Mobile"
+      },
+      status: "Under Maintenance",
+      history: [],
+    },
+    {
+      stallId: "ST-005",
+      originalOwner: "David Kim",
+      recentOwner: "Emma Davis",
+      type: "Food Stall",
+      section: "A",
+      utilities: {
+        electricity: "Metered",
+        water: "Yes",
+        drainage: "No",
+        ventilation: "Yes",
+        structure: "Fixed"
+      },
+      status: "Available",
+      history: [],
     },
   ]);
 
@@ -55,54 +134,75 @@ export default function StallAssignment() {
   const [selectedHistory, setSelectedHistory] = useState([]);
   const [form, setForm] = useState({
     stallId: "",
-    tenantId: "",
-    leaseId: "",
-    leaseStart: "",
-    leaseEnd: "",
+    originalOwner: "",
+    recentOwner: "",
+    type: "",
+    section: "",
+    utilities: {
+      electricity: "Metered",
+      water: "No",
+      drainage: "No",
+      ventilation: "Yes",
+      structure: "Fixed"
+    },
   });
+
+  // --- Filter available stalls ---
+  const availableStalls = useMemo(() => {
+    return assignments.filter(stall => stall.status === "Available");
+  }, [assignments]);
 
   // --- Handle field changes ---
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name.startsWith('utilities.')) {
+      const utilityKey = name.split('.')[1];
+      setForm((prev) => ({
+        ...prev,
+        utilities: {
+          ...prev.utilities,
+          [utilityKey]: value
+        }
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  // --- Add Stall Assignment ---
-  const handleAssign = () => {
-    if (!form.stallId || !form.tenantId || !form.leaseStart || !form.leaseEnd) {
+  // --- Add New Stall ---
+  const handleAddStall = () => {
+    if (!form.stallId || !form.type || !form.section) {
       alert("Please fill all required fields.");
       return;
     }
 
-    const startDate = new Date(form.leaseStart);
-    if (startDate < new Date()) {
-      alert("Lease start date cannot be in the past.");
+    const stallExists = assignments.some((a) => a.stallId === form.stallId);
+    if (stallExists) {
+      alert("This Stall ID already exists.");
       return;
     }
 
-    const isOccupied = assignments.some(
-      (a) => a.stallId === form.stallId && a.status === "Occupied"
-    );
-    if (isOccupied) {
-      alert("This stall is already occupied.");
-      return;
-    }
-
-    const newAssignment = {
+    const newStall = {
       ...form,
-      assignedDate: new Date().toISOString(),
-      status: "Occupied",
+      status: "Available", // Set as Available by default
       history: [],
     };
 
-    setAssignments((prev) => [...prev, newAssignment]);
+    setAssignments((prev) => [...prev, newStall]);
     setOpenModal(false);
     setForm({
       stallId: "",
-      tenantId: "",
-      leaseId: "",
-      leaseStart: "",
-      leaseEnd: "",
+      originalOwner: "",
+      recentOwner: "",
+      type: "",
+      section: "",
+      utilities: {
+        electricity: "Metered",
+        water: "No",
+        drainage: "No",
+        ventilation: "Yes",
+        structure: "Fixed"
+      },
     });
   };
 
@@ -112,31 +212,27 @@ export default function StallAssignment() {
     setHistoryModal(true);
   };
 
-  // --- End Lease / Delete ---
-  const handleEndLease = (stallId) => {
-    setAssignments((prev) =>
-      prev.map((a) =>
-        a.stallId === stallId
-          ? {
-              ...a,
-              status: "Available",
-              history: [
-                ...a.history,
-                {
-                  tenantId: a.tenantId,
-                  leaseId: a.leaseId,
-                  leaseStart: a.leaseStart,
-                  leaseEnd: a.leaseEnd,
-                },
-              ],
-              tenantId: "",
-              leaseId: "",
-              leaseStart: "",
-              leaseEnd: "",
-            }
-          : a
-      )
-    );
+  // --- Ready for Leasing Button Handler ---
+  const handleReadyForLeasing = (stallId) => {
+    // Navigate to lease creation page with stall ID
+    navigate(`/lease-creation?stallId=${stallId}`);
+  };
+
+  // --- Delete Stall ---
+  const handleDeleteStall = (stallId) => {
+    if (window.confirm(`Are you sure you want to delete stall ${stallId}?`)) {
+      setAssignments((prev) => prev.filter((a) => a.stallId !== stallId));
+    }
+  };
+
+  // --- Get Status Chip Color ---
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Occupied": return "warning";
+      case "Available": return "success";
+      case "Under Maintenance": return "error";
+      default: return "default";
+    }
   };
 
   return (
@@ -148,165 +244,339 @@ export default function StallAssignment() {
             underline="hover"
             color="inherit"
             href="/dashboard"
-            sx={{ display: "flex", alignItems: "center", gap: 0.5,'&:hover': {
-                color: '#D32F2F'
-              } }}
+            sx={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: 0.5,
+              '&:hover': { color: '#D32F2F' }
+            }}
           >
             <HomeIcon fontSize="small" /> Dashboard
           </Link>
-          <Link underline="hover" color="inherit" href="#" sx={{'&:hover': {
-                color: '#D32F2F'
-              }}}>
+          <Link 
+            underline="hover" 
+            color="inherit" 
+            href="#"
+            sx={{'&:hover': { color: '#D32F2F' }}}
+          >
             Stall Management
           </Link>
-          <Typography color="text.primary">Stall Available</Typography>
+          <Typography color="text.primary">Available Stalls</Typography>
         </Breadcrumbs>
 
         {/* === Page Header === */}
-        <Typography variant="h4" fontWeight={700} color="black" gutterBottom>
-          Stall Available
-        </Typography>
-        <Typography mb={3} color="text.secondary">
-          Manage and track tenant assignments, leases, and stall availability.
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box>
+            <Typography variant="h4" fontWeight={700} color="black" gutterBottom>
+              Available Stalls
+            </Typography>
+            <Typography color="text.secondary">
+              List of all available stalls ready for leasing.
+            </Typography>
+          </Box>
+          
+          {/* Stats Summary */}
+          <Stack direction="row" spacing={3}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" color="success.main" fontWeight={700}>
+                {availableStalls.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Available
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" color="text.secondary" fontWeight={700}>
+                {assignments.filter(s => s.status === "Occupied").length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Occupied
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" color="text.secondary" fontWeight={700}>
+                {assignments.filter(s => s.status === "Under Maintenance").length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Maintenance
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+
+        {/* === Information Alert === */}
+        {availableStalls.length === 0 ? (
+          <Alert 
+            severity="info" 
+            sx={{ mb: 3, borderRadius: 2 }}
+            action={
+              <Button 
+                color="inherit" 
+                size="small"
+                onClick={() => setOpenModal(true)}
+              >
+                ADD STALL
+              </Button>
+            }
+          >
+            No available stalls found. Add a new stall to get started.
+          </Alert>
+        ) : (
+          <Alert 
+            severity="success" 
+            sx={{ mb: 3, borderRadius: 2 }}
+            icon={<FilterIcon />}
+          >
+            Showing {availableStalls.length} available stall{availableStalls.length !== 1 ? 's' : ''} ready for leasing.
+          </Alert>
+        )}
 
         {/* === Toolbar === */}
         <Box sx={{ mb: 3, display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            sx={{ bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
+            sx={{ 
+              bgcolor: "#D32F2F", 
+              "&:hover": { bgcolor: "#B71C1C" } 
+            }}
             onClick={() => setOpenModal(true)}
           >
-            Assign Stall
+            Add New Stall
           </Button>
         </Box>
 
-        {/* === Assignment Table === */}
-        <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-          <Table>
-            <TableHead sx={{ bgcolor: "#f5f5f5" }}>
-              <TableRow>
-                <TableCell><b>Stall ID</b></TableCell>
-                <TableCell><b>Tenant ID</b></TableCell>
-                <TableCell><b>Lease ID</b></TableCell>
-                <TableCell><b>Lease Start</b></TableCell>
-                <TableCell><b>Lease End</b></TableCell>
-                <TableCell><b>Status</b></TableCell>
-                <TableCell align="center"><b>Actions</b></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {assignments.map((a, index) => (
-                <TableRow key={index} hover>
-                  <TableCell>{a.stallId}</TableCell>
-                  <TableCell>{a.tenantId || "-"}</TableCell>
-                  <TableCell>{a.leaseId || "-"}</TableCell>
-                  <TableCell>{a.leaseStart || "-"}</TableCell>
-                  <TableCell>{a.leaseEnd || "-"}</TableCell>
-                  <TableCell
-                    sx={{
-                      color: a.status === "Occupied" ? "#1976D2" : "#4CAF50",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {a.status}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="View History">
-                      <IconButton onClick={() => handleViewHistory(a.history)}>
-                        <HistoryIcon fontSize="small" color="primary" />
-                      </IconButton>
-                    </Tooltip>
-                    {a.status === "Occupied" && (
-                      <Tooltip title="End Lease">
+        {/* === Available Stalls Table === */}
+        {availableStalls.length > 0 && (
+          <TableContainer 
+            component={Paper} 
+            sx={{ 
+              borderRadius: 3,
+              maxHeight: 600,
+              overflow: 'auto'
+            }}
+          >
+            <Table stickyHeader>
+              <TableHead sx={{ bgcolor: "#f5f5f5" }}>
+                <TableRow>
+                  <TableCell><b>Stall ID</b></TableCell>
+                  <TableCell><b>Original Owner</b></TableCell>
+                  <TableCell><b>Recent Owner</b></TableCell>
+                  <TableCell><b>Type</b></TableCell>
+                  <TableCell><b>Section</b></TableCell>
+                  <TableCell><b>Utilities</b></TableCell>
+                  <TableCell><b>Status</b></TableCell>
+                  <TableCell align="center"><b>Actions</b></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {availableStalls.map((stall, index) => (
+                  <TableRow key={index} hover>
+                    <TableCell>{stall.stallId}</TableCell>
+                    <TableCell>{stall.originalOwner || "-"}</TableCell>
+                    <TableCell>{stall.recentOwner || "-"}</TableCell>
+                    <TableCell>{stall.type}</TableCell>
+                    <TableCell>{stall.section}</TableCell>
+                    <TableCell>
+                      <Box sx={{ fontSize: '0.875rem' }}>
+                        <div><strong>Electricity:</strong> {stall.utilities.electricity}</div>
+                        <div><strong>Water:</strong> {stall.utilities.water}</div>
+                        <div><strong>Drainage:</strong> {stall.utilities.drainage}</div>
+                        <div><strong>Ventilation:</strong> {stall.utilities.ventilation}</div>
+                        <div><strong>Structure:</strong> {stall.utilities.structure}</div>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={stall.status}
+                        color={getStatusColor(stall.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      {/* View History Button */}
+                      <Tooltip title="View History">
+                        <IconButton 
+                          onClick={() => handleViewHistory(stall.history)}
+                          size="small"
+                        >
+                          <HistoryIcon fontSize="small" color="primary" />
+                        </IconButton>
+                      </Tooltip>
+                      
+                      {/* Ready for Leasing Button */}
+                      <Tooltip title="Ready for Leasing">
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<AssignmentIcon />}
+                          sx={{ 
+                            ml: 1,
+                            bgcolor: "#4CAF50",
+                            '&:hover': { bgcolor: "#388E3C" }
+                          }}
+                          onClick={() => handleReadyForLeasing(stall.stallId)}
+                        >
+                          Ready for Leasing
+                        </Button>
+                      </Tooltip>
+                      
+                      {/* Delete Button */}
+                      <Tooltip title="Delete Stall">
                         <IconButton
-                          onClick={() => handleEndLease(a.stallId)}
+                          onClick={() => handleDeleteStall(stall.stallId)}
                           color="error"
+                          size="small"
+                          sx={{ ml: 1 }}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {assignments.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    No stall assignments found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
 
-        {/* === Add Assignment Modal === */}
+        {/* === Add Stall Modal === */}
         <Dialog
           open={openModal}
           onClose={() => setOpenModal(false)}
-          maxWidth="sm"
+          maxWidth="md"
           fullWidth
         >
           <DialogTitle sx={{ bgcolor: "#D32F2F", color: "white" }}>
-            Assign Stall to Tenant
+            Add New Stall
           </DialogTitle>
           <DialogContent dividers>
-            <TextField
-              fullWidth
-              label="Stall ID"
-              name="stallId"
-              value={form.stallId}
-              onChange={handleChange}
-              margin="dense"
-            />
-            <TextField
-              fullWidth
-              label="Tenant ID"
-              name="tenantId"
-              value={form.tenantId}
-              onChange={handleChange}
-              margin="dense"
-            />
-            <TextField
-              fullWidth
-              label="Lease Agreement ID"
-              name="leaseId"
-              value={form.leaseId}
-              onChange={handleChange}
-              margin="dense"
-            />
-            <TextField
-              fullWidth
-              label="Lease Start Date"
-              name="leaseStart"
-              value={form.leaseStart}
-              onChange={handleChange}
-              margin="dense"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              fullWidth
-              label="Lease End Date"
-              name="leaseEnd"
-              value={form.leaseEnd}
-              onChange={handleChange}
-              margin="dense"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+              {/* Basic Information */}
+              <Typography variant="h6" gutterBottom>Basic Information</Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Stall ID *"
+                  name="stallId"
+                  value={form.stallId}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Type *"
+                  name="type"
+                  value={form.type}
+                  onChange={handleChange}
+                  select
+                  required
+                >
+                  <MenuItem value="Food Stall">Food Stall</MenuItem>
+                  <MenuItem value="Retail Stall">Retail Stall</MenuItem>
+                  <MenuItem value="Service Stall">Service Stall</MenuItem>
+                  <MenuItem value="Kiosk">Kiosk</MenuItem>
+                </TextField>
+                <TextField
+                  fullWidth
+                  label="Original Owner"
+                  name="originalOwner"
+                  value={form.originalOwner}
+                  onChange={handleChange}
+                />
+                <TextField
+                  fullWidth
+                  label="Recent Owner"
+                  name="recentOwner"
+                  value={form.recentOwner}
+                  onChange={handleChange}
+                />
+                <TextField
+                  fullWidth
+                  label="Section *"
+                  name="section"
+                  value={form.section}
+                  onChange={handleChange}
+                  required
+                >
+                  <MenuItem value="A">Section A</MenuItem>
+                  <MenuItem value="B">Section B</MenuItem>
+                  <MenuItem value="C">Section C</MenuItem>
+                  <MenuItem value="D">Section D</MenuItem>
+                </TextField>
+              </Box>
+
+              {/* Utilities Section */}
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>Utilities</Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Electricity"
+                  name="utilities.electricity"
+                  value={form.utilities.electricity}
+                  onChange={handleChange}
+                  select
+                >
+                  <MenuItem value="Metered">Metered</MenuItem>
+                  <MenuItem value="Unmetered">Unmetered</MenuItem>
+                  <MenuItem value="None">None</MenuItem>
+                </TextField>
+                <TextField
+                  fullWidth
+                  label="Water"
+                  name="utilities.water"
+                  value={form.utilities.water}
+                  onChange={handleChange}
+                  select
+                >
+                  <MenuItem value="Yes">Yes</MenuItem>
+                  <MenuItem value="No">No</MenuItem>
+                </TextField>
+                <TextField
+                  fullWidth
+                  label="Drainage"
+                  name="utilities.drainage"
+                  value={form.utilities.drainage}
+                  onChange={handleChange}
+                  select
+                >
+                  <MenuItem value="Yes">Yes</MenuItem>
+                  <MenuItem value="No">No</MenuItem>
+                </TextField>
+                <TextField
+                  fullWidth
+                  label="Ventilation"
+                  name="utilities.ventilation"
+                  value={form.utilities.ventilation}
+                  onChange={handleChange}
+                  select
+                >
+                  <MenuItem value="Yes">Yes</MenuItem>
+                  <MenuItem value="No">No</MenuItem>
+                </TextField>
+                <TextField
+                  fullWidth
+                  label="Structure"
+                  name="utilities.structure"
+                  value={form.utilities.structure}
+                  onChange={handleChange}
+                  select
+                >
+                  <MenuItem value="Fixed">Fixed</MenuItem>
+                  <MenuItem value="Temporary">Temporary</MenuItem>
+                  <MenuItem value="Mobile">Mobile</MenuItem>
+                </TextField>
+              </Box>
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenModal(false)}>Cancel</Button>
             <Button
-              onClick={handleAssign}
+              onClick={handleAddStall}
               variant="contained"
-              color="primary"
-              sx={{ bgcolor: "#D32F2F" }}
+              sx={{ bgcolor: "#D32F2F", '&:hover': { bgcolor: "#B71C1C" } }}
             >
-              Assign
+              Add Stall
             </Button>
           </DialogActions>
         </Dialog>
