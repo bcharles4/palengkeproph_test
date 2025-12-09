@@ -85,7 +85,7 @@ export default function StallInventory() {
       id: "C-01", 
       original_owner: "Charles", 
       type: "Tank", 
-      classification: "Center", 
+      section: "Center", 
       location: "Water Tank", 
       dimensions: "6x6m", 
       capacity: 1, 
@@ -107,7 +107,7 @@ export default function StallInventory() {
       id: "D-83", 
       original_owner: "Brian", 
       type: "Stall", 
-      classification: "Center", 
+      section: "Center", 
       location: "Stall", 
       dimensions: "6x6m", 
       capacity: 1, 
@@ -129,7 +129,7 @@ export default function StallInventory() {
       id: "C-01", 
       original_owner: "Mitra", 
       type: "Admin", 
-      classification: "Center", 
+      section: "Center", 
       location: "ADMIN", 
       dimensions: "6x6m", 
       capacity: 1, 
@@ -151,7 +151,7 @@ export default function StallInventory() {
       id: "C-01", 
       original_owner: "Charles", 
       type: "CR", 
-      classification: "Center", 
+      section: "Center", 
       location: "CR", 
       dimensions: "6x6m", 
       capacity: 1, 
@@ -173,7 +173,7 @@ export default function StallInventory() {
       id: "D-53", 
       original_owner: "Charles", 
       type: "Stall", 
-      classification: "Center", 
+      section: "Center", 
       location: "Stall", 
       dimensions: "6x6m", 
       capacity: 1, 
@@ -195,7 +195,7 @@ export default function StallInventory() {
       id: "D-54", 
       original_owner: "Charles", 
       type: "Stall", 
-      classification: "Center", 
+      section: "Center", 
       location: "Stall", 
       dimensions: "6x6m", 
       capacity: 1, 
@@ -218,7 +218,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Left Block",
+      section: "Left Block",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
@@ -246,7 +246,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Left Block",
+      section: "Left Block",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
@@ -276,7 +276,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Center Left Block",
+      section: "Center Left Block",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
@@ -306,7 +306,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Center Left Block",
+      section: "Center Left Block",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
@@ -1252,7 +1252,7 @@ export default function StallInventory() {
                   <TableCell><b>Original Owner</b></TableCell>
                   <TableCell><b>Type</b></TableCell>
                   <TableCell><b>Section</b></TableCell>
-                  <TableCell><b>Location</b></TableCell>
+                  {/* <TableCell><b>Location</b></TableCell> */}
                   <TableCell><b>Dimensions</b></TableCell>
                   <TableCell><b>Capacity</b></TableCell>
                   <TableCell><b>Status</b></TableCell>
@@ -1270,8 +1270,7 @@ export default function StallInventory() {
                     </TableCell>
                     <TableCell>{stall.original_owner}</TableCell>
                     <TableCell>{stall.type}</TableCell>
-                    <TableCell>{stall.classification}</TableCell>
-                    <TableCell>{stall.location}</TableCell>
+                    <TableCell>{stall.section}</TableCell>
                     <TableCell>{stall.dimensions}</TableCell>
                     <TableCell>{stall.capacity}</TableCell>
                     <TableCell>
@@ -1688,7 +1687,7 @@ export default function StallInventory() {
     )}
 
     <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
-      <Button variant="contained" onClick={handleCloseDrawer}>Close</Button>
+      <Button variant="contained"  sx={{ bgcolor: "hsla(209, 100%, 38%, 1.00)" }} onClick={handleCloseDrawer}>Close</Button>
       <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
         if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
       }}>Edit Stall</Button>
