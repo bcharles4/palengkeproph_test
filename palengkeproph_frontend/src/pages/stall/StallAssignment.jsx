@@ -271,22 +271,7 @@ export default function StallAssignment() {
                 Available
               </Typography>
             </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h6" color="text.secondary" fontWeight={700}>
-                {assignments.filter(s => s.status === "Occupied").length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Occupied
-              </Typography>
-            </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h6" color="text.secondary" fontWeight={700}>
-                {assignments.filter(s => s.status === "Under Maintenance").length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Maintenance
-              </Typography>
-            </Box>
+
           </Stack>
         </Box>
 
