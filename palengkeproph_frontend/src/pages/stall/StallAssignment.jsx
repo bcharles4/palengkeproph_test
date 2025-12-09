@@ -57,28 +57,14 @@ export default function StallAssignment() {
       history: [
         {
           tenantId: "TEN-0990",
+          tenantName: "Alice Garcia",
           leaseId: "LEASE-1999",
           leaseStart: "2024-01-01",
           leaseEnd: "2024-12-31",
         },
       ],
     },
-    {
-      stallId: "ST-002",
-      originalOwner: "Maria Garcia",
-      recentOwner: "James Wilson",
-      type: "Retail Stall",
-      section: "B",
-      utilities: {
-        electricity: "Metered",
-        water: "Yes",
-        drainage: "Yes",
-        ventilation: "Yes",
-        structure: "Fixed"
-      },
-      status: "Occupied",
-      history: [],
-    },
+
     {
       stallId: "ST-003",
       originalOwner: "Robert Chen",
@@ -594,7 +580,7 @@ export default function StallAssignment() {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell><b>Tenant ID</b></TableCell>
+                    <TableCell><b>Tenant Name</b></TableCell>
                     <TableCell><b>Lease ID</b></TableCell>
                     <TableCell><b>Start</b></TableCell>
                     <TableCell><b>End</b></TableCell>
@@ -603,7 +589,7 @@ export default function StallAssignment() {
                 <TableBody>
                   {selectedHistory.map((h, i) => (
                     <TableRow key={i}>
-                      <TableCell>{h.tenantId}</TableCell>
+                      <TableCell>{h.tenantName}</TableCell>
                       <TableCell>{h.leaseId}</TableCell>
                       <TableCell>{h.leaseStart}</TableCell>
                       <TableCell>{h.leaseEnd}</TableCell>
