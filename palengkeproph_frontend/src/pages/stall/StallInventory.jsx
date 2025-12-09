@@ -791,7 +791,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Ambulant Blocks",
+      section: "Ambulant Blocks",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
@@ -821,7 +821,7 @@ export default function StallInventory() {
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
-      classification: "Ambulant Blocks",
+      section: "Ambulant Blocks",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
@@ -854,7 +854,7 @@ export default function StallInventory() {
   const [form, setForm] = useState({
     id: "",
     type: "",
-    classification: "",
+    section: "",
     location: "",
     dimensions: "",
     capacity: 1,
@@ -928,7 +928,7 @@ export default function StallInventory() {
     setForm({
       id: "",
       type: "",
-      classification: "",
+      section: "",
       location: "",
       dimensions: "",
       capacity: 1,
@@ -1251,7 +1251,7 @@ export default function StallInventory() {
                   <TableCell><b>Stall ID</b></TableCell>
                   <TableCell><b>Original Owner</b></TableCell>
                   <TableCell><b>Type</b></TableCell>
-                  <TableCell><b>Classification</b></TableCell>
+                  <TableCell><b>Section</b></TableCell>
                   <TableCell><b>Location</b></TableCell>
                   <TableCell><b>Dimensions</b></TableCell>
                   <TableCell><b>Capacity</b></TableCell>
@@ -1480,7 +1480,7 @@ export default function StallInventory() {
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value })}
                 >
-                  {["Fish", "Meat", "Parking", "Fixed Stall", "Food Stall", "Terminal", "Gutter", "Bazaar", "Vegetable", "RTW"].map((t) => (
+                  {["Fish", "Meat", "Parking", "Fixed Stall", "Food Stall", "Terminal", "Gutter", "Bazaar", "Vegetable", "RTW", "Green Tent", "Red Tent"].map((t) => (
                     <MenuItem key={t} value={t}>{t}</MenuItem>
                   ))}
                 </TextField>
@@ -1669,9 +1669,10 @@ export default function StallInventory() {
             <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
           </Box>
         </Grid>
+
         
         {/* UTILITIES SECTION AT THE BOTTOM */}
-        <Grid item xs={12} sx={{ mt: 2, pt: 2, ml: -30, borderTop: "1px solid #eee" }}>
+        <Grid item xs={12} sx={{ borderTop: "1px solid #eee" }}>
           <Typography variant="subtitle1" color="error" sx={{ fontWeight: 'bold', mb: 1 }}>Utilities:</Typography>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
