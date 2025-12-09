@@ -1180,6 +1180,8 @@ export default function StallInventory() {
               Add New Stall
             </Button>
 
+
+
             <TextField
               size="small"
               placeholder="Search stalls..."
