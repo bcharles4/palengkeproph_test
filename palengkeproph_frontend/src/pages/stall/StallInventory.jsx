@@ -1,4 +1,3 @@
-// src/pages/stall/StallInventory.jsx
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   Box,
@@ -30,6 +29,8 @@ import {
   Stack,
   FormControlLabel,
   Checkbox,
+  Card,
+  CardContent,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -41,6 +42,11 @@ import {
   TableRows as TableRowsIcon,
   Fullscreen as FullscreenIcon,
   FullscreenExit as FullscreenExitIcon,
+  CheckCircle as CheckCircleIcon,
+  Business as BusinessIcon,
+  Schedule as ScheduleIcon,
+  Warning as WarningIcon,
+  Block as BlockIcon,
 } from "@mui/icons-material";
 import Legend from "../../layouts/Legend";
 import MainLayout from "../../layouts/MainLayout";
@@ -52,6 +58,15 @@ const STATUS_COLORS = {
   Reserved: "#FFB300",
   "Under Maintenance": "#E64A19",
   Inactive: "#9E9E9E",
+};
+
+// STATUS ICONS
+const STATUS_ICONS = {
+  Available: CheckCircleIcon,
+  Occupied: BusinessIcon,
+  Reserved: ScheduleIcon,
+  "Under Maintenance": WarningIcon,
+  Inactive: BlockIcon,
 };
 
 // UTILITY COLORS for map display
@@ -83,7 +98,7 @@ export default function StallInventory() {
   const [stalls, setStalls] = useState(() => [
     { 
       id: "C-01", 
-      original_owner: "Charles", 
+      original_owner: "John Smith", 
       type: "Tank", 
       section: "Center", 
       location: "Water Tank", 
@@ -214,7 +229,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     },
 
-      ...Array.from({ length: 90 }).map((_, i) => ({
+    ...Array.from({ length: 90 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -262,7 +277,7 @@ export default function StallInventory() {
       w: 3,
       h: 4,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -272,7 +287,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 18 }).map((_, i) => ({
+    ...Array.from({ length: 18 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -292,7 +307,7 @@ export default function StallInventory() {
       w: 4,
       h: 5,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -302,7 +317,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 18 }).map((_, i) => ({
+    ...Array.from({ length: 18 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -322,7 +337,7 @@ export default function StallInventory() {
       w: 4,
       h: 5,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -352,7 +367,7 @@ export default function StallInventory() {
       w: 6,
       h: 15,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -362,7 +377,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-        ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -382,7 +397,7 @@ export default function StallInventory() {
       w: 6,
       h: 15,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -392,8 +407,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -413,7 +427,7 @@ export default function StallInventory() {
       w: 6,
       h: 15,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -444,7 +458,7 @@ export default function StallInventory() {
       w: 6,
       h: 15,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -454,8 +468,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -475,7 +488,7 @@ export default function StallInventory() {
       w: 6,
       h: 15,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -485,7 +498,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(1, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -505,7 +518,7 @@ export default function StallInventory() {
       w: 6,
       h: 15,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -515,7 +528,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 12 }).map((_, i) => ({
+    ...Array.from({ length: 12 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -535,7 +548,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -545,7 +558,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -565,7 +578,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -595,7 +608,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -605,8 +618,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-
-      ...Array.from({ length: 8 }).map((_, i) => ({
+    ...Array.from({ length: 8 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       type: "Food",
       section: "Under the Map",
@@ -625,7 +637,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -635,7 +647,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 8 }).map((_, i) => ({
+    ...Array.from({ length: 8 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -655,7 +667,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -665,7 +677,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 8 }).map((_, i) => ({
+    ...Array.from({ length: 8 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -685,7 +697,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -695,9 +707,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-    
-
-      ...Array.from({ length: 8 }).map((_, i) => ({
+    ...Array.from({ length: 8 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -717,7 +727,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -727,7 +737,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -747,7 +757,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -757,7 +767,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -777,7 +787,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -787,7 +797,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 6 }).map((_, i) => ({
+    ...Array.from({ length: 6 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -807,7 +817,7 @@ export default function StallInventory() {
       w: 5,
       h: 6,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -817,7 +827,7 @@ export default function StallInventory() {
       stallStructure: "Non-Fixed"
     })),
 
-      ...Array.from({ length: 12 }).map((_, i) => ({
+    ...Array.from({ length: 12 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       original_owner: "Charles",
       type: "Food",
@@ -837,7 +847,7 @@ export default function StallInventory() {
       w: 8,
       h: 8,
 
-            // NEW UTILITY FIELDS
+      // NEW UTILITY FIELDS
       hasElectricity: false,
       electricityType: "None",
       hasWater: false,
@@ -846,7 +856,6 @@ export default function StallInventory() {
       hasVentilation: false,
       stallStructure: "Non-Fixed"
     })),
-    
   ]);
   
 
@@ -878,6 +887,18 @@ export default function StallInventory() {
   const electricityTypes = ["Fixed", "Metered", "Optional", "None"];
   const waterTypes = ["Shared", "Dedicated", "None"];
   const structureTypes = ["Fixed", "Non-Fixed"];
+
+  // Calculate status counts
+  const statusCounts = useMemo(() => {
+    const counts = {};
+    statuses.forEach(status => {
+      counts[status] = stalls.filter(stall => stall.status === status).length;
+    });
+    return counts;
+  }, [stalls]);
+
+  // Calculate total stalls
+  const totalStalls = stalls.length;
 
   // filtered stalls (search) - UPDATED TO INCLUDE UTILITY FIELDS IN SEARCH
   const filtered = useMemo(() => {
@@ -1180,6 +1201,131 @@ export default function StallInventory() {
             </Tooltip>
           </Box>
         </Box>
+
+        {/* NEW: Status Monitoring Container */}
+        <Paper sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: "#f8f9fa" }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Stall Status Overview</Typography>
+          <Grid container spacing={2}>
+            {/* Total Stalls Card */}
+            <Grid item xs={12} sm={6} md={2.4}>
+              <Card sx={{ 
+                borderLeft: '4px solid #666',
+                height: '100%',
+                '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
+              }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="h4" fontWeight={700} color="text.primary">
+                        {totalStalls}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Total Stalls
+                      </Typography>
+                    </Box>
+                    <Box sx={{ 
+                      width: 40, 
+                      height: 40, 
+                      borderRadius: '50%', 
+                      bgcolor: '#666', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}>
+                      <Typography variant="h6" color="white" fontWeight={700}>
+                        Σ
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Status Cards */}
+            {statuses.map((status) => {
+              const IconComponent = STATUS_ICONS[status];
+              const count = statusCounts[status];
+              const percentage = totalStalls > 0 ? ((count / totalStalls) * 100).toFixed(1) : 0;
+              
+              return (
+                <Grid item xs={12} sm={6} md={2.4} key={status}>
+                  <Card 
+                    sx={{ 
+                      borderLeft: `4px solid ${STATUS_COLORS[status]}`,
+                      height: '100%',
+                      cursor: 'pointer',
+                      '&:hover': { 
+                        transform: 'translateY(-2px)', 
+                        transition: 'transform 0.2s',
+                        boxShadow: 2 
+                      }
+                    }}
+                    onClick={() => {
+                      setSearch(status);
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box>
+                          <Typography variant="h4" fontWeight={700} color="text.primary">
+                            {count}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {status}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {percentage}% of total
+                          </Typography>
+                        </Box>
+                        <Box sx={{ 
+                          width: 40, 
+                          height: 40, 
+                          borderRadius: '50%', 
+                          bgcolor: STATUS_COLORS[status], 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}>
+                          <IconComponent sx={{ color: 'white' }} />
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+          
+          {/* Summary Stats */}
+          <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #eee' }}>
+            <Grid container spacing={2}>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">Available Rate</Typography>
+                <Typography variant="h6" fontWeight={600} color="success.main">
+                  {totalStalls > 0 ? ((statusCounts['Available'] / totalStalls) * 100).toFixed(1) : 0}%
+                </Typography>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">Occupancy Rate</Typography>
+                <Typography variant="h6" fontWeight={600} color="primary.main">
+                  {totalStalls > 0 ? (((statusCounts['Occupied'] + statusCounts['Reserved']) / totalStalls) * 100).toFixed(1) : 0}%
+                </Typography>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">Maintenance Rate</Typography>
+                <Typography variant="h6" fontWeight={600} color="warning.main">
+                  {totalStalls > 0 ? ((statusCounts['Under Maintenance'] / totalStalls) * 100).toFixed(1) : 0}%
+                </Typography>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">Inactive Rate</Typography>
+                <Typography variant="h6" fontWeight={600} color="text.secondary">
+                  {totalStalls > 0 ? ((statusCounts['Inactive'] / totalStalls) * 100).toFixed(1) : 0}%
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </Paper>
 
         {/* NEW: Utility Filters for Map View Only */}
         {view === "map" && (
@@ -1616,84 +1762,84 @@ export default function StallInventory() {
           </DialogActions>
         </Dialog>
 
-{/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
-<SwipeableDrawer
-  anchor="bottom"
-  open={drawerOpen}
-  onClose={handleCloseDrawer}
-  onOpen={() => {}}
-  disableBackdropTransition={false}
->
-  <Box sx={{ p: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8, minHeight: 180 }}>
-    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-      <Box>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {selectedStall ? `${selectedStall.id} — ${selectedStall.location}` : "Stall Details"}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 13 }}>
-          Quick details & actions
-        </Typography>
-      </Box>
+        {/* --- BOTTOM SLIDE DRAWER (QUICK VIEW + ACTIONS) - UPDATED WITH UTILITIES --- */}
+        <SwipeableDrawer
+          anchor="bottom"
+          open={drawerOpen}
+          onClose={handleCloseDrawer}
+          onOpen={() => {}}
+          disableBackdropTransition={false}
+        >
+          <Box sx={{ p: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8, minHeight: 180 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {selectedStall ? `${selectedStall.id} — ${selectedStall.location}` : "Stall Details"}
+                </Typography>
+                <Typography color="text.secondary" sx={{ fontSize: 13 }}>
+                  Quick details & actions
+                </Typography>
+              </Box>
 
-      <Box>
-        <Button size="small" sx={{ mr: 1 }} onClick={() => {
-          if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
-        }}>
-          Edit
-        </Button>
-        <Button size="small" color="error" onClick={() => {
-          if (selectedStall) { handleDelete(selectedStall.id); setDrawerOpen(false); }
-        }}>
-          Mark Inactive
-        </Button>
-      </Box>
-    </Stack>
+              <Box>
+                <Button size="small" sx={{ mr: 1 }} onClick={() => {
+                  if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
+                }}>
+                  Edit
+                </Button>
+                <Button size="small" color="error" onClick={() => {
+                  if (selectedStall) { handleDelete(selectedStall.id); setDrawerOpen(false); }
+                }}>
+                  Mark Inactive
+                </Button>
+              </Box>
+            </Stack>
 
-    <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 2 }} />
 
-    {selectedStall ? (
-      <Grid container spacing={1}>
-        <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Section:</b> {selectedStall.section}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
-        <Grid item xs={12} sm={6}><Typography><b>Lease ID:</b> {selectedStall.leaseId || "-"}</Typography></Grid>
-        <Grid item xs={12}><Typography><b>Last Updated:</b> {selectedStall.lastUpdated ? new Date(selectedStall.lastUpdated).toLocaleString() : "-"}</Typography></Grid>
-        <Grid item xs={12}>
-          <Box sx={{ mt: 1 }}>
-            <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
+            {selectedStall ? (
+              <Grid container spacing={1}>
+                <Grid item xs={12} sm={6}><Typography><b>Original Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Present Owner:</b> {selectedStall.original_owner}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Type:</b> {selectedStall.type}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Section:</b> {selectedStall.section}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Dimensions:</b> {selectedStall.dimensions}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Capacity:</b> {selectedStall.capacity}</Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Status:</b> <Chip label={selectedStall.status} sx={{ bgcolor: STATUS_COLORS[selectedStall.status], color: "#fff", fontWeight: 600 }} size="small" /></Typography></Grid>
+                <Grid item xs={12} sm={6}><Typography><b>Lease ID:</b> {selectedStall.leaseId || "-"}</Typography></Grid>
+                <Grid item xs={12}><Typography><b>Last Updated:</b> {selectedStall.lastUpdated ? new Date(selectedStall.lastUpdated).toLocaleString() : "-"}</Typography></Grid>
+                <Grid item xs={12}>
+                  <Box sx={{ mt: 1 }}>
+                    <Typography sx={{ fontSize: 13, color: "text.secondary" }}><b>Map Position:</b> X {selectedStall.x}% • Y {selectedStall.y}% • W {selectedStall.w}% • H {selectedStall.h}%</Typography>
+                  </Box>
+                </Grid>
+
+                
+                {/* UTILITIES SECTION AT THE BOTTOM */}
+                <Grid item xs={12} sx={{ borderTop: "1px solid #eee" }}>
+                  <Typography variant="subtitle1" color="error" sx={{ fontWeight: 'bold', mb: 1 }}>Utilities:</Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
+                    <Grid item xs={12} sm={6}><Typography><b>Water:</b> {selectedStall.hasWater ? selectedStall.waterType : "No"}</Typography></Grid>
+                    <Grid item xs={12} sm={6}><Typography><b>Drainage:</b> {selectedStall.hasDrainage ? "Yes" : "No"}</Typography></Grid>
+                    <Grid item xs={12} sm={6}><Typography><b>Ventilation:</b> {selectedStall.hasVentilation ? "Yes" : "No"}</Typography></Grid>
+                    <Grid item xs={12} sm={6}><Typography><b>Structure:</b> {selectedStall.stallStructure}</Typography></Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            ) : (
+              <Typography color="text.secondary">No stall selected.</Typography>
+            )}
+
+            <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
+              <Button variant="contained"  sx={{ bgcolor: "hsla(209, 100%, 38%, 1.00)" }} onClick={handleCloseDrawer}>Close</Button>
+              <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
+                if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
+              }}>Edit Stall</Button>
+              <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
+            </Box>
           </Box>
-        </Grid>
-
-        
-        {/* UTILITIES SECTION AT THE BOTTOM */}
-        <Grid item xs={12} sx={{ borderTop: "1px solid #eee" }}>
-          <Typography variant="subtitle1" color="error" sx={{ fontWeight: 'bold', mb: 1 }}>Utilities:</Typography>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}><Typography><b>Electricity:</b> {selectedStall.hasElectricity ? selectedStall.electricityType : "No"}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Water:</b> {selectedStall.hasWater ? selectedStall.waterType : "No"}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Drainage:</b> {selectedStall.hasDrainage ? "Yes" : "No"}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Ventilation:</b> {selectedStall.hasVentilation ? "Yes" : "No"}</Typography></Grid>
-            <Grid item xs={12} sm={6}><Typography><b>Structure:</b> {selectedStall.stallStructure}</Typography></Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    ) : (
-      <Typography color="text.secondary">No stall selected.</Typography>
-    )}
-
-    <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
-      <Button variant="contained"  sx={{ bgcolor: "hsla(209, 100%, 38%, 1.00)" }} onClick={handleCloseDrawer}>Close</Button>
-      <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
-        if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
-      }}>Edit Stall</Button>
-      <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
-    </Box>
-  </Box>
-</SwipeableDrawer>
+        </SwipeableDrawer>
       </Box>
     </MainLayout>
   );
