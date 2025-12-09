@@ -609,7 +609,7 @@ export default function StallInventory() {
       ...Array.from({ length: 8 }).map((_, i) => ({
       id: `B-${String(i + 1).padStart(0, "0")}`,
       type: "Food",
-      classification: "Under the Map",
+      section: "Under the Map",
       location: `B${i + 1}`,
       dimensions: "2x3m",
       capacity: 1,
