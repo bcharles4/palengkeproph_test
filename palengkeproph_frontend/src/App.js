@@ -27,6 +27,7 @@ import LoanManagement from './pages/loan/LoanManagement';
 import UserManagement from './pages/user/UserManagement';
 import SecurityManagement from './pages/security/SecurityManagement';
 import Settings from './pages/user/Settings';
+import NotFound from './pages/security/NotFound';
 
 const theme = createTheme({
   palette: {
@@ -126,12 +127,8 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           
           {/* Catch-all route for 404 */}
-          <Route path="*" element={
-            <div style={{ padding: 20, textAlign: 'center' }}>
-              <h2>404: Page Not Found</h2>
-              <p>The page you are looking for does not exist.</p>
-            </div>
-          } />
+            <Route path="*" element={<NotFound />} />
+
         </Routes>
       </Router>
     </ThemeProvider>
