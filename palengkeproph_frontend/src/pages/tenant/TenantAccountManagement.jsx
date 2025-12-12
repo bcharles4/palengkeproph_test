@@ -91,7 +91,7 @@ export default function TenantAccountManagement() {
       business: "Dela Cruz Eatery",
       address: "123 Main St, Quezon City",
       period: "2023-01-15 to 2024-01-14",
-      paymentTerms: "Monthly",
+      paymentTerms: "Weekly",
       monthlyRent: 5000,
       securityDeposit: 10000,
       documents: {
@@ -435,6 +435,7 @@ export default function TenantAccountManagement() {
           <Grid item xs={12} sm={6} md={2.4}>
             <Card sx={{ 
               borderLeft: '4px solid #1976d2',
+              boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
               height: '100%',
               '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
             }}>
@@ -468,6 +469,7 @@ export default function TenantAccountManagement() {
           <Grid item xs={12} sm={6} md={2.4}>
             <Card sx={{ 
               borderLeft: '4px solid #2e7d32',
+              boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
               height: '100%',
               '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
             }}>
@@ -501,6 +503,7 @@ export default function TenantAccountManagement() {
           <Grid item xs={12} sm={6} md={2.4}>
             <Card sx={{ 
               borderLeft: '4px solid #d32f2f',
+              boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
               height: '100%',
               '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
             }}>
@@ -537,6 +540,8 @@ export default function TenantAccountManagement() {
             <Card sx={{ 
               borderLeft: '4px solid #ed6c02',
               height: '100%',
+              boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
+
               '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
             }}>
               <CardContent sx={{ p: 2 }}>
