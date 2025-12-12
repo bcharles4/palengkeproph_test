@@ -1753,6 +1753,8 @@ export default function StallInventory() {
           <DialogTitle sx={{ bgcolor: "#D32F2F", color: "#fff" }}>{editMode ? "Edit Stall Details" : "Add New Stall"}</DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}><TextField fullWidth label="Original Owner" value={form.original_owner} onChange={(e) => setForm({ ...form, section: e.target.value })} /></Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth

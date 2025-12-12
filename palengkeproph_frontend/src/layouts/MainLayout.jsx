@@ -106,19 +106,21 @@ export default function MainLayout({ children }) {
         { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
       ],
     },
-  
+    
+    { text: "Tenant Management", icon: <AccountBoxIcon />, path: "/tenant-account-management", keywords: ["tenant", "account", "management", "accounts"] },
 
-    {
-      text: "Tenant Management",
-      key: "tenant",
-      icon: <AccountBoxIcon />,
-      children: [
-        // { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
-        // { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-information", keywords: ["tenant", "information", "details", "profile"] },
-        { text: "Tenant List", icon: <InsightsIcon />, path: "/tenant-account-management", keywords: ["tenant", "account", "management", "accounts"] },
 
-      ],
-    },
+    // {
+    //   text: "Tenant Management",
+    //   key: "tenant",
+    //   icon: <AccountBoxIcon />,
+    //   children: [
+    //     // { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
+    //     // { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-information", keywords: ["tenant", "information", "details", "profile"] },
+    //     // { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-account-management", keywords: ["tenant", "account", "management", "accounts"] },
+
+    //   ],
+    // },
 
     {
       text: "Market Collections",
