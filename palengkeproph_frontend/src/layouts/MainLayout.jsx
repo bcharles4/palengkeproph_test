@@ -91,7 +91,7 @@ export default function MainLayout({ children }) {
       icon: <MapsHomeWorkIcon />,
       children: [
         { text: "Stall Inventory", icon: <StoreIcon />, path: "/stall-inventory", keywords: ["stall", "inventory", "stalls", "market"] },
-        { text: "Stall Available", icon: <AddBusinessIcon />, path: "/stall-assignment", keywords: ["stall", "assignment", "assign", "allocate"] },
+        { text: "Stall Available", icon: <AddBusinessIcon />, path: "/stall-available", keywords: ["stall", "assignment", "assign", "allocate"] },
       ],
     },
 
