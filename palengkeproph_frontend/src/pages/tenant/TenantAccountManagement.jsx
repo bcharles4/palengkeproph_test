@@ -425,7 +425,7 @@ export default function TenantAccountManagement() {
     <MainLayout>
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
-          Tenant Account Management
+          Tenant Accounts
         </Typography>
         <Typography color="text.secondary" mb={2}>
           Log and manage tenant payments, generate statements of account, and correct entries.
@@ -603,7 +603,7 @@ export default function TenantAccountManagement() {
         {/* Section 1: Tenants List with Search */}
         <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="h4" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Users size={20} /> Tenant List
             </Typography>
             

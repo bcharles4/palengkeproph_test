@@ -19,7 +19,7 @@ import ExpenseApproval from './pages/expenses/ExpenseApproval';
 import InventoryTracking from './pages/inventory/InventoryTracking';
 import PurchaseOrderCreation from './pages/inventory/PurchaseOrderCreation';
 import CollectionManagement from './pages/payments/CollectionManagement';
-import TenantAccountManagement from './pages/payments/TenantAccountManagement';
+import TenantAccountManagement from './pages/tenant/TenantAccountManagement';
 import CheckRequestAndRelease from './pages/expenses/CheckRequestAndRelease';
 import Budgeting from './pages/expenses/Budgeting';
 import FinancialReporting from './pages/finance/FinancialReporting';

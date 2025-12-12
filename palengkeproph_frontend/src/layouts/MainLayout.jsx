@@ -106,14 +106,17 @@ export default function MainLayout({ children }) {
         { text: "Lease Renewal", icon: <InsightsIcon />, path: "/lease-renewal", keywords: ["lease", "renewal", "renew", "extend", "agreement"] },
       ],
     },
+  
 
     {
       text: "Tenant Management",
       key: "tenant",
       icon: <AccountBoxIcon />,
       children: [
-        { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
-        { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-information", keywords: ["tenant", "information", "details", "profile"] },
+        // { text: "Tenant List", icon: <ListAltIcon />, path: "/tenant-list", keywords: ["tenant", "list", "tenants", "people", "business"] },
+        // { text: "Tenant Information", icon: <AddBusinessIcon />, path: "/tenant-information", keywords: ["tenant", "information", "details", "profile"] },
+        { text: "Tenant List", icon: <InsightsIcon />, path: "/tenant-account-management", keywords: ["tenant", "account", "management", "accounts"] },
+
       ],
     },
 
@@ -124,7 +127,6 @@ export default function MainLayout({ children }) {
       children: [
         { text: "Payment Recording", icon: <ListAltIcon />, path: "/payment-recording", keywords: ["payment", "recording", "new", "add"] },
         { text: "Collection Management", icon: <AssessmentIcon />, path: "/collection-management", keywords: ["collection", "management", "manage", "overview"] },
-        { text: "Tenant Account Management", icon: <InsightsIcon />, path: "/tenant-account-management", keywords: ["tenant", "account", "management", "accounts"] },
       ],
     },
 
