@@ -15,6 +15,9 @@ import {
   Link,
   Alert,
   Divider,
+  Card,
+  CardContent,
+  InputAdornment,
 } from "@mui/material";
 import {
   NavigateNext,
@@ -22,7 +25,12 @@ import {
   Person,
   Business,
   CalendarToday,
+  Phone,
+  Email,
+  LocationOn,
   AttachMoney,
+  Description,
+  ReceiptLong,
 } from "@mui/icons-material";
 import MainLayout from "../../layouts/MainLayout";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +39,7 @@ export default function LeaseCreation() {
   const navigate = useNavigate();
   const [leaseData, setLeaseData] = useState({
     tenantName: "",
+    tenantBusinessName: "",
     tenantContact: "",
     tenantEmail: "",
     tenantAddress: "",
@@ -93,7 +102,7 @@ export default function LeaseCreation() {
     
     // Basic validation
     const requiredFields = [
-      'tenantName', 'stallId', 'leaseStart', 
+      'tenantName', 'tenantBusinessName', 'stallId', 'leaseStart', 
       'leaseEnd', 'monthlyRate'
     ];
     
@@ -107,12 +116,6 @@ export default function LeaseCreation() {
     setPreviewOpen(true);
   };
 
-  const generateTenantId = () => {
-    const currentYear = new Date().getFullYear();
-    const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `TEN-${currentYear}-${randomNum}`;
-  };
-
   const handleConfirmLease = () => {
     // Generate unique lease ID
     const leaseId = `LEASE-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
@@ -123,14 +126,13 @@ export default function LeaseCreation() {
       status: "Pending Approval",
       dateCreated: new Date().toISOString(),
       dateRequested: new Date().toISOString(),
-      createdBy: "Staff", // In real app, get from user session
+      createdBy: "Staff",
+      tenantId: "",
       
-      // Tenant ID will be generated upon approval
-      tenantId: "", // Will be generated when approved
-      
-      // Store tenant information separately
+      // Tenant information
       tenantInfo: {
         name: leaseData.tenantName,
+        business: leaseData.tenantBusinessName,
         contact: leaseData.tenantContact,
         email: leaseData.tenantEmail,
         address: leaseData.tenantAddress,
@@ -158,6 +160,7 @@ export default function LeaseCreation() {
     // Reset form
     setLeaseData({
       tenantName: "",
+      tenantBusinessName: "",
       tenantContact: "",
       tenantEmail: "",
       tenantAddress: "",
@@ -166,7 +169,7 @@ export default function LeaseCreation() {
       leaseEnd: "",
       monthlyRate: "",
       securityDeposit: "",
-      paymentTerms: "Daily",
+      paymentTerms: "Monthly",
       remarks: "",
     });
     
@@ -225,241 +228,336 @@ export default function LeaseCreation() {
 
         <Paper sx={{ p: 4, borderRadius: 2, boxShadow: 3 }}>
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              
-              {/* Tenant Information Section */}
-              <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mb: 2, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
+            
+            {/* SECTION 1: Tenant Information */}
+            <Card variant="outlined" sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 3, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
                   <Person sx={{ mr: 1 }} />
                   Tenant Information
                 </Typography>
-                <Divider sx={{ mb: 3 }} />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Tenant Name"
-                  name="tenantName"
-                  value={leaseData.tenantName}
-                  onChange={handleChange}
-                  size="small"
-                  required
-                  placeholder="Enter full name"
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Contact Number"
-                  name="tenantContact"
-                  value={leaseData.tenantContact}
-                  onChange={handleChange}
-                  size="small"
-                  placeholder="09XXXXXXXXX"
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Email Address"
-                  name="tenantEmail"
-                  value={leaseData.tenantEmail}
-                  onChange={handleChange}
-                  size="small"
-                  type="email"
-                  placeholder="email@example.com"
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Address"
-                  name="tenantAddress"
-                  value={leaseData.tenantAddress}
-                  onChange={handleChange}
-                  size="small"
-                  placeholder="Complete address"
-                />
-              </Grid>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Tenant Name *"
+                      name="tenantName"
+                      value={leaseData.tenantName}
+                      onChange={handleChange}
+                      size="small"
+                      required
+                      placeholder="Enter full name"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
 
-              {/* Stall Information Section */}
-              <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 4, mb: 2, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Business Name *"
+                      name="tenantBusinessName"
+                      value={leaseData.tenantBusinessName}
+                      onChange={handleChange}
+                      size="small"
+                      required
+                      placeholder="Enter Business Name"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Business fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Contact Number"
+                      name="tenantContact"
+                      value={leaseData.tenantContact}
+                      onChange={handleChange}
+                      size="small"
+                      placeholder="09XXXXXXXXX"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Phone fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Email Address"
+                      name="tenantEmail"
+                      value={leaseData.tenantEmail}
+                      onChange={handleChange}
+                      size="small"
+                      type="email"
+                      placeholder="email@example.com"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Email fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      name="tenantAddress"
+                      value={leaseData.tenantAddress}
+                      onChange={handleChange}
+                      size="small"
+                      placeholder="Complete address"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LocationOn fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* SECTION 2: Stall Information */}
+            <Card variant="outlined" sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 3, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
                   <Business sx={{ mr: 1 }} />
                   Stall Information
                 </Typography>
-                <Divider sx={{ mb: 3 }} />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Select Stall *"
+                      name="stallId"
+                      value={leaseData.stallId}
+                      onChange={handleChange}
+                      size="small"
+                      required
+                    >
+                      <MenuItem value="">
+                        <em>Select a stall</em>
+                      </MenuItem>
+                      {availableStalls.map((stall) => (
+                        <MenuItem key={stall.id} value={stall.id}>
+                          {stall.id} - {stall.type || 'Stall'} (₱{stall.rate || '0'}/month)
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    {availableStalls.length === 0 && (
+                      <Alert severity="warning" sx={{ mt: 1 }}>
+                        No available stalls. Please add stalls first.
+                      </Alert>
+                    )}
+                  </Grid>
                   
-                  fullWidth
-                  label="Select Stall"
-                  name="stallId"
-                  value={leaseData.stallId}
-                  onChange={handleChange}
-                  size="small"
-                  required
-                >
-                  <MenuItem value="">
-                    <em>Select a stall</em>
-                  </MenuItem>
-                  {availableStalls.map((stall) => (
-                    <MenuItem key={stall.id} value={stall.id}>
-                      {stall.id} - {stall.type || 'Stall'} (₱{stall.rate || '0'}/month)
-                    </MenuItem>
-                  ))}
-                </TextField>
-                {availableStalls.length === 0 && (
-                  <Alert severity="warning" sx={{ mt: 1 }}>
-                    No available stalls. Please add stalls first.
-                  </Alert>
-                )}
-              </Grid>
-              
-              {selectedStall && (
-                <Grid item xs={12} md={6}>
-                  <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f5f5f5' }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Selected Stall Details:
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Type:</strong> {selectedStall.type || 'Standard'} <br />
-                      <strong>Size:</strong> {selectedStall.size || 'N/A'} <br />
-                      <strong>Location:</strong> {selectedStall.location || 'N/A'} <br />
-                      <strong>Base Rate:</strong> ₱{selectedStall.rate || '0'}/month
-                    </Typography>
-                  </Paper>
+                  {selectedStall && (
+                    <Grid item xs={12} md={6}>
+                      <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f5f5f5', height: '100%' }}>
+                        <Typography variant="subtitle2" gutterBottom color="primary">
+                          Selected Stall Details:
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Typography variant="body2">
+                            <strong>Type:</strong> {selectedStall.type || 'Standard'}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Size:</strong> {selectedStall.size || 'N/A'}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Location:</strong> {selectedStall.location || 'N/A'}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Base Rate:</strong> ₱{selectedStall.rate || '0'}/month
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    </Grid>
+                  )}
                 </Grid>
-              )}
+              </CardContent>
+            </Card>
 
-              {/* Lease Terms Section */}
-              <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mt: 4, mb: 2, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
+            {/* SECTION 3: Lease Terms */}
+            <Card variant="outlined" sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 3, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
                   <CalendarToday sx={{ mr: 1 }} />
                   Lease Terms
                 </Typography>
-                <Divider sx={{ mb: 3 }} />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Lease Start Date"
-                  type="date"
-                  name="leaseStart"
-                  value={leaseData.leaseStart}
-                  onChange={handleChange}
-                  size="small"
-                  InputLabelProps={{ shrink: true }}
-                  required
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Lease End Date"
-                  type="date"
-                  name="leaseEnd"
-                  value={leaseData.leaseEnd}
-                  onChange={handleChange}
-                  size="small"
-                  InputLabelProps={{ shrink: true }}
-                  required
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Monthly Rate (₱)"
-                  name="monthlyRate"
-                  value={leaseData.monthlyRate}
-                  onChange={handleChange}
-                  size="small"
-                  type="number"
-                  required
-                  InputProps={{
-                    // startAdornment: <AttachMoney sx={{ mr: 1, color: 'action.active' }} />,
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Security Deposit (₱)"
-                  name="securityDeposit"
-                  value={leaseData.securityDeposit}
-                  onChange={handleChange}
-                  size="small"
-                  type="number"
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Payment Terms"
-                  name="paymentTerms"
-                  value={leaseData.paymentTerms}
-                  onChange={handleChange}
-                  size="small"
-                >
-                  <MenuItem value="Daily">Daily</MenuItem>
-                  <MenuItem value="Weekly">Weekly</MenuItem>
-                  <MenuItem value="Monthly">Monthly</MenuItem>
-                  <MenuItem value="Quarterly">Quarterly</MenuItem>
-                  <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>
-                  <MenuItem value="Annual">Annual</MenuItem>
-                </TextField>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Remarks / Special Conditions"
-                  name="remarks"
-                  value={leaseData.remarks}
-                  onChange={handleChange}
-                  size="small"
-                  multiline
-                  rows={3}
-                  placeholder="Any special terms, conditions, or notes..."
-                />
-              </Grid>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Lease Start Date *"
+                      type="date"
+                      name="leaseStart"
+                      value={leaseData.leaseStart}
+                      onChange={handleChange}
+                      size="small"
+                      InputLabelProps={{ shrink: true }}
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CalendarToday fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Lease End Date *"
+                      type="date"
+                      name="leaseEnd"
+                      value={leaseData.leaseEnd}
+                      onChange={handleChange}
+                      size="small"
+                      InputLabelProps={{ shrink: true }}
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CalendarToday fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
 
-              {/* Submit Section */}
-              <Grid item xs={12}>
-                <Divider sx={{ my: 3 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => navigate("/lease-approval")}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      bgcolor: "#D32F2F",
-                      "&:hover": { bgcolor: "#B71C1C" },
-                      minWidth: '150px'
-                    }}
-                  >
-                    Submit for Approval
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Monthly Rate (₱) *"
+                      name="monthlyRate"
+                      value={leaseData.monthlyRate}
+                      onChange={handleChange}
+                      size="small"
+                      type="number"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <AttachMoney fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Security Deposit (₱)"
+                      name="securityDeposit"
+                      value={leaseData.securityDeposit}
+                      onChange={handleChange}
+                      size="small"
+                      type="number"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <ReceiptLong fontSize="small" color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Payment Terms"
+                      name="paymentTerms"
+                      value={leaseData.paymentTerms}
+                      onChange={handleChange}
+                      size="small"
+                    >
+                      <MenuItem value="Daily">Daily</MenuItem>
+                      <MenuItem value="Weekly">Weekly</MenuItem>
+                      <MenuItem value="Monthly">Monthly</MenuItem>
+                      <MenuItem value="Quarterly">Quarterly</MenuItem>
+                      <MenuItem value="Semi-Annual">Semi-Annual</MenuItem>
+                      <MenuItem value="Annual">Annual</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* SECTION 4: Additional Information */}
+            <Card variant="outlined" sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 3, color: '#D32F2F', display: 'flex', alignItems: 'center' }}>
+                  <Description sx={{ mr: 1 }} />
+                  Additional Information
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Remarks / Special Conditions"
+                      name="remarks"
+                      value={leaseData.remarks}
+                      onChange={handleChange}
+                      size="small"
+                      multiline
+                      rows={4}
+                      placeholder="Any special terms, conditions, or notes..."
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Submit Section */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/lease-approval")}
+                size="large"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                sx={{
+                  bgcolor: "#D32F2F",
+                  "&:hover": { bgcolor: "#B71C1C" },
+                  minWidth: '200px'
+                }}
+              >
+                Submit for Approval
+              </Button>
+            </Box>
           </form>
         </Paper>
       </Box>
@@ -474,36 +572,55 @@ export default function LeaseCreation() {
             New Lease Request
           </Typography>
           
-          <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid container spacing={3} sx={{ mb: 3 }}>
             <Grid item xs={12} md={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Tenant Information
-              </Typography>
-              <Typography><strong>Name:</strong> {leaseData.tenantName}</Typography>
-              {leaseData.tenantContact && (
-                <Typography><strong>Contact:</strong> {leaseData.tenantContact}</Typography>
-              )}
-              {leaseData.tenantEmail && (
-                <Typography><strong>Email:</strong> {leaseData.tenantEmail}</Typography>
-              )}
-              {leaseData.tenantAddress && (
-                <Typography><strong>Address:</strong> {leaseData.tenantAddress}</Typography>
-              )}
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="subtitle2" color="primary" gutterBottom>
+                  Tenant Information
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Typography><strong>Name:</strong> {leaseData.tenantName}</Typography>
+                  <Typography><strong>Business:</strong> {leaseData.tenantBusinessName}</Typography>
+                  {leaseData.tenantContact && (
+                    <Typography><strong>Contact:</strong> {leaseData.tenantContact}</Typography>
+                  )}
+                  {leaseData.tenantEmail && (
+                    <Typography><strong>Email:</strong> {leaseData.tenantEmail}</Typography>
+                  )}
+                  {leaseData.tenantAddress && (
+                    <Typography><strong>Address:</strong> {leaseData.tenantAddress}</Typography>
+                  )}
+                </Box>
+              </Paper>
             </Grid>
             
             <Grid item xs={12} md={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Lease Details
-              </Typography>
-              <Typography><strong>Stall:</strong> {leaseData.stallId}</Typography>
-              <Typography><strong>Start:</strong> {leaseData.leaseStart}</Typography>
-              <Typography><strong>End:</strong> {leaseData.leaseEnd}</Typography>
-              <Typography><strong>Monthly Rate:</strong> ₱{leaseData.monthlyRate}</Typography>
-              {leaseData.securityDeposit && (
-                <Typography><strong>Security Deposit:</strong> ₱{leaseData.securityDeposit}</Typography>
-              )}
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="subtitle2" color="primary" gutterBottom>
+                  Lease Details
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Typography><strong>Stall:</strong> {leaseData.stallId}</Typography>
+                  <Typography><strong>Start:</strong> {leaseData.leaseStart}</Typography>
+                  <Typography><strong>End:</strong> {leaseData.leaseEnd}</Typography>
+                  <Typography><strong>Monthly Rate:</strong> ₱{leaseData.monthlyRate}</Typography>
+                  {leaseData.securityDeposit && (
+                    <Typography><strong>Security Deposit:</strong> ₱{leaseData.securityDeposit}</Typography>
+                  )}
+                  <Typography><strong>Payment Terms:</strong> {leaseData.paymentTerms}</Typography>
+                </Box>
+              </Paper>
             </Grid>
           </Grid>
+          
+          {leaseData.remarks && (
+            <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+              <Typography variant="subtitle2" color="primary" gutterBottom>
+                Remarks
+              </Typography>
+              <Typography>{leaseData.remarks}</Typography>
+            </Paper>
+          )}
           
           <Alert severity="info" sx={{ mt: 2 }}>
             <Typography variant="body2">

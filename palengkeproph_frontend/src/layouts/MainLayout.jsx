@@ -71,7 +71,6 @@ export default function MainLayout({ children }) {
 
   const handleDrawerToggle = () => setOpen(!open);
 
-  // ✅ Improved: only one dropdown open at a time
   const handleDropdownToggle = (key) => {
     setOpenDropdowns((prev) => {
       const updated = {};
