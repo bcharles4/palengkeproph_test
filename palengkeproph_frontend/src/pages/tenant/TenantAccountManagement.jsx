@@ -71,7 +71,6 @@ export default function TenantAccountManagement() {
     total: 0,
     active: 0,
     inactive: 0,
-    pending: 0,
     overdue: 0
   });
 
@@ -176,7 +175,7 @@ export default function TenantAccountManagement() {
       email: "carlos.garcia@email.com",
       phone: "+63 920 111 2222",
       joinDate: "2023-04-01",
-      status: "Pending",
+      status: "Inactive",
       business: "Garcia Pharmacy",
       address: "555 Maple St, Pasig",
       period: "2023-04-01 to 2024-03-31",
@@ -206,14 +205,12 @@ export default function TenantAccountManagement() {
     const total = tenants.length;
     const active = tenants.filter(t => t.status === "Active").length;
     const inactive = tenants.filter(t => t.status === "Inactive").length;
-    const pending = tenants.filter(t => t.status === "Pending").length;
     const overdue = tenants.filter(t => t.status === "Overdue").length;
     
     setTenantStats({
       total,
       active,
       inactive,
-      pending,
       overdue
     });
   }, [tenants]);
@@ -294,7 +291,7 @@ export default function TenantAccountManagement() {
   ];
 
   // Status options for edit form
-  const statusOptions = ["Active", "Inactive", "Pending", "Overdue"];
+  const statusOptions = ["Active", "Inactive", "Overdue"];
 
   // Payment terms options
   const paymentTermsOptions = ["Daily", "Weekly", "Monthly", "Quarterly", "Annual"];
@@ -533,43 +530,12 @@ export default function TenantAccountManagement() {
             </Card>
           </Grid>
 
-          {/* Pending Tenants */}
-          <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ 
-              borderLeft: '4px solid #ed6c02',
-              height: '100%',
-              '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
-            }}>
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="h4" fontWeight={700} color="text.primary">
-                      {tenantStats.pending}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Pending
-                    </Typography>
-                  </Box>
-                  <Box sx={{ 
-                    width: 40, 
-                    height: 40, 
-                    borderRadius: '50%', 
-                    bgcolor: '#ed6c02', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}>
-                    <Clock size={20} color="white" />
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+
 
           {/* Overdue Tenants */}
           <Grid item xs={12} sm={6} md={2.4}>
             <Card sx={{ 
-              borderLeft: '4px solid #9c27b0',
+              borderLeft: '4px solid #ed6c02',
               height: '100%',
               '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
             }}>
@@ -587,7 +553,7 @@ export default function TenantAccountManagement() {
                     width: 40, 
                     height: 40, 
                     borderRadius: '50%', 
-                    bgcolor: '#9c27b0', 
+                    bgcolor: '#ed6c02', 
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'center' 
