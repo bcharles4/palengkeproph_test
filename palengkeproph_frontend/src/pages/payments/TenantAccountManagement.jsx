@@ -1198,6 +1198,7 @@ export default function TenantAccountManagement() {
                     value={editForm.paymentTerms}
                     onChange={(e) => setEditForm({...editForm, paymentTerms: e.target.value})}
                     label="Payment Terms"
+                    
                   >
                     {paymentTermsOptions.map((term) => (
                       <MenuItem key={term} value={term}>{term}</MenuItem>
