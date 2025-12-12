@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import StallInventory from "./pages/stall/StallInventory";
-import StallAssignment from "./pages/stall/StallAvailable";
+import StallAvailable from "./pages/stall/StallAvailable";
 import TenantList from './pages/tenant/TenantList';  
 import TenantInformation from './pages/tenant/TenantInformation';
 import LeaseList from './pages/lease/LeaseRecords';
@@ -89,7 +89,7 @@ function App() {
           
           {/* Stall Management */}
           <Route path="/stall-inventory" element={<StallInventory />} />
-          <Route path="/stall-assignment" element={<StallAssignment />} />
+          <Route path="/stall-available" element={<StallAvailable />} />
           
           {/* Tenant Management */}
           <Route path="/tenant-list" element={<TenantList />} />
