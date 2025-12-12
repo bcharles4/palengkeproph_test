@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import StallInventory from "./pages/stall/StallInventory";
-import StallAssignment from "./pages/stall/StallAssignment";
+import StallAssignment from "./pages/stall/StallAvailable";
 import TenantList from './pages/tenant/TenantList';  
 import TenantInformation from './pages/tenant/TenantInformation';
 import LeaseList from './pages/lease/LeaseRecords';
