@@ -31,6 +31,11 @@ import {
   Checkbox,
   Card,
   CardContent,
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -47,6 +52,16 @@ import {
   Schedule as ScheduleIcon,
   Warning as WarningIcon,
   Block as BlockIcon,
+  Person as PersonIcon,
+  History as HistoryIcon,
+  ArrowForward as ArrowForwardIcon,
+  CalendarToday as CalendarIcon,
+  AccessTime as AccessTimeIcon,
+  Phone as PhoneIcon,
+  Email as EmailIcon,
+  Receipt as ReceiptIcon,
+  Note as NoteIcon,
+  People as PeopleIcon,
 } from "@mui/icons-material";
 import Legend from "../../layouts/Legend";
 import MainLayout from "../../layouts/MainLayout";
@@ -90,6 +105,8 @@ export default function StallInventory() {
   const [selectedStall, setSelectedStall] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
+  const [ownerHistory, setOwnerHistory] = useState([]);
 
   // Drawer (bottom) state
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -1154,6 +1171,123 @@ export default function StallInventory() {
     return borders.length > 0 ? borders.join(', ') : 'none';
   };
 
+  const generateOwnerHistory = (stallId) => {
+    const histories = {
+      "C-01": [
+        { 
+          id: 1, 
+          ownerName: "John Smith", 
+          contact: "0912-345-6789",
+          email: "john.smith@email.com",
+          startDate: "2023-01-01", 
+          endDate: null, 
+          status: "Active", 
+          type: "Current Owner",
+          leaseId: "LEASE-2023-001",
+          paymentStatus: "Paid",
+          notes: "Regular tenant, pays on time",
+          duration: "1 year 2 months"
+        },
+        { 
+          id: 2, 
+          ownerName: "Maria Garcia", 
+          contact: "0917-890-1234",
+          email: "maria.garcia@email.com",
+          startDate: "2021-06-01", 
+          endDate: "2022-12-31", 
+          status: "Completed", 
+          type: "Previous Owner",
+          leaseId: "LEASE-2021-045",
+          paymentStatus: "Completed",
+          notes: "Moved to larger stall",
+          duration: "1 year 7 months"
+        },
+      ],
+      "D-83": [
+        { 
+          id: 1, 
+          ownerName: "Brian Chen", 
+          contact: "0915-678-9012",
+          email: "brian.chen@email.com",
+          startDate: "2023-03-15", 
+          endDate: null, 
+          status: "Active", 
+          type: "Current Owner",
+          leaseId: "LEASE-2023-023",
+          paymentStatus: "Pending",
+          notes: "New tenant, first month",
+          duration: "11 months"
+        },
+      ],
+    };
+    
+    // Default history if stall not found
+    return histories[stallId] || [
+      { 
+        id: 1, 
+        ownerName: selectedStall?.original_owner || "Unknown Owner", 
+        contact: "N/A",
+        email: "N/A",
+        startDate: new Date().toISOString().split('T')[0], 
+        endDate: null, 
+        status: "Active", 
+        type: "Current Owner",
+        leaseId: "N/A",
+        paymentStatus: "N/A",
+        notes: "No history available",
+        duration: "N/A"
+      },
+    ];
+  };
+
+  // Function to open owner history drawer
+  const handleOpenHistoryDrawer = (stall) => {
+    setSelectedStall(stall);
+    const history = generateOwnerHistory(stall.id);
+    setOwnerHistory(history);
+    setHistoryDrawerOpen(true);
+  };
+
+  const handleCloseHistoryDrawer = () => {
+    setHistoryDrawerOpen(false);
+    setTimeout(() => {
+      setOwnerHistory([]);
+    }, 200);
+  };
+
+  // Function to update current owner
+  const updateCurrentOwner = () => {
+    const newOwnerName = prompt("Enter new owner name:");
+    if (newOwnerName && selectedStall) {
+      // In real app, you would save to database here
+      alert(`Owner updated to: ${newOwnerName}\n\nIn a real application, this would save to the database.`);
+      
+      // Update local state for demo
+      const updatedHistory = ownerHistory.map(owner => 
+        owner.status === "Active" 
+          ? { ...owner, status: "Completed", endDate: new Date().toISOString().split('T')[0] }
+          : owner
+      );
+      
+      const newOwner = {
+        id: updatedHistory.length + 1,
+        ownerName: newOwnerName,
+        contact: "New contact",
+        email: "new@email.com",
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: null,
+        status: "Active",
+        type: "Current Owner",
+        leaseId: `LEASE-${new Date().getFullYear()}-${Math.floor(Math.random() * 100)}`,
+        paymentStatus: "Pending",
+        notes: "Newly added tenant",
+        duration: "0 months"
+      };
+      
+      setOwnerHistory([newOwner, ...updatedHistory]);
+    }
+  };
+
   return (
     <MainLayout>
       <Box sx={{ height:"calc(100vh - 140px)", overflowY:"auto" }}>
@@ -1838,11 +1972,242 @@ export default function StallInventory() {
               <Button variant="contained" sx={{ bgcolor: "#D32F2F" }} onClick={() => {
                 if (selectedStall) { handleEdit(selectedStall); setDrawerOpen(false); }
               }}>Edit Stall</Button>
-              <Button variant="contained" sx={{bgcolor: "black"}} onClick={handleCloseDrawer}>Stall History</Button>
+              <Button 
+                variant="contained" 
+                sx={{bgcolor: "black"}} 
+                onClick={() => {
+                  if (selectedStall) {
+                    handleOpenHistoryDrawer(selectedStall);
+                    setDrawerOpen(false);
+                  }
+                }}
+                startIcon={<HistoryIcon />}
+              >
+                Stall History
+              </Button>            
             </Box>
           </Box>
         </SwipeableDrawer>
       </Box>
+
+
+              {/* ===== STALL HISTORY DRAWER ===== */}
+        <SwipeableDrawer
+          anchor="bottom"
+          open={historyDrawerOpen}
+          onClose={handleCloseHistoryDrawer}
+          onOpen={() => {}}
+          disableBackdropTransition={false}
+          PaperProps={{
+            sx: {
+              height: "75vh",
+              maxHeight: "75vh",
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+            }
+          }}
+        >
+          <Box sx={{ p: 3, overflowY: "auto", height: "100%" }}>
+            {/* Header */}
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: "#D32F2F" }}>
+                  Stall Ownership History
+                </Typography>
+                <Typography color="text.secondary">
+                  {selectedStall ? `${selectedStall.id} - ${selectedStall.location} - ${selectedStall.type}` : ""}
+                </Typography>
+              </Box>
+              <IconButton onClick={handleCloseHistoryDrawer} sx={{ bgcolor: "#f5f5f5" }}>
+                <ArrowForwardIcon />
+              </IconButton>
+            </Stack>
+
+            <Divider sx={{ mb: 3 }} />
+
+            {selectedStall && (
+              <>
+                {/* Current Owner Section */}
+                <Paper sx={{ p: 2, mb: 3, bgcolor: "#e8f5e9", borderLeft: "4px solid #4CAF50" }}>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#2E7D32" }}>
+                    <PersonIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                    Current Owner
+                  </Typography>
+                  
+                  {ownerHistory.find(item => item.status === "Active") ? (
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                          {ownerHistory.find(item => item.status === "Active")?.ownerName}
+                        </Typography>
+                        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <PhoneIcon sx={{ fontSize: 16, color: '#666' }} />
+                          <Typography variant="body2">
+                            {ownerHistory.find(item => item.status === "Active")?.contact}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                          <EmailIcon sx={{ fontSize: 16, color: '#666' }} />
+                          <Typography variant="body2">
+                            {ownerHistory.find(item => item.status === "Active")?.email}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ReceiptIcon sx={{ fontSize: 16, color: '#666' }} />
+                          <Typography variant="body2">
+                            <b>Lease:</b> {ownerHistory.find(item => item.status === "Active")?.leaseId}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                          <CalendarIcon sx={{ fontSize: 16, color: '#666' }} />
+                          <Typography variant="body2">
+                            <b>Since:</b> {ownerHistory.find(item => item.status === "Active")?.startDate}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                          <AccessTimeIcon sx={{ fontSize: 16, color: '#666' }} />
+                          <Typography variant="body2">
+                            <b>Duration:</b> {ownerHistory.find(item => item.status === "Active")?.duration}
+                          </Typography>
+                        </Box>
+                        <Chip 
+                          label={ownerHistory.find(item => item.status === "Active")?.paymentStatus} 
+                          color={
+                            ownerHistory.find(item => item.status === "Active")?.paymentStatus === "Paid" ? "success" : 
+                            ownerHistory.find(item => item.status === "Active")?.paymentStatus === "Pending" ? "warning" : "error"
+                          }
+                          size="small"
+                          sx={{ mt: 1 }}
+                        />
+                      </Grid>
+                      {ownerHistory.find(item => item.status === "Active")?.notes && (
+                        <Grid item xs={12}>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 1 }}>
+                            <NoteIcon sx={{ fontSize: 16, color: '#666', mt: 0.25 }} />
+                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                              {ownerHistory.find(item => item.status === "Active")?.notes}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      )}
+                    </Grid>
+                  ) : (
+                    <Typography color="text.secondary">No active owner assigned</Typography>
+                  )}
+                </Paper>
+
+                {/* Previous Owners */}
+                {ownerHistory.filter(item => item.status === "Completed").length > 0 && (
+                  <>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                      <PeopleIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                      Previous Owners ({ownerHistory.filter(item => item.status === "Completed").length})
+                    </Typography>
+                    
+                    <List>
+                      {ownerHistory
+                        .filter(item => item.status === "Completed")
+                        .map((item) => (
+                          <ListItem 
+                            key={item.id}
+                            sx={{ 
+                              bgcolor: '#f9f9f9',
+                              mb: 1,
+                              borderRadius: 1,
+                              border: '1px solid #eee'
+                            }}
+                          >
+                            <ListItemAvatar>
+                              <Avatar sx={{ bgcolor: '#757575' }}>
+                                {item.ownerName.split(' ').map(n => n[0]).join('')}
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={
+                                <Typography variant="subtitle1" fontWeight={600}>
+                                  {item.ownerName}
+                                </Typography>
+                              }
+                              secondary={
+                                <>
+                                  <Typography component="span" variant="body2" color="text.primary">
+                                    {item.type}
+                                  </Typography>
+                                  {` • ${item.startDate} to ${item.endDate}`}
+                                  <br />
+                                  <Typography component="span" variant="body2" color="text.secondary">
+                                    <PhoneIcon sx={{ fontSize: 12, verticalAlign: 'middle', mr: 0.5 }} />
+                                    {item.contact}
+                                  </Typography>
+                                  <br />
+                                  <Typography component="span" variant="body2" color="text.secondary">
+                                    Lease: {item.leaseId} • Duration: {item.duration}
+                                  </Typography>
+                                </>
+                              }
+                            />
+                          </ListItem>
+                        ))}
+                    </List>
+                  </>
+                )}
+
+                {/* Simple Timeline */}
+                <Typography variant="h6" sx={{ mt: 3, mb: 2, fontWeight: 600 }}>
+                  Ownership Timeline
+                </Typography>
+                
+                <Box sx={{ ml: 3, pl: 2, borderLeft: '2px dashed #ccc', position: 'relative' }}>
+                  {ownerHistory.map((item, index) => (
+                    <Box key={item.id} sx={{ mb: 2, position: 'relative' }}>
+                      <Box sx={{
+                        position: 'absolute',
+                        left: -10,
+                        top: 4,
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        bgcolor: item.status === "Active" ? '#4CAF50' : '#757575',
+                        border: '2px solid white',
+                        boxShadow: 1
+                      }} />
+                      <Typography variant="body1" fontWeight={600}>
+                        {item.ownerName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <CalendarIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />
+                        {item.startDate} {item.endDate ? `→ ${item.endDate}` : '(Current)'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        {item.type} • {item.duration}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                {/* Action Buttons */}
+                <Box sx={{ mt: 4, display: "flex", gap: 2, justifyContent: "flex-end" }}>
+                  <Button 
+                    variant="outlined" 
+                    onClick={updateCurrentOwner}
+                    startIcon={<PersonIcon />}
+                  >
+                    Update Owner
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    onClick={handleCloseHistoryDrawer}
+                    sx={{ bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
+                  >
+                    Close History
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Box>
+        </SwipeableDrawer>
     </MainLayout>
   );
 }
