@@ -32,6 +32,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  InputAdornment,
 } from "@mui/material";
 import {
   Receipt,
@@ -60,6 +61,7 @@ import {
   UserCheck,
   UserX,
   FileCheck,
+  Search,
 } from "lucide-react";
 import MainLayout from "../../layouts/MainLayout";
 
@@ -72,6 +74,9 @@ export default function TenantAccountManagement() {
     pending: 0,
     overdue: 0
   });
+
+  // Search filter for tenant list
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Mock tenant data with documents
   const [tenants, setTenants] = useState([
@@ -186,6 +191,15 @@ export default function TenantAccountManagement() {
       }
     }
   ]);
+
+  // Filtered tenants based on search query
+  const filteredTenants = tenants.filter(tenant =>
+    tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.business.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.stallId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.leaseId.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Calculate tenant statistics
   useEffect(() => {
@@ -422,13 +436,31 @@ export default function TenantAccountManagement() {
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {/* Total Tenants */}
           <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ height: '100%', borderRadius: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Users size={32} color="#1976d2" style={{ marginRight: 12 }} />
+            <Card sx={{ 
+              borderLeft: '4px solid #1976d2',
+              height: '100%',
+              '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h6" color="text.secondary">Total Tenants</Typography>
-                    <Typography variant="h4" fontWeight={700}>{tenantStats.total}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="text.primary">
+                      {tenantStats.total}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Total Tenants
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '50%', 
+                    bgcolor: '#1976d2', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
+                    <Users size={20} color="white" />
                   </Box>
                 </Box>
               </CardContent>
@@ -437,13 +469,31 @@ export default function TenantAccountManagement() {
 
           {/* Active Tenants */}
           <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ height: '100%', borderRadius: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <UserCheck size={32} color="#2e7d32" style={{ marginRight: 12 }} />
+            <Card sx={{ 
+              borderLeft: '4px solid #2e7d32',
+              height: '100%',
+              '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h6" color="text.secondary">Active</Typography>
-                    <Typography variant="h4" fontWeight={700}>{tenantStats.active}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="text.primary">
+                      {tenantStats.active}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Active
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '50%', 
+                    bgcolor: '#2e7d32', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
+                    <CheckCircle size={20} color="white" />
                   </Box>
                 </Box>
               </CardContent>
@@ -452,13 +502,31 @@ export default function TenantAccountManagement() {
 
           {/* Inactive Tenants */}
           <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ height: '100%', borderRadius: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <UserX size={32} color="#d32f2f" style={{ marginRight: 12 }} />
+            <Card sx={{ 
+              borderLeft: '4px solid #d32f2f',
+              height: '100%',
+              '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h6" color="text.secondary">Inactive</Typography>
-                    <Typography variant="h4" fontWeight={700}>{tenantStats.inactive}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="text.primary">
+                      {tenantStats.inactive}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Inactive
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '50%', 
+                    bgcolor: '#d32f2f', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
+                    <XCircle size={20} color="white" />
                   </Box>
                 </Box>
               </CardContent>
@@ -467,13 +535,31 @@ export default function TenantAccountManagement() {
 
           {/* Pending Tenants */}
           <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ height: '100%', borderRadius: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Clock size={32} color="#ed6c02" style={{ marginRight: 12 }} />
+            <Card sx={{ 
+              borderLeft: '4px solid #ed6c02',
+              height: '100%',
+              '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h6" color="text.secondary">Pending</Typography>
-                    <Typography variant="h4" fontWeight={700}>{tenantStats.pending}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="text.primary">
+                      {tenantStats.pending}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Pending
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '50%', 
+                    bgcolor: '#ed6c02', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
+                    <Clock size={20} color="white" />
                   </Box>
                 </Box>
               </CardContent>
@@ -482,13 +568,31 @@ export default function TenantAccountManagement() {
 
           {/* Overdue Tenants */}
           <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ height: '100%', borderRadius: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <DollarSign size={32} color="#9c27b0" style={{ marginRight: 12 }} />
+            <Card sx={{ 
+              borderLeft: '4px solid #9c27b0',
+              height: '100%',
+              '&:hover': { transform: 'translateY(-2px)', transition: 'transform 0.2s' }
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h6" color="text.secondary">Overdue</Typography>
-                    <Typography variant="h4" fontWeight={700}>{tenantStats.overdue}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="text.primary">
+                      {tenantStats.overdue}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Overdue
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '50%', 
+                    bgcolor: '#9c27b0', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
+                    <DollarSign size={20} color="white" />
                   </Box>
                 </Box>
               </CardContent>
@@ -496,92 +600,120 @@ export default function TenantAccountManagement() {
           </Grid>
         </Grid>
 
-        {/* Section 1: Tenants List */}
+        {/* Section 1: Tenants List with Search */}
         <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
-          <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-            <Users size={20} /> Tenant List
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Users size={20} /> Tenant List
+            </Typography>
+            
+            <TextField
+              size="small"
+              placeholder="Search tenants..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ width: 300 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search size={18} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
           <Grid container spacing={2}>
-            {tenants.map((tenant) => {
-              const userPaymentCount = getUserPayments(tenant.id).length;
-              const totalPaid = getUserPayments(tenant.id).reduce((sum, p) => sum + p.amount, 0);
-              
-              return (
-                <Grid item xs={12} sm={6} md={3} key={tenant.id}>
-                  <Card 
-                    variant="outlined" 
-                    sx={{ 
-                      cursor: 'pointer',
-                      '&:hover': { 
-                        boxShadow: 2, 
-                        borderColor: '#D32F2F' 
-                      } 
-                    }}
-                    onClick={() => handleViewTenantDetails(tenant)}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Avatar sx={{ bgcolor: '#D32F2F', width: 40, height: 40 }}>
-                          {tenant.name.split(' ').map(n => n[0]).join('')}
-                        </Avatar>
-                        <Box sx={{ ml: 2 }}>
-                          <Typography variant="h6" fontSize="1rem">
-                            {tenant.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {tenant.id}
-                          </Typography>
+            {filteredTenants.length === 0 ? (
+              <Grid item xs={12}>
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Users size={48} color="#ccc" />
+                  <Typography color="text.secondary" mt={2}>
+                    No tenants found matching your search
+                  </Typography>
+                </Box>
+              </Grid>
+            ) : (
+              filteredTenants.map((tenant) => {
+                const userPaymentCount = getUserPayments(tenant.id).length;
+                const totalPaid = getUserPayments(tenant.id).reduce((sum, p) => sum + p.amount, 0);
+                
+                return (
+                  <Grid item xs={12} sm={6} md={3} key={tenant.id}>
+                    <Card 
+                      variant="outlined" 
+                      sx={{ 
+                        cursor: 'pointer',
+                        '&:hover': { 
+                          boxShadow: 2, 
+                          borderColor: '#D32F2F' 
+                        } 
+                      }}
+                      onClick={() => handleViewTenantDetails(tenant)}
+                    >
+                      <CardContent>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                          <Avatar sx={{ bgcolor: '#D32F2F', width: 40, height: 40 }}>
+                            {tenant.name.split(' ').map(n => n[0]).join('')}
+                          </Avatar>
+                          <Box sx={{ ml: 2 }}>
+                            <Typography variant="h6" fontSize="1rem">
+                              {tenant.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {tenant.id}
+                            </Typography>
+                          </Box>
                         </Box>
-                      </Box>
-                      
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong>Lease ID:</strong> {tenant.leaseId}
-                      </Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong>Business:</strong> {tenant.business}
-                      </Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong>Stall:</strong> {tenant.stallId}
-                      </Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong>Status:</strong> 
-                        <Chip 
-                          label={tenant.status}
-                          size="small"
-                          color={
-                            tenant.status === 'Active' ? 'success' :
-                            tenant.status === 'Inactive' ? 'error' :
-                            tenant.status === 'Pending' ? 'warning' : 'secondary'
-                          }
-                          sx={{ ml: 1, height: 20, fontSize: '0.75rem' }}
-                        />
-                      </Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong>Payments:</strong> {userPaymentCount}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Total Paid:</strong> ₱{totalPaid.toLocaleString()}
-                      </Typography>
-                      
-                      <Button 
-                        fullWidth 
-                        variant="contained" 
-                        size="small" 
-                        startIcon={<Eye size={16} />}
-                        sx={{ mt: 2, bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewTenantDetails(tenant);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              );
-            })}
+                        
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Lease ID:</strong> {tenant.leaseId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Business:</strong> {tenant.business}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Stall:</strong> {tenant.stallId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Status:</strong> 
+                          <Chip 
+                            label={tenant.status}
+                            size="small"
+                            color={
+                              tenant.status === 'Active' ? 'success' :
+                              tenant.status === 'Inactive' ? 'error' :
+                              tenant.status === 'Pending' ? 'warning' : 'secondary'
+                            }
+                            sx={{ ml: 1, height: 20, fontSize: '0.75rem' }}
+                          />
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Payments:</strong> {userPaymentCount}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Total Paid:</strong> ₱{totalPaid.toLocaleString()}
+                        </Typography>
+                        
+                        <Button 
+                          fullWidth 
+                          variant="contained" 
+                          size="small" 
+                          startIcon={<Eye size={16} />}
+                          sx={{ mt: 2, bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewTenantDetails(tenant);
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })
+            )}
           </Grid>
         </Paper>
 
