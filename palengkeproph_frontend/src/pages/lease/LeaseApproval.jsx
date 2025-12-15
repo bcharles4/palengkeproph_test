@@ -998,6 +998,7 @@ export default function LeaseApproval() {
                       <IconButton size="small" onClick={() => handleRemoveFile(setValidId)}>
                         <Delete color="error" />
                       </IconButton>
+                
                     </Box>
                   ) : (
                     <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
