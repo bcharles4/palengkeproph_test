@@ -116,13 +116,40 @@ TEMPLATES = [
 WSGI_APPLICATION = 'palengkeproph_backend.wsgi.application'
 
 # Database configuration for Railway - handles both SQLite and PostgreSQL
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='sqlite:///db.sqlite3',
+#         conn_max_age=600,
+#         conn_health_checks=True,
+#     )
+# }
+
+
+# Database configuration
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    # Railway / Production
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Local PostgreSQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'PalengkeProPH',      # your DB name
+            'USER': 'postgres',         # your local postgres user
+            'PASSWORD': 'imthebest',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
+
 
 # Custom user model
 AUTH_USER_MODEL = 'users.User'
