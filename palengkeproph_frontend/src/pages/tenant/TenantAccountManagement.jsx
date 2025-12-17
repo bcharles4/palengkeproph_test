@@ -1101,7 +1101,7 @@ export default function TenantAccountManagement() {
               <Grid item xs={12}>
                 <TextField 
                   fullWidth 
-                  label="Business Name *" 
+                  label="Business Name" 
                   name="business" 
                   value={editForm.business} 
                   onChange={(e) => setEditForm({...editForm, business: e.target.value})}
@@ -1111,7 +1111,7 @@ export default function TenantAccountManagement() {
               <Grid item xs={12} sm={6}>
                 <TextField 
                   fullWidth 
-                  label="Contact Number *" 
+                  label="Contact Number" 
                   name="phone" 
                   value={editForm.phone} 
                   onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
