@@ -302,20 +302,7 @@ export default function StallAssignment() {
           </Alert>
         )}
 
-        {/* === Toolbar === */}
-        <Box sx={{ mb: 3, display: "flex", gap: 2, flexWrap: "wrap" }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{ 
-              bgcolor: "#D32F2F", 
-              "&:hover": { bgcolor: "#B71C1C" } 
-            }}
-            onClick={() => setOpenModal(true)}
-          >
-            Add New Stall
-          </Button>
-        </Box>
+
 
         {/* === Available Stalls Table === */}
         {availableStalls.length > 0 && (
