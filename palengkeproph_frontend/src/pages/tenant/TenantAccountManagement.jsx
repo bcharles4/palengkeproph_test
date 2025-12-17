@@ -287,7 +287,7 @@ export default function TenantAccountManagement() {
     { id: "validId", name: "Valid ID", icon: <Shield size={20} />, color: "#1976d2" },
     { id: "businessPermit", name: "Business Permit", icon: <Building size={20} />, color: "#2e7d32" },
     { id: "barangayPermit", name: "Barangay Permit", icon: <Home size={20} />, color: "#ed6c02" },
-    { id: "leaseContract", name: "Lease Contract", icon: <FileCheck size={20} />, color: "#7b1fa2" },
+    // { id: "leaseContract", name: "Lease Contract", icon: <FileCheck size={20} />, color: "#7b1fa2" },
   ];
 
   // Status options for edit form
