@@ -325,6 +325,7 @@ export default function StallAssignment() {
                   <TableCell><b>Utilities</b></TableCell>
                   <TableCell><b>Status</b></TableCell>
                   <TableCell align="center"><b>Actions</b></TableCell>
+
                 </TableRow>
               </TableHead>
               <TableBody>
