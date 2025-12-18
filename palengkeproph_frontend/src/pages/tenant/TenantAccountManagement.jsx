@@ -1037,7 +1037,7 @@ export default function TenantAccountManagement() {
                               }
                             />
                           </ListItem>
-                          <Divider />
+                          <Divider/>
                         </Box>
                       );
                     })}
