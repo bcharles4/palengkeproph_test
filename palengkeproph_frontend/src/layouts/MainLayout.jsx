@@ -207,7 +207,7 @@ export default function MainLayout({ children }) {
   // 🔁 Keep correct dropdown open on page load or route change
   useEffect(() => {
     menuItems.forEach((item) => {
-      if (item.children) {9
+      if (item.children) {
         const isChildActive = item.children.some(
           (sub) => location.pathname === sub.path
         );
