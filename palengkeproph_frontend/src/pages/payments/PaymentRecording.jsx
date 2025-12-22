@@ -36,10 +36,6 @@ import {
   StepLabel,
   StepContent,
   Alert,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormLabel,
   Tabs,
   Tab,
   Snackbar,
@@ -93,7 +89,6 @@ export default function PaymentRecording() {
     other: 0,
     total: 0
   });
-  const [receiptType, setReceiptType] = useState("AR");
   const [breakdown, setBreakdown] = useState({
     electric: "",
     water: "",
@@ -178,9 +173,6 @@ export default function PaymentRecording() {
     const storedPayments = JSON.parse(localStorage.getItem("paymentHistory")) || [];
     setPaymentHistory(storedPayments);
 
-    // Generate receipt number
-    setReceiptNumber(`AR-${String(storedPayments.length + 1).padStart(5, "0")}`);
-    
     // Set default collector ID
     setCollectorId(storedCollectors[0]?.id || "C-001");
 
@@ -264,6 +256,12 @@ export default function PaymentRecording() {
       return;
     }
 
+    // Require receipt number
+    if (!receiptNumber.trim()) {
+      showSnackbar("Please enter a receipt number.", "warning");
+      return;
+    }
+
     // For tenant payments, require tenant selection
     if (requiresTenant && !selectedTenant) {
       showSnackbar("Please select a tenant for this payment type.", "warning");
@@ -293,9 +291,8 @@ export default function PaymentRecording() {
     setPaymentHistory(updatedHistory);
     localStorage.setItem("paymentHistory", JSON.stringify(updatedHistory));
 
-    // Generate next receipt number
-    const nextNumber = updatedHistory.length + 1;
-    setReceiptNumber(`${receiptType}-${String(nextNumber).padStart(5, "0")}`);
+    // Reset receipt number after successful payment
+    setReceiptNumber("");
 
     setReceipt(newPayment);
     setOpenReceipt(true);
@@ -344,9 +341,6 @@ export default function PaymentRecording() {
     setPaymentHistory(updatedHistory);
     localStorage.setItem("paymentHistory", JSON.stringify(updatedHistory));
 
-    const nextNumber = updatedHistory.length + 1;
-    setReceiptNumber(`${receiptType}-${String(nextNumber).padStart(5, "0")}`);
-
     setUploadedData([]);
     calculateDailyBreakdown(updatedHistory);
     showSnackbar(`${newPayments.length} payments added manually!`, "success");
@@ -361,7 +355,6 @@ export default function PaymentRecording() {
     return {
       id: `PAY-${String(paymentHistory.length + 1).padStart(5, "0")}`,
       receiptNumber: isManual ? (baseData.receiptNumber || "MANUAL") : receiptNumber,
-      receiptType: isManual ? (baseData.receiptType || "MANUAL") : receiptType,
       tenantId: requiresTenant ? selectedTenant : "N/A",
       tenantName: baseData.tenantName || (requiresTenant ? currentTenant?.name : patronName || "Walk-in Customer"),
       stallId: requiresTenant ? (selectedStall || currentTenant?.stallId) : "N/A",
@@ -407,11 +400,9 @@ export default function PaymentRecording() {
         const missingFields = [];
         const validatedData = jsonData.map((row, index) => {
           const receiptNo = row['Receipt Number'] || row['receiptNumber'] || row['Receipt No'] || '';
-          const receiptType = row['Receipt Type'] || row['receiptType'] || '';
           const tenantName = row['Tenant Name'] || row['tenantName'] || row['Tenant'] || '';
           
           if (!receiptNo) missingFields.push(`Row ${index + 2}: Receipt Number`);
-          if (!receiptType) missingFields.push(`Row ${index + 2}: Receipt Type`);
           if (!tenantName) missingFields.push(`Row ${index + 2}: Tenant Name`);
 
           // Calculate total from breakdown
@@ -426,7 +417,6 @@ export default function PaymentRecording() {
           return {
             id: `UPL-${index + 1}`,
             receiptNumber: receiptNo,
-            receiptType: mapReceiptType(receiptType),
             tenantName: tenantName,
             stallName: row['Stall'] || row['stallName'] || row['Stall Name'] || 'N/A',
             paymentType: mapPaymentType(row['Payment Type'] || row['paymentType'] || row['Type'] || 'other_fees'),
@@ -454,22 +444,6 @@ export default function PaymentRecording() {
       }
     };
     reader.readAsArrayBuffer(file);
-  };
-
-  const mapReceiptType = (type) => {
-    if (!type) return 'AR';
-    
-    const typeMap = {
-      'ar': 'AR',
-      'AR': 'AR',
-      'acknowledgement': 'AR',
-      'Acknowledgement': 'AR',
-      'or': 'OR',
-      'OR': 'OR',
-      'official': 'OR',
-      'Official': 'OR'
-    };
-    return typeMap[type.toString().toLowerCase()] || 'AR';
   };
 
   const mapPaymentType = (type) => {
@@ -547,9 +521,6 @@ export default function PaymentRecording() {
     setPaymentHistory(updatedHistory);
     localStorage.setItem("paymentHistory", JSON.stringify(updatedHistory));
 
-    const nextNumber = updatedHistory.length + 1;
-    setReceiptNumber(`${receiptType}-${String(nextNumber).padStart(5, "0")}`);
-
     setUploadedData([]);
     calculateDailyBreakdown(updatedHistory);
     showSnackbar(`Successfully imported ${newPayments.length} payments!`, "success");
@@ -570,8 +541,7 @@ export default function PaymentRecording() {
       // Sample data with new column structure
       const testData = [
         {
-          'Receipt Number': 'AR-00001',
-          'Receipt Type': 'AR',
+          'Receipt Number': 'REC-00001',
           'Tenant Name': 'Juan Dela Cruz',
           'Stall': 'Stall 1 - Food Section',
           'Electric': '0',
@@ -583,8 +553,7 @@ export default function PaymentRecording() {
           'Collector': 'C-001'
         },
         {
-          'Receipt Number': 'AR-00002',
-          'Receipt Type': 'AR',
+          'Receipt Number': 'REC-00002',
           'Tenant Name': 'Maria Santos',
           'Stall': 'Stall 2 - Clothing Section',
           'Electric': '500',
@@ -596,8 +565,7 @@ export default function PaymentRecording() {
           'Collector': 'C-002'
         },
         {
-          'Receipt Number': 'OR-00001',
-          'Receipt Type': 'OR',
+          'Receipt Number': 'REC-00003',
           'Tenant Name': 'Pedro Reyes',
           'Stall': 'Stall 3 - Electronics',
           'Electric': '0',
@@ -609,8 +577,7 @@ export default function PaymentRecording() {
           'Collector': 'C-001'
         },
         {
-          'Receipt Number': 'AR-00003',
-          'Receipt Type': 'AR',
+          'Receipt Number': 'REC-00004',
           'Tenant Name': 'Walk-in Customer',
           'Stall': 'Parking Area',
           'Electric': '0',
@@ -631,7 +598,7 @@ export default function PaymentRecording() {
       XLSX.utils.book_append_sheet(wb, ws, 'Payment Data');
       
       // Generate and download the file
-      XLSX.writeFile(wb, 'payment_test_data_new_format.xlsx');
+      XLSX.writeFile(wb, 'payment_test_data.xlsx');
     };
 
     return (
@@ -640,7 +607,7 @@ export default function PaymentRecording() {
           Generate Test XLSX File
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Download a sample XLSX file with the new column structure.
+          Download a sample XLSX file with the required column structure.
         </Typography>
         <Button
           variant="contained"
@@ -684,7 +651,7 @@ export default function PaymentRecording() {
   const handleResetData = () => {
     if (window.confirm("Are you sure you want to reset all payment data?")) {
       setPaymentHistory([]);
-      setReceiptNumber("AR-00001");
+      setReceiptNumber("");
       localStorage.removeItem("paymentHistory");
       setDailyBreakdown({ rent: 0, rights: 0, electricity: 0, water: 0, other: 0, total: 0 });
       setUploadedData([]);
@@ -729,12 +696,6 @@ export default function PaymentRecording() {
       setSelectedStall("");
     }
   }, [paymentType, requiresTenant]);
-
-  // Update receipt number when receipt type changes
-  useEffect(() => {
-    const nextNumber = paymentHistory.length + 1;
-    setReceiptNumber(`${receiptType}-${String(nextNumber).padStart(5, "0")}`);
-  }, [receiptType, paymentHistory.length]);
 
   const handlePrepareReceipts = () => {
     setActiveStep(1);
@@ -904,49 +865,39 @@ export default function PaymentRecording() {
             '& .Mui-selected': { color: '#D32F2F' }
           }}
         >
-          <Tab label="Auto Issuance" />
-          <Tab label="Import Payment Records" />
-          {/* <Tab label="Excel Upload" /> */}
+          <Tab label="Single Payment" />
+          <Tab label="Manual Entry" />
+          <Tab label="Excel Upload" />
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
           <Box>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Auto Issuance - Single Payment</Typography>
-            <Typography color="text.secondary" mb={2}>Record individual payments with automatic receipt generation</Typography>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Single Payment Recording</Typography>
+            <Typography color="text.secondary" mb={2}>Record individual payments with receipt generation</Typography>
             
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Receipt Type</FormLabel>
-                  <RadioGroup
-                    row
-                    value={receiptType}
-                    onChange={(e) => setReceiptType(e.target.value)}
-                  >
-                    <FormControlLabel value="AR" control={<Radio />} label="Acknowledgement Receipt (AR)" />
-                    <FormControlLabel value="OR" control={<Radio />} label="Official Receipt (OR)" />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
                 <TextField
-                  label={`${receiptType} Number`}
+                  label="Receipt Number *"
                   fullWidth
                   value={receiptNumber}
-                  InputProps={{ readOnly: true }}
-                  helperText={`${receiptType} Number`}
+                  onChange={(e) => setReceiptNumber(e.target.value)}
+                  placeholder="e.g., REC-00123"
+                  required
+                  error={receiptNumber.trim() === ""}
+                  helperText={receiptNumber.trim() === "" ? "Receipt number is required" : "Enter the receipt number from the physical receipt"}
                   size={isMobile ? "small" : "medium"}
                 />
               </Grid>
 
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth size={isMobile ? "small" : "medium"}>
-                  <InputLabel>Payment Type</InputLabel>
+                  <InputLabel>Payment Type *</InputLabel>
                   <Select
                     value={paymentType}
-                    label="Payment Type"
+                    label="Payment Type *"
                     onChange={(e) => setPaymentType(e.target.value)}
+                    required
                   >
                     {paymentTypes.map((type) => (
                       <MenuItem key={type.value} value={type.value}>
@@ -963,7 +914,7 @@ export default function PaymentRecording() {
                   <Grid item xs={12} md={6}>
                     <TextField
                       select
-                      label="Select Tenant"
+                      label="Select Tenant *"
                       fullWidth
                       value={selectedTenant}
                       onChange={(e) => {
@@ -1061,7 +1012,7 @@ export default function PaymentRecording() {
               <Grid item xs={12} md={6}>
                 <TextField
                   select
-                  label="Collector"
+                  label="Collector *"
                   fullWidth
                   value={collectorId}
                   onChange={(e) => setCollectorId(e.target.value)}
@@ -1084,8 +1035,9 @@ export default function PaymentRecording() {
               startIcon={<ReceiptIcon />}
               sx={{ mt: 2, bgcolor: "#D32F2F", "&:hover": { bgcolor: "#B71C1C" } }}
               onClick={handleRecordPayment}
+              disabled={!receiptNumber.trim()}
             >
-              Issue {receiptType === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt'}
+              Record Payment
             </Button>
           </Box>
         </TabPanel>
@@ -1143,7 +1095,6 @@ export default function PaymentRecording() {
                       <TableHead>
                         <TableRow>
                           <TableCell>Receipt No.</TableCell>
-                          <TableCell>Type</TableCell>
                           <TableCell>Tenant</TableCell>
                           <TableCell>Total</TableCell>
                           <TableCell>Collector</TableCell>
@@ -1153,9 +1104,6 @@ export default function PaymentRecording() {
                         {uploadedData.slice(0, 10).map((row, index) => (
                           <TableRow key={index}>
                             <TableCell>{row.receiptNumber}</TableCell>
-                            <TableCell>
-                              <Chip label={row.receiptType} size="small" variant="outlined" />
-                            </TableCell>
                             <TableCell>{row.tenantName}</TableCell>
                             <TableCell>₱{parseFloat(row.amount).toFixed(2)}</TableCell>
                             <TableCell>{row.collectorId}</TableCell>
@@ -1202,10 +1150,9 @@ export default function PaymentRecording() {
                 <Alert severity="info">
                   <Typography variant="subtitle2" gutterBottom>Excel Format Requirements:</Typography>
                   <Typography variant="body2">
-                    • <strong>Required Columns:</strong> Receipt Number, Receipt Type, Tenant Name<br/>
+                    • <strong>Required Columns:</strong> Receipt Number, Tenant Name<br/>
                     • <strong>Breakdown Columns:</strong> Electric, Water, Rent, Rights, Others, Total<br/>
                     • <strong>Additional Column:</strong> Collector<br/>
-                    • <strong>Receipt Types:</strong> AR (Acknowledgement Receipt), OR (Official Receipt)<br/>
                     • <strong>Note:</strong> Total is automatically calculated from breakdown, but can be overridden
                   </Typography>
                 </Alert>
@@ -1227,7 +1174,6 @@ export default function PaymentRecording() {
                         <TableHead>
                           <TableRow>
                             <TableCell>Receipt No.</TableCell>
-                            <TableCell>Type</TableCell>
                             <TableCell>Tenant</TableCell>
                             <TableCell>Stall</TableCell>
                             <TableCell>Total</TableCell>
@@ -1240,12 +1186,9 @@ export default function PaymentRecording() {
                               <TableCell>
                                 <Chip 
                                   label={row.receiptNumber} 
-                                  color={row.receiptType === 'AR' ? 'primary' : 'secondary'}
+                                  color="primary"
                                   size="small"
                                 />
-                              </TableCell>
-                              <TableCell>
-                                <Chip label={row.receiptType} size="small" variant="outlined" />
                               </TableCell>
                               <TableCell>{row.tenantName}</TableCell>
                               <TableCell>{row.stallName}</TableCell>
@@ -1346,7 +1289,6 @@ export default function PaymentRecording() {
             <TableHead sx={{ bgcolor: "#f5f5f5"}}>
               <TableRow>
                 <TableCell sx={{ minWidth: 120 }}><b>Receipt No.</b></TableCell>
-                <TableCell sx={{ minWidth: 80 }}><b>Type</b></TableCell>
                 <TableCell sx={{ minWidth: 150 }}><b>Date & Time</b></TableCell>
                 <TableCell sx={{ minWidth: 140 }}><b>Payment Type</b></TableCell>
                 <TableCell sx={{ minWidth: 150 }}><b>Tenant/Patron</b></TableCell>
@@ -1368,16 +1310,9 @@ export default function PaymentRecording() {
                     <TableCell sx={{ minWidth: 120 }}>
                       <Chip 
                         label={payment.receiptNumber} 
-                        color={payment.receiptType === 'AR' ? 'primary' : payment.receiptType === 'OR' ? 'secondary' : 'default'}
+                        color="primary"
                         size="small"
                         variant={payment.isManual ? "outlined" : "filled"}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ minWidth: 80 }}>
-                      <Chip 
-                        label={payment.receiptType} 
-                        size="small"
-                        variant="outlined"
                       />
                     </TableCell>
                     <TableCell sx={{ minWidth: 150 }}>{payment.displayDate}</TableCell>
@@ -1402,7 +1337,7 @@ export default function PaymentRecording() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={14} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={13} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">
                       {filterDate || filterType !== "all" ? "No payment records found for the selected filters." : "No payment records found."}
                     </Typography>
@@ -1449,7 +1384,7 @@ export default function PaymentRecording() {
       {/* 🧾 VERTICAL RECEIPT DIALOG */}
       <Dialog open={openReceipt} onClose={() => setOpenReceipt(false)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ bgcolor: "#D32F2F", color: "white", textAlign: 'center' }}>
-          {receiptType === 'AR' ? 'ACKNOWLEDGEMENT RECEIPT' : 'OFFICIAL RECEIPT'}
+          OFFICIAL RECEIPT
         </DialogTitle>
         <DialogContent dividers>
           {receipt && (
@@ -1471,7 +1406,7 @@ export default function PaymentRecording() {
 
               {/* Receipt Title */}
               <Typography variant="h6" fontWeight="bold" align="center" sx={{ mb: 2 }}>
-                {receiptType === 'AR' ? 'ACKNOWLEDGEMENT RECEIPT' : 'OFFICIAL RECEIPT'}
+                OFFICIAL RECEIPT
               </Typography>
 
               {/* Date */}
@@ -1547,7 +1482,7 @@ export default function PaymentRecording() {
                   {receipt.collectorName}
                 </Typography>
                 <Typography variant="caption">
-                  <strong>Nº {receiptType}</strong>
+                  <strong>Nº {receipt.receiptNumber}</strong>
                 </Typography>
                 <Typography variant="caption" display="block">
                   Authorized Signature
